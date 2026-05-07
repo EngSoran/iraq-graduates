@@ -76,6 +76,7 @@ function DashboardPage(){
   var qs=useState("");var search=qs[0];var setSearch=qs[1];
   var cs=useState("province");var chart=cs[0];var setChart=cs[1];
   var xs=useState(null);var expanded=xs[0];var setExpanded=xs[1];
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   var load=useCallback(async function(){setLoad(true);try{var results=await Promise.all([db.getStats(),db.getMembers(0)]);setStats(results[0]);setMembers(results[1]);}catch(e){console.error(e);}setLoad(false);},[]);
   useEffect(function(){load();},[load]);
   if(!stats&&loading)return(<div style={{textAlign:"center",padding:"80px 20px",color:"#94a3b8"}}>\u23f3 \u062c\u0627\u0631\u064a \u062a\u062d\u0645\u064a\u0644 \u0627\u0644\u0628\u064a\u0627\u0646\u0627\u062a\u2026</div>);
