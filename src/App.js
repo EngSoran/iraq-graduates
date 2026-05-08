@@ -14,6 +14,7 @@ var READY = Boolean(SUPABASE_URL && SUPABASE_KEY);
 // ── Constants ─────────────────────────────────────────────────────────
 var PROVINCES = ["بغداد","البصرة","نينوى","أربيل","السليمانية","كركوك","الأنبار","ديالى","بابل","كربلاء","النجف","واسط","ذي قار","ميسان","المثنى","القادسية","صلاح الدين","دهوك"];
 var EMPLOY_OPTS = ["موظف","غير موظف","طالب دراسات عليا"];
+var TICKER_TEXT = "⚠️ تنبيه : هذا الموقع لا يمثل أي جهة حكومية وغير تابع إلى أي جهة حكومية  •  رابطة الخريجين العراقيين القدماء — منصة مستقلة لتوثيق بيانات الخريجين  •  ⚠️ تنبيه : هذا الموقع لا يمثل أي جهة حكومية وغير تابع إلى أي جهة حكومية";
 var COLORS = ["#0ea5e9","#6366f1","#22c55e","#f59e0b","#ef4444","#8b5cf6","#14b8a6","#f97316","#ec4899","#06b6d4","#84cc16","#a855f7","#10b981","#3b82f6","#fbbf24","#e11d48","#64748b","#d97706"];
 var MARITAL_COLORS = {"أعزب":"#0ea5e9","متزوج":"#22c55e","مطلق":"#f59e0b","أرمل":"#ef4444"};
 var EMPLOY_COLORS  = {"موظف":"#22c55e","غير موظف":"#ef4444","طالب دراسات عليا":"#6366f1"};
@@ -54,6 +55,15 @@ var db = {
     });
     if(!r.ok){var e=await r.json();throw new Error(e.code==="23505"?"phone_exists":"insert_failed");}
     return true;
+  },
+  searchByPhone: async function(phone) {
+    var r = await fetch(
+      SUPABASE_URL+"/rest/v1/graduates?select=full_name,province,specialization,graduation_year,gender,university,employment_status,marital_status,created_at&phone=eq."+encodeURIComponent(phone)+"&limit=1",
+      {headers:H()}
+    );
+    if(!r.ok) throw new Error("search_failed");
+    var data = await r.json();
+    return data.length ? data[0] : null;
   }
 };
 
@@ -120,6 +130,136 @@ function NoEnvScreen() {
       <div style={{background:"#fff",borderRadius:16,padding:40,maxWidth:480,textAlign:"center",boxShadow:"0 4px 24px rgba(0,0,0,.1)"}}>
         <div style={{fontSize:52,marginBottom:12}}>⚙️</div>
         <h2>يلزم إعداد المتغيرات البيئية</h2>
+      </div>
+    </div>
+  );
+}
+
+// ── Ticker ────────────────────────────────────────────────────────────
+function Ticker() {
+  useEffect(function(){
+    if(document.getElementById("ticker-style")) return;
+    var s = document.createElement("style");
+    s.id = "ticker-style";
+    s.textContent = "@keyframes ticker-ltr{from{transform:translateX(-100%)}to{transform:translateX(100vw)}}";
+    document.head.appendChild(s);
+  },[]);
+  return (
+    <div style={{background:"#0f2c54",borderBottom:"2px solid #fbbf24",overflow:"hidden",height:36,display:"flex",alignItems:"center"}}>
+      <div style={{background:"#fbbf24",color:"#0f172a",padding:"0 14px",fontSize:12,fontWeight:700,whiteSpace:"nowrap",height:"100%",display:"flex",alignItems:"center",flexShrink:0,zIndex:1}}>
+        📢 عاجل
+      </div>
+      <div style={{overflow:"hidden",flex:1,height:"100%",display:"flex",alignItems:"center"}}>
+        <span style={{
+          display:"inline-block",whiteSpace:"nowrap",color:"#fef9c3",fontSize:13,fontWeight:500,
+          animation:"ticker-ltr 35s linear infinite"
+        }}>
+          {TICKER_TEXT}
+        </span>
+      </div>
+    </div>
+  );
+}
+
+// ── Search Modal ──────────────────────────────────────────────────────
+function SearchModal({onClose}) {
+  var [phone,setPhone]   = useState("");
+  var [loading,setLoad]  = useState(false);
+  var [result,setResult] = useState(null);
+  var [notFound,setNotFound] = useState(false);
+  var [err,setErr]       = useState("");
+
+  function normalizePhone(v) {
+    return v.replace(/[\s\-+]/g,"").replace(/^00964/,"0").replace(/^964/,"0");
+  }
+
+  async function search() {
+    var p = normalizePhone(phone.trim());
+    if(!/^07[3-9]\d{8}$/.test(p)){setErr("أدخل رقم هاتف عراقي صحيح (07...)");return;}
+    setErr(""); setLoad(true); setResult(null); setNotFound(false);
+    try {
+      var r = await db.searchByPhone(p);
+      if(r) setResult(r); else setNotFound(true);
+    } catch(e){ setErr("حدث خطأ أثناء البحث، حاول مجدداً"); }
+    setLoad(false);
+  }
+
+  return (
+    <div style={{position:"fixed",inset:0,background:"rgba(0,0,0,.6)",zIndex:1000,display:"flex",alignItems:"center",justifyContent:"center",padding:16,direction:"rtl"}} onClick={function(e){if(e.target===e.currentTarget)onClose();}}>
+      <div style={{background:"#fff",borderRadius:20,width:"100%",maxWidth:480,boxShadow:"0 20px 60px rgba(0,0,0,.3)",overflow:"hidden"}}>
+        {/* Header */}
+        <div style={{background:"linear-gradient(135deg,#0f2c54,#0a1a35)",padding:"20px 24px",position:"relative"}}>
+          <button onClick={onClose} style={{position:"absolute",top:12,left:12,background:"rgba(239,68,68,.9)",border:"none",color:"#fff",borderRadius:8,padding:"4px 12px",fontSize:13,cursor:"pointer",fontWeight:700}}>✕ إغلاق</button>
+          <div style={{display:"flex",alignItems:"center",gap:12}}>
+            <div style={{background:"rgba(255,255,255,.15)",borderRadius:12,padding:"10px",fontSize:22}}>👤</div>
+            <div>
+              <h3 style={{color:"#fff",margin:0,fontSize:18}}>✨ البحث الذكي عن حالة التسجيل</h3>
+              <p style={{color:"#94a3b8",margin:0,fontSize:13,marginTop:4}}>ابحث برقم هاتفك المسجل لمعرفة حالتك فوراً</p>
+            </div>
+          </div>
+        </div>
+
+        {/* Body */}
+        <div style={{padding:"24px"}}>
+          <div style={{display:"flex",gap:10,marginBottom:8}}>
+            <input
+              value={phone} onChange={function(e){setPhone(e.target.value);setErr("");setResult(null);setNotFound(false);}}
+              onKeyDown={function(e){if(e.key==="Enter")search();}}
+              placeholder="📞 أدخل رقم الهاتف المسجل هنا..."
+              style={{flex:1,padding:"12px 16px",borderRadius:12,border:"1.5px solid #e2e8f0",fontSize:14,outline:"none",direction:"ltr",textAlign:"right",background:"#f8fafc"}}
+            />
+            <button onClick={search} disabled={loading} style={{background:"linear-gradient(135deg,#0f2c54,#0ea5e9)",color:"#fff",border:"none",borderRadius:12,padding:"12px 20px",fontSize:14,fontWeight:700,cursor:"pointer",whiteSpace:"nowrap",opacity:loading?0.7:1}}>
+              {loading?"⏳":"🔍 بحث"}
+            </button>
+          </div>
+          <p style={{color:"#94a3b8",fontSize:12,margin:"0 0 16px",textAlign:"center"}}>سيتم إزالة الفراغات والصفر الأول والرموز تلقائياً قبل البحث</p>
+
+          {err && <div style={{background:"#fef2f2",border:"1px solid #fecaca",color:"#dc2626",padding:"10px 14px",borderRadius:10,fontSize:13,marginBottom:12}}>{err}</div>}
+
+          {notFound && (
+            <div style={{background:"#fef2f2",border:"1px solid #fecaca",borderRadius:14,padding:"20px",textAlign:"center"}}>
+              <div style={{fontSize:48,marginBottom:8}}>❌</div>
+              <h4 style={{color:"#dc2626",margin:"0 0 6px"}}>لم يتم العثور على رقم الهاتف</h4>
+              <p style={{color:"#64748b",fontSize:13,margin:0}}>هذا الرقم غير مسجل في قاعدة بيانات الرابطة</p>
+              <p style={{color:"#0369a1",fontSize:12,marginTop:8}}>إذا كنت خريجاً وتريد الانضمام، اضغط على <b>تسجيل</b> في القائمة العلوية</p>
+            </div>
+          )}
+
+          {result && (
+            <div style={{background:"linear-gradient(135deg,#f0fdf4,#dcfce7)",border:"1px solid #86efac",borderRadius:14,padding:"20px"}}>
+              <div style={{display:"flex",alignItems:"center",gap:10,marginBottom:16}}>
+                <div style={{fontSize:40}}>✅</div>
+                <div>
+                  <h4 style={{color:"#15803d",margin:0,fontSize:16}}>أنت مسجل في الرابطة!</h4>
+                  <p style={{color:"#166534",margin:0,fontSize:12}}>تسجيل مؤكد في قاعدة البيانات</p>
+                </div>
+              </div>
+              <div style={{display:"grid",gridTemplateColumns:"1fr 1fr",gap:10}}>
+                {[
+                  {l:"الاسم الكامل",v:result.full_name,icon:"👤"},
+                  {l:"المحافظة",v:result.province,icon:"📍"},
+                  {l:"التخصص",v:result.specialization,icon:"🎓"},
+                  {l:"سنة التخرج",v:result.graduation_year,icon:"📅"},
+                  {l:"الجنس",v:result.gender||"—",icon:"👥"},
+                  {l:"الوضع الوظيفي",v:result.employment_status||"—",icon:"💼"},
+                  {l:"الجامعة",v:result.university||"—",icon:"🏛️"},
+                  {l:"تاريخ التسجيل",v:new Date(result.created_at).toLocaleDateString("ar-IQ"),icon:"🗓️"},
+                ].map(function(item){return(
+                  <div key={item.l} style={{background:"rgba(255,255,255,.7)",borderRadius:10,padding:"10px 12px"}}>
+                    <div style={{fontSize:10,color:"#64748b",marginBottom:3}}>{item.icon} {item.l}</div>
+                    <div style={{fontWeight:700,fontSize:13,color:"#0f172a"}}>{item.v}</div>
+                  </div>
+                );})}
+              </div>
+            </div>
+          )}
+
+          {!result && !notFound && !err && (
+            <div style={{textAlign:"center",padding:"16px",color:"#94a3b8",fontSize:13,borderTop:"1px solid #f1f5f9",marginTop:8}}>
+              ⓘ أدخل رقم الهاتف للبحث عن حالة التسجيل
+            </div>
+          )}
+        </div>
       </div>
     </div>
   );
@@ -279,7 +419,6 @@ function DashboardPage() {
   var [stats,setStats]     = useState(null);
   var [members,setMembers] = useState([]);
   var [loading,setLoad]    = useState(true);
-  var [search,setSearch]   = useState("");
   var [chart,setChart]     = useState("province");
   var [expanded,setExpanded] = useState(null);
 
@@ -319,19 +458,6 @@ function DashboardPage() {
     {k:"univ",l:"🏛️ الجامعات"}
   ];
 
-  var filtered = search.trim()
-    ? members.filter(r=>(r.full_name&&r.full_name.includes(search))||(r.specialization&&r.specialization.includes(search))||(r.province&&r.province.includes(search))||(r.university&&r.university.includes(search)))
-    : members;
-
-  function exportCSV() {
-    var hdr=["الاسم","المحافظة","التخصص","الجامعة","سنة التخرج","الجنس","التوظيف","الحالة","أطفال"];
-    var rows=members.map(r=>[r.full_name,r.province,r.specialization,r.university||"",r.graduation_year,r.gender||"",r.employment_status||"",r.marital_status,r.children_count||0]);
-    var csv=[hdr,...rows].map(r=>r.join(",")).join("\n");
-    var a=document.createElement("a");
-    a.href=URL.createObjectURL(new Blob(["﻿"+csv],{type:"text/csv;charset=utf-8"}));
-    a.download="graduates_"+new Date().toISOString().slice(0,10)+".csv";
-    a.click();
-  }
 
   var statCards = [
     {icon:"👥",label:"إجمالي المسجلين",val:total.toLocaleString("ar-IQ"),bg:"linear-gradient(135deg,#0ea5e9,#0369a1)"},
@@ -400,13 +526,11 @@ function DashboardPage() {
 
       {/* Member list */}
       <div style={{...card,padding:"14px 18px",display:"flex",gap:10,alignItems:"center",marginBottom:12,flexWrap:"wrap"}}>
-        <input value={search} onChange={e=>setSearch(e.target.value)} placeholder="🔍 بحث بالاسم أو التخصص أو المحافظة..." style={{...inp(false),flex:"1 1 200px",marginBottom:0}}/>
-        <button style={{...btn("#0f766e","#0d9488"),whiteSpace:"nowrap"}} onClick={load}>🔄</button>
-        <button style={{...btn("#16a34a","#15803d"),whiteSpace:"nowrap"}} onClick={exportCSV}>📥 CSV</button>
+        <span style={{color:"#64748b",fontSize:13,flex:1}}>👥 أحدث المسجلين</span>
+        <button style={{...btn("#0f766e","#0d9488"),whiteSpace:"nowrap"}} onClick={load}>🔄 تحديث</button>
       </div>
 
       <div style={card}>
-        {search && <span style={{background:"#e0f2fe",color:"#0369a1",padding:"2px 12px",borderRadius:20,fontSize:12,fontWeight:700,display:"inline-block",marginBottom:12}}>{filtered.length} نتيجة</span>}
         <div style={{overflowX:"auto"}}>
           <table style={{width:"100%",borderCollapse:"collapse",fontSize:12}}>
             <thead>
@@ -417,7 +541,7 @@ function DashboardPage() {
               </tr>
             </thead>
             <tbody>
-              {filtered.map((r,i)=>{
+              {members.map((r,i)=>{
                 var isExp=expanded===r.id;
                 var ec=EMPLOY_COLORS[r.employment_status]||"#94a3b8";
                 return (
@@ -440,7 +564,7 @@ function DashboardPage() {
                   </tr>
                 );
               })}
-              {!filtered.length && <tr><td colSpan={9} style={{padding:36,textAlign:"center",color:"#94a3b8"}}>لا توجد نتائج</td></tr>}
+              {!members.length && <tr><td colSpan={9} style={{padding:36,textAlign:"center",color:"#94a3b8"}}>لا توجد بيانات بعد</td></tr>}
             </tbody>
           </table>
         </div>
@@ -724,7 +848,8 @@ function PrivacyPage() {
 
 // ── App Root ──────────────────────────────────────────────────────────
 export default function App() {
-  var [page,setPage] = useState("register");
+  var [page,setPage]         = useState("register");
+  var [showSearch,setSearch] = useState(false);
   if(!READY) return <NoEnvScreen/>;
 
   var navItems = [
@@ -737,21 +862,31 @@ export default function App() {
 
   return (
     <div style={{fontFamily:"'Segoe UI',Tahoma,Arial,sans-serif",minHeight:"100vh",background:"#f1f5f9",color:"#1e293b",direction:"rtl"}}>
+
+      {/* Navbar */}
       <nav style={{background:"linear-gradient(135deg,#0f2c54,#0a1a35)",padding:"0 24px",display:"flex",alignItems:"center",justifyContent:"space-between",boxShadow:"0 2px 16px rgba(0,0,0,.35)",flexWrap:"wrap",gap:4,paddingTop:4,paddingBottom:4}}>
         <div style={{color:"#fff",fontSize:16,fontWeight:700,padding:"13px 0",display:"flex",alignItems:"center",gap:10}}>
           🎓 رابطة الخريجين العراقيين
           <span style={{fontSize:10,background:"rgba(34,197,94,.2)",color:"#4ade80",padding:"2px 8px",borderRadius:20}}>● LIVE</span>
         </div>
-        <div style={{display:"flex",gap:2,flexWrap:"wrap"}}>
+        <div style={{display:"flex",gap:2,flexWrap:"wrap",alignItems:"center"}}>
           {navItems.map(n=><button key={n.k} style={navBtn(page===n.k)} onClick={()=>setPage(n.k)}>{n.l}</button>)}
+          <button onClick={()=>setSearch(true)} style={{background:"linear-gradient(135deg,#fbbf24,#f59e0b)",border:"none",color:"#0f172a",padding:"9px 16px",borderRadius:8,cursor:"pointer",fontSize:13,fontWeight:700,marginRight:6}}>
+            🔍 ابحث عن اسمك
+          </button>
         </div>
       </nav>
+
+      {/* News Ticker */}
+      <Ticker/>
 
       {page==="register"  && <RegisterPage/>}
       {page==="dashboard" && <DashboardPage/>}
       {page==="admin"     && <AdminPage/>}
       {page==="about"     && <AboutPage/>}
       {page==="privacy"   && <PrivacyPage/>}
+
+      {showSearch && <SearchModal onClose={()=>setSearch(false)}/>}
 
       <footer style={{textAlign:"center",padding:"16px",color:"#94a3b8",fontSize:11,borderTop:"1px solid #e2e8f0",background:"#fff",marginTop:8}}>
         رابطة الخريجين العراقيين القدماء © {CUR_YEAR} ·{" "}
