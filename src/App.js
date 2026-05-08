@@ -406,8 +406,16 @@ function RegisterPage() {
     var yr=parseInt(f.graduation_year);
     if(!yr||yr<1970||yr>CUR_YEAR) e.graduation_year="سنة التخرج غير صحيحة";
     else if(yr>CUR_YEAR-5) e.graduation_year="يجب أن تكون قد تخرجت قبل 5 سنوات على الأقل ("+(CUR_YEAR-5)+" أو أقل)";
-    if(!f.birth_date) e.birth_date="تاريخ الميلاد مطلوب";
-    else { var by=new Date(f.birth_date).getFullYear(); if(by<1940||by>2005) e.birth_date="تاريخ الميلاد غير صحيح"; }
+    if(!f.birth_date.trim()) e.birth_date="تاريخ الميلاد مطلوب";
+    else {
+      var bdParts=f.birth_date.trim().split("/");
+      var bdValid=bdParts.length===3&&bdParts.every(function(p){return /^\d+$/.test(p);});
+      if(!bdValid) e.birth_date="الصيغة غير صحيحة — استخدم: يوم/شهر/سنة";
+      else {
+        var bYear=parseInt(bdParts[2]), bMonth=parseInt(bdParts[1]), bDay=parseInt(bdParts[0]);
+        if(bYear<1940||bYear>2005||bMonth<1||bMonth>12||bDay<1||bDay>31) e.birth_date="تاريخ الميلاد غير صحيح";
+      }
+    }
     if(!/^07[3-9]\d{8}$/.test(f.phone)) e.phone="رقم الهاتف غير صحيح — يبدأ بـ 07";
     if(f.has_children&&f.children_count<1) e.children_count="أدخل عدد الأطفال";
     setEr(e);
@@ -425,7 +433,7 @@ function RegisterPage() {
         full_name:f.full_name.trim(),province:f.province,sub_district:f.sub_district,
         university:f.university.trim(),department:f.department.trim(),
         specialization:f.specialization.trim(),
-        graduation_year:parseInt(f.graduation_year),birth_date:f.birth_date,phone:f.phone.trim(),
+        graduation_year:parseInt(f.graduation_year),birth_date:(function(){var p=f.birth_date.split("/");return p[2]+"-"+(p[1].padStart(2,"0"))+"-"+(p[0].padStart(2,"0"));}()),phone:f.phone.trim(),
         gender:f.gender,employment_status:f.employment_status,
         marital_status:f.marital_status,has_wife:f.has_wife,has_children:f.has_children,
         children_count:f.has_children?(parseInt(f.children_count)||0):0
@@ -484,8 +492,8 @@ function RegisterPage() {
             <Field label="رقم الهاتف" error={er.phone}>
               <input value={f.phone} onChange={e=>up("phone",e.target.value)} placeholder="07901234567" style={{...inp(er.phone),direction:"ltr",textAlign:"right"}}/>
             </Field>
-            <Field label="تاريخ الميلاد" error={er.birth_date}>
-              <input type="date" value={f.birth_date} onChange={e=>up("birth_date",e.target.value)} style={inp(er.birth_date)} min="1940-01-01" max="2005-12-31"/>
+            <Field label="تاريخ الميلاد (يوم/شهر/سنة)" error={er.birth_date}>
+              <input value={f.birth_date} onChange={e=>up("birth_date",e.target.value)} placeholder="مثال: 15/06/1990" style={{...inp(er.birth_date),direction:"ltr",textAlign:"right"}} maxLength={10}/>
             </Field>
           </div>
           <div style={{...grid2}}>
