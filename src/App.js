@@ -144,6 +144,7 @@ function RegisterPage() {
     if(!f.specialization.trim()) e.specialization="التخصص مطلوب";
     var yr=parseInt(f.graduation_year);
     if(!yr||yr<1970||yr>CUR_YEAR) e.graduation_year="سنة التخرج غير صحيحة";
+    else if(yr > CUR_YEAR - 5) e.graduation_year="يجب أن تكون قد تخرجت قبل 5 سنوات على الأقل ("+( CUR_YEAR-5)+" أو أقل)";
     if(!/^07[3-9]\d{8}$/.test(f.phone)) e.phone="رقم الهاتف غير صحيح (يبدأ بـ 07)";
     if(f.has_children&&f.children_count<1) e.children_count="أدخل عدد الأطفال";
     setEr(e);
@@ -207,7 +208,7 @@ function RegisterPage() {
               <input value={f.specialization} onChange={e=>up("specialization",e.target.value)} placeholder="مثال: هندسة مدنية" style={inp(er.specialization)}/>
             </Field>
             <Field label="سنة التخرج *" error={er.graduation_year}>
-              <input type="number" value={f.graduation_year} onChange={e=>up("graduation_year",e.target.value)} placeholder="2020" style={inp(er.graduation_year)} min="1970" max={CUR_YEAR}/>
+              <input type="number" value={f.graduation_year} onChange={e=>up("graduation_year",e.target.value)} placeholder="2020" style={inp(er.graduation_year)} min="1970" max={CUR_YEAR-5}/>
             </Field>
           </div>
           <Field label="اسم الجامعة">
