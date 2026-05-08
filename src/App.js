@@ -1,9 +1,4 @@
 import { useState, useEffect, useCallback, useMemo } from "react";
-import {
-  BarChart, Bar, PieChart, Pie, Cell,
-  XAxis, YAxis, CartesianGrid, Tooltip,
-  ResponsiveContainer, Legend
-} from "recharts";
 
 // ── Config ────────────────────────────────────────────────────────────
 var SUPABASE_URL = process.env.REACT_APP_SUPABASE_URL;
@@ -14,10 +9,28 @@ var READY = Boolean(SUPABASE_URL && SUPABASE_KEY);
 // ── Constants ─────────────────────────────────────────────────────────
 var PROVINCES = ["بغداد","البصرة","نينوى","أربيل","السليمانية","كركوك","الأنبار","ديالى","بابل","كربلاء","النجف","واسط","ذي قار","ميسان","المثنى","القادسية","صلاح الدين","دهوك"];
 var EMPLOY_OPTS = ["موظف","غير موظف","طالب دراسات عليا"];
+var IRAQ_DISTRICTS = {
+  "بغداد":      ["الكرخ","الرصافة","الكاظمية","الأعظمية","الكرادة","أبو غريب","المحمودية","المدائن","الطارمية","الصدر","الشعلة","العامرية","الدورة","الزعفرانية"],
+  "البصرة":     ["البصرة المركز","أبو الخصيب","الزبير","القرنة","شط العرب","الفاو","المدينة","الدير","المطر"],
+  "نينوى":      ["الموصل","الحمدانية","سنجار","تلعفر","تلكيف","الشيخان","بعشيقة","ربيعة","مخمور","الحضر","برطلة","النمرود"],
+  "أربيل":      ["أربيل","كويسنجق","شقلاوة","صوران","سوران","مخمور","ديانا"],
+  "السليمانية": ["السليمانية","حلبجة","رانية","دوكان","كفري","بنجوين","قلعة دزة","شهربازار","قره داغ"],
+  "كركوك":      ["كركوك","داقوق","حويجة","دبس"],
+  "الأنبار":    ["الرمادي","الفلوجة","القائم","حديثة","هيت","عانه","راوة","الرطبة","البغدادي","الكرمة","الخالدية"],
+  "ديالى":      ["بعقوبة","المقدادية","خانقين","بلدروز","الخالص","كفري","قره تبة","الشهربان","الوجيهية"],
+  "بابل":       ["الحلة","المسيب","الهاشمية","المحاويل","الكفل","الشوملي","قضاء النيل"],
+  "كربلاء":     ["كربلاء","الهندية","عين التمر"],
+  "النجف":      ["النجف","الكوفة","المناذرة","أبو صخير"],
+  "واسط":       ["الكوت","النعمانية","الحي","بدرة","الصويرة","العزيزية","الأحمدي","الموفقية","الشحيمية"],
+  "ذي قار":     ["الناصرية","الشطرة","قلعة سكر","الرفاعي","سوق الشيوخ","الجبايش","الفجر","الفهود","كرمة علي"],
+  "ميسان":      ["العمارة","علي الغربي","قلعة صالح","الكحلاء","المجر الكبير","الأحمدي","سيد نور الدين"],
+  "المثنى":     ["السماوة","الرميثة","السلمان","الخضر"],
+  "القادسية":   ["الديوانية","الشامية","السنية","عفك","نفر"],
+  "صلاح الدين": ["تكريت","بيجي","بلد","الدور","الشرقاط","سامراء","الطوز"],
+  "دهوك":       ["دهوك","زاخو","عقرة","أمدية","العمادية","شيخان"]
+};
 var TICKER_TEXT = "⚠️ تنبيه : هذا الموقع لا يمثل أي جهة حكومية وغير تابع إلى أي جهة حكومية  •  رابطة الخريجين العراقيين القدماء — منصة مستقلة لتوثيق بيانات الخريجين  •  ⚠️ تنبيه : هذا الموقع لا يمثل أي جهة حكومية وغير تابع إلى أي جهة حكومية";
-var COLORS = ["#0ea5e9","#6366f1","#22c55e","#f59e0b","#ef4444","#8b5cf6","#14b8a6","#f97316","#ec4899","#06b6d4","#84cc16","#a855f7","#10b981","#3b82f6","#fbbf24","#e11d48","#64748b","#d97706"];
-var MARITAL_COLORS = {"أعزب":"#0ea5e9","متزوج":"#22c55e","مطلق":"#f59e0b","أرمل":"#ef4444"};
-var EMPLOY_COLORS  = {"موظف":"#22c55e","غير موظف":"#ef4444","طالب دراسات عليا":"#6366f1"};
+var EMPLOY_COLORS = {"موظف":"#22c55e","غير موظف":"#ef4444","طالب دراسات عليا":"#6366f1"};
 var CUR_YEAR = new Date().getFullYear();
 
 // ── API ───────────────────────────────────────────────────────────────
@@ -56,14 +69,22 @@ var db = {
     if(!r.ok){var e=await r.json();throw new Error(e.code==="23505"?"phone_exists":"insert_failed");}
     return true;
   },
-  searchByPhone: async function(phone) {
+  searchByPhone: async function(phone, name) {
     var r = await fetch(
-      SUPABASE_URL+"/rest/v1/graduates?select=full_name,province,specialization,graduation_year,gender,university,employment_status,marital_status,created_at&phone=eq."+encodeURIComponent(phone)+"&limit=1",
+      SUPABASE_URL+"/rest/v1/graduates?select=full_name,province,sub_district,specialization,graduation_year,gender,university,employment_status,marital_status,created_at&phone=eq."+encodeURIComponent(phone)+"&limit=1",
       {headers:H()}
     );
     if(!r.ok) throw new Error("search_failed");
     var data = await r.json();
-    return data.length ? data[0] : null;
+    if(!data.length) return {found:false, reason:"phone"};
+    var rec = data[0];
+    var normalize = function(s){ return (s||"").trim().replace(/\s+/g," "); };
+    var dbName = normalize(rec.full_name);
+    var enteredName = normalize(name);
+    var enteredWords = enteredName.split(" ").filter(function(w){return w.length>1;});
+    var nameMatch = enteredWords.length>0 && enteredWords.every(function(w){return dbName.includes(w);});
+    if(!nameMatch) return {found:false, reason:"name"};
+    return {found:true, data:rec};
   }
 };
 
@@ -103,15 +124,6 @@ function Check({value,label,color,onChange}) {
   );
 }
 
-function Tip({active,payload,label}) {
-  if(!active||!payload||!payload.length) return null;
-  return (
-    <div style={{background:"#1e293b",borderRadius:8,padding:"8px 14px",color:"#fff",fontSize:13}}>
-      <div style={{fontWeight:700,marginBottom:2}}>{label}</div>
-      <div>{payload[0].value}</div>
-    </div>
-  );
-}
 
 function StatCard({icon,label,val,bg,sub}) {
   return (
@@ -164,89 +176,115 @@ function Ticker() {
 // ── Search Modal ──────────────────────────────────────────────────────
 function SearchModal({onClose}) {
   var [phone,setPhone]   = useState("");
+  var [name,setName]     = useState("");
   var [loading,setLoad]  = useState(false);
   var [result,setResult] = useState(null);
-  var [notFound,setNotFound] = useState(false);
-  var [err,setErr]       = useState("");
+  var [status,setStatus] = useState("idle"); // idle | found | no_phone | no_name
 
   function normalizePhone(v) {
     return v.replace(/[\s\-+]/g,"").replace(/^00964/,"0").replace(/^964/,"0");
   }
 
+  function reset() { setResult(null); setStatus("idle"); }
+
   async function search() {
     var p = normalizePhone(phone.trim());
-    if(!/^07[3-9]\d{8}$/.test(p)){setErr("أدخل رقم هاتف عراقي صحيح (07...)");return;}
-    setErr(""); setLoad(true); setResult(null); setNotFound(false);
+    if(!name.trim()||name.trim().split(/\s+/).length<3){setStatus("err_name");return;}
+    if(!/^07[3-9]\d{8}$/.test(p)){setStatus("err_phone");return;}
+    setLoad(true); reset();
     try {
-      var r = await db.searchByPhone(p);
-      if(r) setResult(r); else setNotFound(true);
-    } catch(e){ setErr("حدث خطأ أثناء البحث، حاول مجدداً"); }
+      var res = await db.searchByPhone(p, name.trim());
+      if(res.found){ setResult(res.data); setStatus("found"); }
+      else setStatus(res.reason==="phone"?"no_phone":"no_name");
+    } catch(e){ setStatus("err_api"); }
     setLoad(false);
   }
 
+  function onChange(){ reset(); }
+
   return (
-    <div style={{position:"fixed",inset:0,background:"rgba(0,0,0,.6)",zIndex:1000,display:"flex",alignItems:"center",justifyContent:"center",padding:16,direction:"rtl"}} onClick={function(e){if(e.target===e.currentTarget)onClose();}}>
-      <div style={{background:"#fff",borderRadius:20,width:"100%",maxWidth:480,boxShadow:"0 20px 60px rgba(0,0,0,.3)",overflow:"hidden"}}>
+    <div style={{position:"fixed",inset:0,background:"rgba(0,0,0,.65)",zIndex:1000,display:"flex",alignItems:"center",justifyContent:"center",padding:16,direction:"rtl"}} onClick={function(e){if(e.target===e.currentTarget)onClose();}}>
+      <div style={{background:"#fff",borderRadius:20,width:"100%",maxWidth:500,boxShadow:"0 20px 60px rgba(0,0,0,.3)",overflow:"hidden"}}>
         {/* Header */}
-        <div style={{background:"linear-gradient(135deg,#0f2c54,#0a1a35)",padding:"20px 24px",position:"relative"}}>
-          <button onClick={onClose} style={{position:"absolute",top:12,left:12,background:"rgba(239,68,68,.9)",border:"none",color:"#fff",borderRadius:8,padding:"4px 12px",fontSize:13,cursor:"pointer",fontWeight:700}}>✕ إغلاق</button>
-          <div style={{display:"flex",alignItems:"center",gap:12}}>
-            <div style={{background:"rgba(255,255,255,.15)",borderRadius:12,padding:"10px",fontSize:22}}>👤</div>
+        <div style={{background:"linear-gradient(135deg,#0f2c54,#1e40af)",padding:"22px 24px",position:"relative"}}>
+          <button onClick={onClose} style={{position:"absolute",top:14,left:14,background:"rgba(239,68,68,.9)",border:"none",color:"#fff",borderRadius:8,padding:"5px 14px",fontSize:13,cursor:"pointer",fontWeight:700}}>✕ إغلاق</button>
+          <div style={{display:"flex",alignItems:"center",gap:14}}>
+            <div style={{background:"rgba(255,255,255,.15)",borderRadius:12,padding:"12px",fontSize:24}}>🔍</div>
             <div>
-              <h3 style={{color:"#fff",margin:0,fontSize:18}}>✨ البحث الذكي عن حالة التسجيل</h3>
-              <p style={{color:"#94a3b8",margin:0,fontSize:13,marginTop:4}}>ابحث برقم هاتفك المسجل لمعرفة حالتك فوراً</p>
+              <h3 style={{color:"#fff",margin:0,fontSize:18,fontWeight:700}}>البحث عن حالة التسجيل</h3>
+              <p style={{color:"#93c5fd",margin:"4px 0 0",fontSize:13}}>أدخل اسمك الرباعي ورقم هاتفك للتحقق من تسجيلك</p>
             </div>
           </div>
         </div>
 
         {/* Body */}
         <div style={{padding:"24px"}}>
-          <div style={{display:"flex",gap:10,marginBottom:8}}>
-            <input
-              value={phone} onChange={function(e){setPhone(e.target.value);setErr("");setResult(null);setNotFound(false);}}
+          {/* Name field */}
+          <div style={{marginBottom:14}}>
+            <label style={{display:"block",fontSize:13,fontWeight:600,color:"#374151",marginBottom:6}}>الاسم الرباعي الكامل *</label>
+            <input value={name} onChange={function(e){setName(e.target.value);onChange();}}
               onKeyDown={function(e){if(e.key==="Enter")search();}}
-              placeholder="📞 أدخل رقم الهاتف المسجل هنا..."
-              style={{flex:1,padding:"12px 16px",borderRadius:12,border:"1.5px solid #e2e8f0",fontSize:14,outline:"none",direction:"ltr",textAlign:"right",background:"#f8fafc"}}
-            />
-            <button onClick={search} disabled={loading} style={{background:"linear-gradient(135deg,#0f2c54,#0ea5e9)",color:"#fff",border:"none",borderRadius:12,padding:"12px 20px",fontSize:14,fontWeight:700,cursor:"pointer",whiteSpace:"nowrap",opacity:loading?0.7:1}}>
-              {loading?"⏳":"🔍 بحث"}
-            </button>
+              placeholder="أدخل الاسم الرباعي كما هو مسجل..."
+              style={{width:"100%",padding:"12px 16px",borderRadius:12,border:"1.5px solid "+(status==="err_name"||status==="no_name"?"#f87171":"#e2e8f0"),fontSize:14,outline:"none",background:"#f8fafc",boxSizing:"border-box"}}/>
           </div>
-          <p style={{color:"#94a3b8",fontSize:12,margin:"0 0 16px",textAlign:"center"}}>سيتم إزالة الفراغات والصفر الأول والرموز تلقائياً قبل البحث</p>
 
-          {err && <div style={{background:"#fef2f2",border:"1px solid #fecaca",color:"#dc2626",padding:"10px 14px",borderRadius:10,fontSize:13,marginBottom:12}}>{err}</div>}
+          {/* Phone field */}
+          <div style={{marginBottom:16}}>
+            <label style={{display:"block",fontSize:13,fontWeight:600,color:"#374151",marginBottom:6}}>رقم الهاتف المسجل *</label>
+            <div style={{display:"flex",gap:10}}>
+              <input value={phone} onChange={function(e){setPhone(e.target.value);onChange();}}
+                onKeyDown={function(e){if(e.key==="Enter")search();}}
+                placeholder="07XXXXXXXXX"
+                style={{flex:1,padding:"12px 16px",borderRadius:12,border:"1.5px solid "+(status==="err_phone"||status==="no_phone"?"#f87171":"#e2e8f0"),fontSize:14,outline:"none",direction:"ltr",textAlign:"right",background:"#f8fafc"}}/>
+              <button onClick={search} disabled={loading} style={{background:"linear-gradient(135deg,#1e40af,#0ea5e9)",color:"#fff",border:"none",borderRadius:12,padding:"12px 22px",fontSize:14,fontWeight:700,cursor:"pointer",opacity:loading?0.7:1}}>
+                {loading?"⏳":"بحث"}
+              </button>
+            </div>
+          </div>
 
-          {notFound && (
-            <div style={{background:"#fef2f2",border:"1px solid #fecaca",borderRadius:14,padding:"20px",textAlign:"center"}}>
-              <div style={{fontSize:48,marginBottom:8}}>❌</div>
-              <h4 style={{color:"#dc2626",margin:"0 0 6px"}}>لم يتم العثور على رقم الهاتف</h4>
-              <p style={{color:"#64748b",fontSize:13,margin:0}}>هذا الرقم غير مسجل في قاعدة بيانات الرابطة</p>
-              <p style={{color:"#0369a1",fontSize:12,marginTop:8}}>إذا كنت خريجاً وتريد الانضمام، اضغط على <b>تسجيل</b> في القائمة العلوية</p>
+          {/* Status messages */}
+          {status==="err_name" && <div style={{background:"#fef2f2",border:"1px solid #fecaca",color:"#dc2626",padding:"10px 14px",borderRadius:10,fontSize:13,marginBottom:12}}>⚠️ يرجى إدخال الاسم الرباعي (4 أجزاء على الأقل)</div>}
+          {status==="err_phone" && <div style={{background:"#fef2f2",border:"1px solid #fecaca",color:"#dc2626",padding:"10px 14px",borderRadius:10,fontSize:13,marginBottom:12}}>⚠️ رقم الهاتف غير صحيح (يجب أن يبدأ بـ 07)</div>}
+          {status==="err_api" && <div style={{background:"#fef2f2",border:"1px solid #fecaca",color:"#dc2626",padding:"10px 14px",borderRadius:10,fontSize:13,marginBottom:12}}>⚠️ حدث خطأ في الاتصال، حاول مرة أخرى</div>}
+
+          {status==="no_phone" && (
+            <div style={{background:"#fef2f2",border:"1px solid #fecaca",borderRadius:14,padding:"22px",textAlign:"center"}}>
+              <div style={{fontSize:44,marginBottom:10}}>❌</div>
+              <h4 style={{color:"#dc2626",margin:"0 0 8px",fontSize:16}}>رقم الهاتف غير مسجل</h4>
+              <p style={{color:"#64748b",fontSize:13,margin:0}}>لا يوجد سجل بهذا الرقم في قاعدة بيانات الرابطة</p>
+              <p style={{color:"#0369a1",fontSize:12,marginTop:10,padding:"8px 12px",background:"#e0f2fe",borderRadius:8,display:"inline-block"}}>إذا كنت خريجاً ومضى على تخرجك 5 سنوات، يمكنك التسجيل الآن</p>
             </div>
           )}
 
-          {result && (
-            <div style={{background:"linear-gradient(135deg,#f0fdf4,#dcfce7)",border:"1px solid #86efac",borderRadius:14,padding:"20px"}}>
-              <div style={{display:"flex",alignItems:"center",gap:10,marginBottom:16}}>
+          {status==="no_name" && (
+            <div style={{background:"#fffbeb",border:"1px solid #fde68a",borderRadius:14,padding:"22px",textAlign:"center"}}>
+              <div style={{fontSize:44,marginBottom:10}}>⚠️</div>
+              <h4 style={{color:"#92400e",margin:"0 0 8px",fontSize:16}}>الاسم لا يطابق السجل</h4>
+              <p style={{color:"#64748b",fontSize:13,margin:0}}>رقم الهاتف موجود في قاعدة البيانات لكن الاسم المدخل لا يتطابق مع السجل</p>
+              <p style={{color:"#92400e",fontSize:12,marginTop:8}}>تأكد من كتابة الاسم كما سجّلته بالضبط</p>
+            </div>
+          )}
+
+          {status==="found" && result && (
+            <div style={{background:"linear-gradient(135deg,#f0fdf4,#dcfce7)",border:"1px solid #86efac",borderRadius:14,padding:"22px"}}>
+              <div style={{display:"flex",alignItems:"center",gap:12,marginBottom:18}}>
                 <div style={{fontSize:40}}>✅</div>
                 <div>
-                  <h4 style={{color:"#15803d",margin:0,fontSize:16}}>أنت مسجل في الرابطة!</h4>
-                  <p style={{color:"#166534",margin:0,fontSize:12}}>تسجيل مؤكد في قاعدة البيانات</p>
+                  <h4 style={{color:"#15803d",margin:0,fontSize:17,fontWeight:700}}>أنت مسجل في الرابطة</h4>
+                  <p style={{color:"#166534",margin:"3px 0 0",fontSize:12}}>بيانات التسجيل مؤكدة</p>
                 </div>
               </div>
               <div style={{display:"grid",gridTemplateColumns:"1fr 1fr",gap:10}}>
                 {[
-                  {l:"الاسم الكامل",v:result.full_name,icon:"👤"},
-                  {l:"المحافظة",v:result.province,icon:"📍"},
-                  {l:"التخصص",v:result.specialization,icon:"🎓"},
-                  {l:"سنة التخرج",v:result.graduation_year,icon:"📅"},
-                  {l:"الجنس",v:result.gender||"—",icon:"👥"},
-                  {l:"الوضع الوظيفي",v:result.employment_status||"—",icon:"💼"},
-                  {l:"الجامعة",v:result.university||"—",icon:"🏛️"},
-                  {l:"تاريخ التسجيل",v:new Date(result.created_at).toLocaleDateString("ar-IQ"),icon:"🗓️"},
+                  {l:"الاسم الكامل",   v:result.full_name},
+                  {l:"المحافظة",        v:result.province+(result.sub_district?" — "+result.sub_district:"")},
+                  {l:"التخصص",          v:result.specialization},
+                  {l:"سنة التخرج",     v:result.graduation_year},
+                  {l:"الجامعة",         v:result.university||"—"},
+                  {l:"تاريخ التسجيل",  v:new Date(result.created_at).toLocaleDateString("ar-IQ")},
                 ].map(function(item){return(
-                  <div key={item.l} style={{background:"rgba(255,255,255,.7)",borderRadius:10,padding:"10px 12px"}}>
-                    <div style={{fontSize:10,color:"#64748b",marginBottom:3}}>{item.icon} {item.l}</div>
+                  <div key={item.l} style={{background:"rgba(255,255,255,.8)",borderRadius:10,padding:"10px 14px"}}>
+                    <div style={{fontSize:11,color:"#64748b",marginBottom:3,fontWeight:600}}>{item.l}</div>
                     <div style={{fontWeight:700,fontSize:13,color:"#0f172a"}}>{item.v}</div>
                   </div>
                 );})}
@@ -254,9 +292,9 @@ function SearchModal({onClose}) {
             </div>
           )}
 
-          {!result && !notFound && !err && (
-            <div style={{textAlign:"center",padding:"16px",color:"#94a3b8",fontSize:13,borderTop:"1px solid #f1f5f9",marginTop:8}}>
-              ⓘ أدخل رقم الهاتف للبحث عن حالة التسجيل
+          {status==="idle" && (
+            <div style={{textAlign:"center",padding:"12px",color:"#94a3b8",fontSize:12,borderTop:"1px solid #f1f5f9",marginTop:4}}>
+              يجب تطابق الاسم الرباعي ورقم الهاتف معاً للتحقق من التسجيل
             </div>
           )}
         </div>
@@ -267,13 +305,14 @@ function SearchModal({onClose}) {
 
 // ── Register Page ─────────────────────────────────────────────────────
 function RegisterPage() {
-  var INIT = {full_name:"",province:"",specialization:"",graduation_year:"",phone:"",gender:"ذكر",university:"",employment_status:"غير موظف",marital_status:"أعزب",has_wife:false,has_children:false,children_count:0};
+  var INIT = {full_name:"",province:"",sub_district:"",specialization:"",graduation_year:"",phone:"",gender:"ذكر",university:"",employment_status:"غير موظف",marital_status:"أعزب",has_wife:false,has_children:false,children_count:0};
   var [f,setF]     = useState(INIT);
   var [er,setEr]   = useState({});
   var [st,setSt]   = useState("idle");
   var [msg,setMsg] = useState("");
 
   function up(k,v){ setF(p=>({...p,[k]:v})); setEr(p=>({...p,[k]:""})); }
+  function setProvince(v){ setF(p=>({...p,province:v,sub_district:""})); setEr(p=>({...p,province:"",sub_district:""})); }
   function setMarital(v){ setF(p=>({...p,marital_status:v,has_wife:v!=="متزوج"?false:p.has_wife})); }
   function setHasChildren(v){ setF(p=>({...p,has_children:v,children_count:v?p.children_count:0})); }
 
@@ -281,6 +320,7 @@ function RegisterPage() {
     var e={};
     if(!f.full_name.trim()||f.full_name.trim().length<4) e.full_name="الاسم مطلوب (4 أحرف على الأقل)";
     if(!f.province) e.province="يرجى اختيار المحافظة";
+    if(f.province && !f.sub_district) e.sub_district="يرجى اختيار القضاء/الناحية";
     if(!f.specialization.trim()) e.specialization="التخصص مطلوب";
     var yr=parseInt(f.graduation_year);
     if(!yr||yr<1970||yr>CUR_YEAR) e.graduation_year="سنة التخرج غير صحيحة";
@@ -299,7 +339,7 @@ function RegisterPage() {
     setSt("loading");
     try {
       await db.insert({
-        full_name:f.full_name.trim(),province:f.province,specialization:f.specialization.trim(),
+        full_name:f.full_name.trim(),province:f.province,sub_district:f.sub_district,specialization:f.specialization.trim(),
         graduation_year:parseInt(f.graduation_year),phone:f.phone.trim(),
         gender:f.gender,university:f.university.trim(),employment_status:f.employment_status,
         marital_status:f.marital_status,has_wife:f.has_wife,has_children:f.has_children,
@@ -339,7 +379,7 @@ function RegisterPage() {
               <input value={f.full_name} onChange={e=>up("full_name",e.target.value)} placeholder="أدخل الاسم الرباعي" style={inp(er.full_name)}/>
             </Field>
             <Field label="المحافظة *" error={er.province}>
-              <select value={f.province} onChange={e=>up("province",e.target.value)} style={{...inp(er.province),cursor:"pointer"}}>
+              <select value={f.province} onChange={e=>setProvince(e.target.value)} style={{...inp(er.province),cursor:"pointer"}}>
                 <option value="">— اختر المحافظة —</option>
                 {PROVINCES.map(p=><option key={p} value={p}>{p}</option>)}
               </select>
@@ -351,6 +391,14 @@ function RegisterPage() {
               <input type="number" value={f.graduation_year} onChange={e=>up("graduation_year",e.target.value)} placeholder="2020" style={inp(er.graduation_year)} min="1970" max={CUR_YEAR-5}/>
             </Field>
           </div>
+          {f.province && (
+            <Field label="القضاء / الناحية *" error={er.sub_district}>
+              <select value={f.sub_district} onChange={e=>up("sub_district",e.target.value)} style={{...inp(er.sub_district),cursor:"pointer"}}>
+                <option value="">— اختر القضاء أو الناحية —</option>
+                {(IRAQ_DISTRICTS[f.province]||[]).map(d=><option key={d} value={d}>{d}</option>)}
+              </select>
+            </Field>
+          )}
           <Field label="اسم الجامعة">
             <input value={f.university} onChange={e=>up("university",e.target.value)} placeholder="مثال: جامعة بغداد" style={inp(false)}/>
           </Field>
@@ -416,158 +464,62 @@ function RegisterPage() {
 
 // ── Dashboard Page ────────────────────────────────────────────────────
 function DashboardPage() {
-  var [stats,setStats]     = useState(null);
-  var [members,setMembers] = useState([]);
-  var [loading,setLoad]    = useState(true);
-  var [chart,setChart]     = useState("province");
-  var [expanded,setExpanded] = useState(null);
+  var [stats,setStats] = useState(null);
+  var [loading,setLoad] = useState(true);
 
   // eslint-disable-next-line react-hooks/exhaustive-deps
   var load = useCallback(async function(){
     setLoad(true);
-    try { var [s,m]=await Promise.all([db.getStats(),db.getMembers(0)]); setStats(s); setMembers(m); }
+    try { setStats(await db.getStats()); }
     catch(e){ console.error(e); }
     setLoad(false);
   },[]);
 
   useEffect(()=>{load();},[load]);
 
-  if(!stats&&loading) return <div style={{textAlign:"center",padding:"80px",color:"#94a3b8"}}>⏳ جاري تحميل البيانات…</div>;
+  if(!stats&&loading) return (
+    <div style={{textAlign:"center",padding:"80px 20px",color:"#94a3b8"}}>
+      <div style={{fontSize:40,marginBottom:12}}>⏳</div>
+      <div>جاري تحميل الإحصائيات...</div>
+    </div>
+  );
 
-  var total        = stats ? parseInt(stats.total)||0 : 0;
-  var unemployed   = stats ? parseInt(stats.unemployed)||0 : 0;
-  var employed     = stats ? parseInt(stats.employed)||0 : 0;
-  var male         = stats ? parseInt(stats.male)||0 : 0;
-  var female       = stats ? parseInt(stats.female)||0 : 0;
-  var unemployedPct = total ? Math.round(unemployed/total*100) : 0;
+  var total      = stats ? parseInt(stats.total)||0 : 0;
+  var male       = stats ? parseInt(stats.male)||0 : 0;
+  var female     = stats ? parseInt(stats.female)||0 : 0;
+  var married    = stats ? parseInt(stats.married)||0 : 0;
+  var notMarried = total - married;
+  var provinces  = (stats?.by_province||[]).length;
+  var specs      = (stats?.by_spec||[]).length;
 
-  var byProvince = (stats?.by_province||[]).map((r,i)=>({name:r.province,count:parseInt(r.count),fill:COLORS[i%COLORS.length]}));
-  var bySpec     = (stats?.by_spec||[]).map((r,i)=>({name:r.specialization,count:parseInt(r.count),fill:COLORS[i%COLORS.length]}));
-  var byYear     = (stats?.by_year||[]).map(r=>({name:String(r.graduation_year),count:parseInt(r.count)}));
-  var byMarital  = (stats?.by_marital||[]).map(r=>({name:r.marital_status,count:parseInt(r.count),fill:MARITAL_COLORS[r.marital_status]||"#94a3b8"}));
-  var byGender   = (stats?.by_gender||[]).map(r=>({name:r.gender,count:parseInt(r.count),fill:r.gender==="ذكر"?"#0ea5e9":"#ec4899"}));
-  var byEmploy   = (stats?.by_employment||[]).map(r=>({name:r.employment_status,count:parseInt(r.count),fill:EMPLOY_COLORS[r.employment_status]||"#94a3b8"}));
-  var byUniv     = (stats?.by_university||[]).map((r,i)=>({name:r.university,count:parseInt(r.count),fill:COLORS[i%COLORS.length]}));
-
-  var chartMap = {province:byProvince,spec:bySpec,year:byYear,marital:byMarital,gender:byGender,employ:byEmploy,univ:byUniv};
-  var pieCharts = ["marital","gender","employ"];
-  var chartTabs = [
-    {k:"province",l:"📍 المحافظات"},{k:"spec",l:"🎓 التخصصات"},
-    {k:"year",l:"📅 سنة التخرج"},{k:"marital",l:"💑 الحالة"},
-    {k:"gender",l:"👥 الجنس"},{k:"employ",l:"💼 التوظيف"},
-    {k:"univ",l:"🏛️ الجامعات"}
-  ];
-
-
-  var statCards = [
-    {icon:"👥",label:"إجمالي المسجلين",val:total.toLocaleString("ar-IQ"),bg:"linear-gradient(135deg,#0ea5e9,#0369a1)"},
-    {icon:"🔍",label:"نسبة البطالة",val:unemployedPct+"%",sub:unemployed+" غير موظف",bg:"linear-gradient(135deg,#ef4444,#dc2626)"},
-    {icon:"💼",label:"الموظفون",val:employed.toLocaleString("ar-IQ"),bg:"linear-gradient(135deg,#22c55e,#15803d)"},
-    {icon:"👨",label:"الذكور",val:male.toLocaleString("ar-IQ"),bg:"linear-gradient(135deg,#0ea5e9,#0369a1)"},
-    {icon:"👩",label:"الإناث",val:female.toLocaleString("ar-IQ"),bg:"linear-gradient(135deg,#ec4899,#be185d)"},
-    {icon:"🗺️",label:"المحافظات",val:byProvince.length,bg:"linear-gradient(135deg,#14b8a6,#0f766e)"},
-    {icon:"🎓",label:"التخصصات",val:bySpec.length,bg:"linear-gradient(135deg,#8b5cf6,#7c3aed)"},
+  var cards = [
+    {icon:"👥", label:"إجمالي المسجلين", val:total.toLocaleString("ar-IQ"), bg:"linear-gradient(135deg,#1e40af,#1d4ed8)", span:true},
+    {icon:"👨", label:"الذكور",            val:male.toLocaleString("ar-IQ"),   bg:"linear-gradient(135deg,#0369a1,#0ea5e9)"},
+    {icon:"👩", label:"الإناث",            val:female.toLocaleString("ar-IQ"), bg:"linear-gradient(135deg,#be185d,#ec4899)"},
+    {icon:"🗺️", label:"المحافظات",         val:provinces,                      bg:"linear-gradient(135deg,#0f766e,#14b8a6)"},
+    {icon:"🎓", label:"التخصصات",          val:specs,                          bg:"linear-gradient(135deg,#6d28d9,#8b5cf6)"},
+    {icon:"💑", label:"متزوجون",           val:married.toLocaleString("ar-IQ"),bg:"linear-gradient(135deg,#15803d,#22c55e)"},
+    {icon:"🧑", label:"غير متزوجين",       val:notMarried.toLocaleString("ar-IQ"),bg:"linear-gradient(135deg,#92400e,#f59e0b)"},
   ];
 
   return (
-    <div style={pageWrap}>
-      {/* Stat cards */}
-      <div style={{display:"flex",gap:12,marginBottom:24,flexWrap:"wrap"}}>
-        {statCards.map(c=><StatCard key={c.label} {...c}/>)}
+    <div style={{...pageWrap,maxWidth:1100}}>
+      <h2 style={{textAlign:"center",color:"#0f172a",marginBottom:28,fontSize:20,fontWeight:700,letterSpacing:.5}}>
+        الإحصائيات العامة — رابطة الخريجين العراقيين القدماء
+      </h2>
+      <div style={{display:"grid",gridTemplateColumns:"repeat(auto-fit,minmax(160px,1fr))",gap:18}}>
+        {cards.map(function(c){
+          return (
+            <div key={c.label} style={{background:c.bg,borderRadius:20,padding:"28px 20px",color:"#fff",textAlign:"center",boxShadow:"0 4px 24px rgba(0,0,0,.15)",gridColumn:c.span?"span 2":undefined}}>
+              <div style={{fontSize:42,marginBottom:10}}>{c.icon}</div>
+              <div style={{fontSize:c.span?40:32,fontWeight:800,lineHeight:1,marginBottom:8}}>{c.val}</div>
+              <div style={{fontSize:14,opacity:.9,fontWeight:500}}>{c.label}</div>
+            </div>
+          );
+        })}
       </div>
-
-      {/* Charts */}
-      <div style={card}>
-        <div style={{display:"flex",gap:8,marginBottom:20,flexWrap:"wrap"}}>
-          {chartTabs.map(t=>(
-            <button key={t.k} onClick={()=>setChart(t.k)} style={{padding:"7px 13px",borderRadius:8,border:"none",cursor:"pointer",fontWeight:700,fontSize:12,background:chart===t.k?"#0ea5e9":"#f1f5f9",color:chart===t.k?"#fff":"#475569"}}>
-              {t.l}
-            </button>
-          ))}
-        </div>
-
-        {loading ? <div style={{textAlign:"center",padding:48,color:"#94a3b8"}}>⏳</div> :
-          chart==="year" ? (
-            <ResponsiveContainer width="100%" height={280}>
-              <BarChart data={byYear} margin={{top:5,right:10,left:0,bottom:5}}>
-                <CartesianGrid strokeDasharray="3 3" stroke="#f1f5f9"/>
-                <XAxis dataKey="name" tick={{fontSize:10}}/>
-                <YAxis tick={{fontSize:11}}/>
-                <Tooltip content={<Tip/>}/>
-                <Bar dataKey="count" fill="#6366f1" radius={[4,4,0,0]}/>
-              </BarChart>
-            </ResponsiveContainer>
-          ) : pieCharts.includes(chart) ? (
-            <ResponsiveContainer width="100%" height={300}>
-              <PieChart>
-                <Pie data={chartMap[chart]||[]} dataKey="count" nameKey="name" cx="50%" cy="50%" outerRadius={110}
-                  label={e=>e.name+" "+(e.percent*100).toFixed(0)+"%"} labelLine={false}>
-                  {(chartMap[chart]||[]).map((e,i)=><Cell key={i} fill={e.fill}/>)}
-                </Pie>
-                <Tooltip formatter={v=>[v,"العدد"]}/>
-                <Legend/>
-              </PieChart>
-            </ResponsiveContainer>
-          ) : (
-            <ResponsiveContainer width="100%" height={320}>
-              <BarChart data={chartMap[chart]||[]} margin={{top:5,right:10,left:0,bottom:85}}>
-                <CartesianGrid strokeDasharray="3 3" stroke="#f1f5f9"/>
-                <XAxis dataKey="name" angle={-40} textAnchor="end" tick={{fontSize:10}} interval={0}/>
-                <YAxis tick={{fontSize:11}}/>
-                <Tooltip content={<Tip/>}/>
-                <Bar dataKey="count" radius={[6,6,0,0]}>
-                  {(chartMap[chart]||[]).map((e,i)=><Cell key={i} fill={e.fill||COLORS[i%COLORS.length]}/>)}
-                </Bar>
-              </BarChart>
-            </ResponsiveContainer>
-          )
-        }
-      </div>
-
-      {/* Member list */}
-      <div style={{...card,padding:"14px 18px",display:"flex",gap:10,alignItems:"center",marginBottom:12,flexWrap:"wrap"}}>
-        <span style={{color:"#64748b",fontSize:13,flex:1}}>👥 أحدث المسجلين</span>
-        <button style={{...btn("#0f766e","#0d9488"),whiteSpace:"nowrap"}} onClick={load}>🔄 تحديث</button>
-      </div>
-
-      <div style={card}>
-        <div style={{overflowX:"auto"}}>
-          <table style={{width:"100%",borderCollapse:"collapse",fontSize:12}}>
-            <thead>
-              <tr style={{background:"#f8fafc"}}>
-                {["#","الاسم","المحافظة","التخصص","سنة التخرج","الجنس","التوظيف","الحالة","أطفال"].map(h=>(
-                  <th key={h} style={{padding:"10px",textAlign:"right",borderBottom:"2px solid #e2e8f0",fontWeight:700,color:"#374151",whiteSpace:"nowrap"}}>{h}</th>
-                ))}
-              </tr>
-            </thead>
-            <tbody>
-              {members.map((r,i)=>{
-                var isExp=expanded===r.id;
-                var ec=EMPLOY_COLORS[r.employment_status]||"#94a3b8";
-                return (
-                  <tr key={r.id} onClick={()=>setExpanded(isExp?null:r.id)} style={{borderBottom:"1px solid #f1f5f9",background:isExp?"#f0f9ff":i%2?"#fafafa":"#fff",cursor:"pointer"}}>
-                    <td style={{padding:"9px 10px",color:"#94a3b8"}}>{i+1}</td>
-                    <td style={{padding:"9px 10px",fontWeight:600}}>
-                      {r.full_name}
-                      {isExp && <div style={{marginTop:4,fontSize:11,color:"#64748b"}}>
-                        {r.university&&<span>🏛️ {r.university} · </span>}
-                        <span>{new Date(r.created_at).toLocaleDateString("ar-IQ")}</span>
-                      </div>}
-                    </td>
-                    <td style={{padding:"9px 10px"}}><span style={{background:"#e0f2fe",color:"#0369a1",padding:"2px 8px",borderRadius:20,fontSize:11,fontWeight:600}}>{r.province}</span></td>
-                    <td style={{padding:"9px 10px"}}>{r.specialization}</td>
-                    <td style={{padding:"9px 10px",textAlign:"center",fontWeight:600}}>{r.graduation_year}</td>
-                    <td style={{padding:"9px 10px",textAlign:"center"}}>{r.gender==="ذكر"?"👨":"👩"} {r.gender}</td>
-                    <td style={{padding:"9px 10px"}}><span style={{background:ec+"22",color:ec,padding:"2px 8px",borderRadius:20,fontSize:11,fontWeight:600}}>{r.employment_status||"—"}</span></td>
-                    <td style={{padding:"9px 10px"}}>{r.marital_status}</td>
-                    <td style={{padding:"9px 10px",textAlign:"center"}}>{r.has_children?`✅ (${r.children_count})`:"➖"}</td>
-                  </tr>
-                );
-              })}
-              {!members.length && <tr><td colSpan={9} style={{padding:36,textAlign:"center",color:"#94a3b8"}}>لا توجد بيانات بعد</td></tr>}
-            </tbody>
-          </table>
-        </div>
+      <div style={{textAlign:"center",marginTop:28,color:"#94a3b8",fontSize:12}}>
+        يتم تحديث الإحصائيات تلقائياً عند كل تسجيل جديد
       </div>
     </div>
   );
