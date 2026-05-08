@@ -95,9 +95,14 @@ var db = {
     if(!r.ok){var e=await r.json();throw new Error(e.code==="23505"?"phone_exists":"insert_failed");}
     return true;
   },
+  deleteGraduate: async function(id) {
+    var r = await fetch(SUPABASE_URL+"/rest/v1/graduates?id=eq."+encodeURIComponent(id),{method:"DELETE",headers:H()});
+    if(!r.ok) throw new Error("delete_failed");
+    return true;
+  },
   searchByPhone: async function(phone, name) {
     var r = await fetch(
-      SUPABASE_URL+"/rest/v1/graduates?select=full_name,province,sub_district,specialization,department,graduation_year,gender,university,employment_status,marital_status,created_at&phone=eq."+encodeURIComponent(phone)+"&limit=1",
+      SUPABASE_URL+"/rest/v1/graduates?select=full_name,province,sub_district,specialization,department,graduation_year,gender,university,employment_status,marital_status,birth_date,created_at&phone=eq."+encodeURIComponent(phone)+"&limit=1",
       {headers:H()}
     );
     if(!r.ok) throw new Error("search_failed");
@@ -343,7 +348,7 @@ function SearchModal({onClose}) {
                   {l:"الكلية / القسم",   v:result.department||"—"},
                   {l:"التخصص",           v:result.specialization||"—"},
                   {l:"سنة التخرج",      v:result.graduation_year},
-                  {l:"تاريخ التسجيل",   v:new Date(result.created_at).toLocaleDateString("ar-IQ")},
+                  {l:"تاريخ التسجيل",   v:new Date(result.created_at).toLocaleDateString("en-GB")},
                 ].map(function(item){return(
                   <div key={item.l} style={{background:"rgba(255,255,255,.8)",borderRadius:10,padding:"10px 14px"}}>
                     <div style={{fontSize:11,color:"#64748b",marginBottom:3,fontWeight:600}}>{item.l}</div>
@@ -380,7 +385,7 @@ function NoEnvScreen() {
 
 // ── Register Page ─────────────────────────────────────────────────────
 function RegisterPage() {
-  var INIT = {full_name:"",province:"",sub_district:"",university:"",department:"",specialization:"",graduation_year:"",phone:"",gender:"ذكر",employment_status:"غير موظف",marital_status:"أعزب",has_wife:false,has_children:false,children_count:0};
+  var INIT = {full_name:"",province:"",sub_district:"",university:"",department:"",specialization:"",graduation_year:"",birth_date:"",phone:"",gender:"ذكر",employment_status:"غير موظف",marital_status:"أعزب",has_wife:false,has_children:false,children_count:0};
   var [f,setF]     = useState(INIT);
   var [er,setEr]   = useState({});
   var [st,setSt]   = useState("idle");
@@ -401,6 +406,8 @@ function RegisterPage() {
     var yr=parseInt(f.graduation_year);
     if(!yr||yr<1970||yr>CUR_YEAR) e.graduation_year="سنة التخرج غير صحيحة";
     else if(yr>CUR_YEAR-5) e.graduation_year="يجب أن تكون قد تخرجت قبل 5 سنوات على الأقل ("+(CUR_YEAR-5)+" أو أقل)";
+    if(!f.birth_date) e.birth_date="تاريخ الميلاد مطلوب";
+    else { var by=new Date(f.birth_date).getFullYear(); if(by<1940||by>2005) e.birth_date="تاريخ الميلاد غير صحيح"; }
     if(!/^07[3-9]\d{8}$/.test(f.phone)) e.phone="رقم الهاتف غير صحيح — يبدأ بـ 07";
     if(f.has_children&&f.children_count<1) e.children_count="أدخل عدد الأطفال";
     setEr(e);
@@ -418,7 +425,7 @@ function RegisterPage() {
         full_name:f.full_name.trim(),province:f.province,sub_district:f.sub_district,
         university:f.university.trim(),department:f.department.trim(),
         specialization:f.specialization.trim(),
-        graduation_year:parseInt(f.graduation_year),phone:f.phone.trim(),
+        graduation_year:parseInt(f.graduation_year),birth_date:f.birth_date,phone:f.phone.trim(),
         gender:f.gender,employment_status:f.employment_status,
         marital_status:f.marital_status,has_wife:f.has_wife,has_children:f.has_children,
         children_count:f.has_children?(parseInt(f.children_count)||0):0
@@ -477,6 +484,11 @@ function RegisterPage() {
             <Field label="رقم الهاتف" error={er.phone}>
               <input value={f.phone} onChange={e=>up("phone",e.target.value)} placeholder="07901234567" style={{...inp(er.phone),direction:"ltr",textAlign:"right"}}/>
             </Field>
+            <Field label="تاريخ الميلاد" error={er.birth_date}>
+              <input type="date" value={f.birth_date} onChange={e=>up("birth_date",e.target.value)} style={inp(er.birth_date)} min="1940-01-01" max="2005-12-31"/>
+            </Field>
+          </div>
+          <div style={{...grid2}}>
             <Field label="سنة التخرج" error={er.graduation_year}>
               <input type="number" value={f.graduation_year} onChange={e=>up("graduation_year",e.target.value)} placeholder="2020" style={inp(er.graduation_year)} min="1970" max={CUR_YEAR-5}/>
             </Field>
@@ -610,7 +622,7 @@ function DashboardPage() {
       <div style={{display:"grid",gridTemplateColumns:"repeat(auto-fill,minmax(200px,1fr))",gap:20}}>
         {cards.map(function(c){
           return <StatCardPro key={c.label} iconPath={c.iconPath} label={c.label}
-            val={typeof c.val==="number"?c.val.toLocaleString("ar-IQ"):c.val}
+            val={typeof c.val==="number"?c.val.toLocaleString("en-US"):c.val}
             pct={c.pct} barPct={c.barPct} color={c.color}/>;
         })}
       </div>
@@ -706,7 +718,7 @@ function AdminPage() {
 
   function exportCSV() {
     var hdr=["الاسم","المحافظة","القضاء","الجامعة","الكلية/القسم","التخصص","سنة التخرج","الجنس","التوظيف","الحالة","الهاتف","التسجيل"];
-    var rows=filtered.map(r=>[r.full_name,r.province,r.sub_district||"",r.university||"",r.department||"",r.specialization||"",r.graduation_year,r.gender||"",r.employment_status||"",r.marital_status,r.phone,new Date(r.created_at).toLocaleDateString("ar-IQ")]);
+    var rows=filtered.map(r=>[r.full_name,r.province,r.sub_district||"",r.university||"",r.department||"",r.specialization||"",r.graduation_year,r.gender||"",r.employment_status||"",r.marital_status,r.phone,new Date(r.created_at).toLocaleDateString("en-GB")]);
     var csv=[hdr,...rows].map(r=>r.join(",")).join("\n");
     var a=document.createElement("a");
     a.href=URL.createObjectURL(new Blob(["﻿"+csv],{type:"text/csv;charset=utf-8"}));
@@ -760,7 +772,7 @@ function AdminPage() {
         ].map(function(c){
           return (
             <div key={c.l} style={{background:"#fff",borderRadius:14,padding:"16px 20px",flex:"1 1 130px",borderRight:"4px solid "+c.color,boxShadow:"0 2px 10px rgba(0,0,0,.06)"}}>
-              <div style={{fontSize:22,fontWeight:800,color:"#0f172a"}}>{c.v.toLocaleString("ar-IQ")}</div>
+              <div style={{fontSize:22,fontWeight:800,color:"#0f172a"}}>{c.v.toLocaleString("en-US")}</div>
               <div style={{fontSize:12,color:"#64748b",marginTop:4}}>{c.l}</div>
             </div>
           );
@@ -802,7 +814,7 @@ function AdminPage() {
               <table style={{width:"100%",borderCollapse:"collapse",fontSize:12}}>
                 <thead>
                   <tr style={{background:"#f8fafc"}}>
-                    {["#","الاسم","المحافظة","الجامعة","الكلية/القسم","التخصص","سنة","الجنس","التوظيف","الحالة","الهاتف","التسجيل"].map(h=>(
+                    {["#","الاسم","المحافظة","الجامعة","الكلية/القسم","التخصص","سنة","الجنس","التوظيف","الحالة","الهاتف","التسجيل","حذف"].map(h=>(
                       <th key={h} style={{padding:"9px",textAlign:"right",borderBottom:"2px solid #e2e8f0",fontWeight:700,color:"#374151",whiteSpace:"nowrap"}}>{h}</th>
                     ))}
                   </tr>
@@ -824,7 +836,13 @@ function AdminPage() {
                         <td style={{padding:"8px 9px"}}><span style={{background:ec+"22",color:ec,padding:"2px 7px",borderRadius:20,fontSize:11,fontWeight:600}}>{r.employment_status||"—"}</span></td>
                         <td style={{padding:"8px 9px"}}>{r.marital_status}</td>
                         <td style={{padding:"8px 9px",direction:"ltr",textAlign:"left",color:"#0369a1",fontFamily:"monospace",whiteSpace:"nowrap"}}>{r.phone}</td>
-                        <td style={{padding:"8px 9px",color:"#94a3b8",fontSize:11,whiteSpace:"nowrap"}}>{new Date(r.created_at).toLocaleDateString("ar-IQ")}</td>
+                        <td style={{padding:"8px 9px",color:"#94a3b8",fontSize:11,whiteSpace:"nowrap"}}>{new Date(r.created_at).toLocaleDateString("en-GB")}</td>
+                        <td style={{padding:"8px 9px"}}>
+                          <button onClick={async function(e){e.stopPropagation();if(!window.confirm("هل تريد حذف سجل "+r.full_name+"؟\nلا يمكن التراجع عن هذا الإجراء.")){return;}try{await db.deleteGraduate(r.id);setMembers(function(prev){return prev.filter(function(m){return m.id!==r.id;});});}catch(err){alert("حدث خطأ أثناء الحذف");}}}
+                            style={{background:"#fef2f2",border:"1px solid #fecaca",color:"#dc2626",borderRadius:7,padding:"5px 10px",cursor:"pointer",fontSize:11,fontWeight:600,whiteSpace:"nowrap",display:"flex",alignItems:"center",gap:5}}>
+                            <SvgIcon d={P.trash} size={12} color="#dc2626"/> حذف
+                          </button>
+                        </td>
                       </tr>
                     );
                   })}
@@ -859,7 +877,7 @@ function AdminPage() {
                       <td style={{padding:"8px 10px"}}>{r.province}</td>
                       <td style={{padding:"8px 10px"}}>{r.university||"—"}</td>
                       <td style={{padding:"8px 10px",direction:"ltr",fontFamily:"monospace"}}>{r.phone}</td>
-                      <td style={{padding:"8px 10px",fontSize:11,color:"#92400e"}}>{new Date(r.created_at).toLocaleDateString("ar-IQ")}</td>
+                      <td style={{padding:"8px 10px",fontSize:11,color:"#92400e"}}>{new Date(r.created_at).toLocaleDateString("en-GB")}</td>
                     </tr>
                   ))}
                 </tbody>
@@ -970,7 +988,7 @@ function PrivacyPage() {
           <SvgIcon d={P.privacy} size={28} color="#fff"/>
         </div>
         <h1 style={{fontSize:22,marginBottom:8}}>سياسة الخصوصية</h1>
-        <p style={{opacity:.6,fontSize:12}}>آخر تحديث: {new Date().toLocaleDateString("ar-IQ")}</p>
+        <p style={{opacity:.6,fontSize:12}}>آخر تحديث: {new Date().toLocaleDateString("en-GB")}</p>
       </div>
       <div style={card}>
         <p style={{color:"#64748b",lineHeight:2,marginBottom:24,fontSize:14,borderBottom:"1px solid #f1f5f9",paddingBottom:20}}>
