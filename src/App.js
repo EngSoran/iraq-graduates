@@ -96,8 +96,13 @@ var db = {
     return true;
   },
   deleteGraduate: async function(id) {
-    var r = await fetch(SUPABASE_URL+"/rest/v1/graduates?id=eq."+encodeURIComponent(id),{method:"DELETE",headers:H()});
+    var r = await fetch(
+      SUPABASE_URL+"/rest/v1/graduates?id=eq."+id,
+      {method:"DELETE", headers:Object.assign({},H(),{"Prefer":"return=representation"})}
+    );
     if(!r.ok) throw new Error("delete_failed");
+    var deleted = await r.json();
+    if(!deleted.length) throw new Error("not_deleted");
     return true;
   },
   searchByPhone: async function(phone, name) {
@@ -652,6 +657,7 @@ function AdminPage() {
   var [filterProv,setFilterProv] = useState("");
   var [filterEmp,setFilterEmp]   = useState("");
   var [filterGen,setFilterGen]   = useState("");
+  var [filterDept,setFilterDept] = useState("");
   var [tab,setTab]               = useState("list");
   var [tickerMsgs,setTickerMsgs] = useState([]);
   var [newMsg,setNewMsg]         = useState("");
@@ -689,6 +695,7 @@ function AdminPage() {
     if(filterProv && r.province!==filterProv) return false;
     if(filterEmp  && r.employment_status!==filterEmp) return false;
     if(filterGen  && r.gender!==filterGen) return false;
+    if(filterDept.trim() && !(r.department&&r.department.includes(filterDept.trim()))) return false;
     if(search.trim() && !(
       (r.full_name&&r.full_name.includes(search))||
       (r.phone&&r.phone.includes(search))||
@@ -697,7 +704,7 @@ function AdminPage() {
       (r.department&&r.department.includes(search))
     )) return false;
     return true;
-  }),[members,filterProv,filterEmp,filterGen,search]);
+  }),[members,filterProv,filterEmp,filterGen,filterDept,search]);
 
   // eslint-disable-next-line react-hooks/exhaustive-deps
   var dupIds = useMemo(()=>{
@@ -814,6 +821,7 @@ function AdminPage() {
               <option value="ذكر">ذكر</option>
               <option value="أنثى">أنثى</option>
             </select>
+            <input value={filterDept} onChange={e=>setFilterDept(e.target.value)} placeholder="تصفية: الكلية / القسم..." style={{...inp(false),flex:"1 1 180px",marginBottom:0}}/>
           </div>
         </div>
         <div style={card}>
