@@ -478,20 +478,8 @@ function AdminPage() {
 
   useEffect(()=>{loadAll();},[loadAll]);
 
-  if(!authed) return (
-    <div style={{...pageWrap,maxWidth:420}}>
-      <div style={{...card,textAlign:"center"}}>
-        <div style={{fontSize:52,marginBottom:12}}>🔐</div>
-        <h2 style={{marginBottom:20,color:"#0f172a"}}>لوحة الإدارة</h2>
-        {pwdErr && <div style={{background:"#fef2f2",border:"1px solid #fecaca",color:"#dc2626",padding:"10px 14px",borderRadius:8,marginBottom:14,fontSize:13}}>{pwdErr}</div>}
-        <input type="password" value={pwd} onChange={e=>{setPwd(e.target.value);setPwdErr("");}}
-          onKeyDown={e=>e.key==="Enter"&&login()}
-          placeholder="كلمة المرور" style={{...inp(pwdErr),marginBottom:14,textAlign:"center"}}/>
-        <button style={{...btn(),width:"100%",padding:14}} onClick={login}>🔓 دخول</button>
-      </div>
-    </div>
-  );
-
+  // Hooks must be before any conditional return
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   var filtered = useMemo(()=>members.filter(r=>{
     if(filterProv && r.province!==filterProv) return false;
     if(filterEmp  && r.employment_status!==filterEmp) return false;
@@ -505,11 +493,26 @@ function AdminPage() {
     return true;
   }),[members,filterProv,filterEmp,filterGen,search]);
 
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   var dupIds = useMemo(()=>{
     var m={};
     members.forEach(r=>{var k=(r.full_name||"").trim().toLowerCase();if(!m[k])m[k]=[];m[k].push(r.id);});
     return new Set(Object.values(m).filter(a=>a.length>1).flat());
   },[members]);
+
+  if(!authed) return (
+    <div style={{...pageWrap,maxWidth:420}}>
+      <div style={{...card,textAlign:"center"}}>
+        <div style={{fontSize:52,marginBottom:12}}>🔐</div>
+        <h2 style={{marginBottom:20,color:"#0f172a"}}>لوحة الإدارة</h2>
+        {pwdErr && <div style={{background:"#fef2f2",border:"1px solid #fecaca",color:"#dc2626",padding:"10px 14px",borderRadius:8,marginBottom:14,fontSize:13}}>{pwdErr}</div>}
+        <input type="password" value={pwd} onChange={e=>{setPwd(e.target.value);setPwdErr("");}}
+          onKeyDown={e=>e.key==="Enter"&&login()}
+          placeholder="كلمة المرور" style={{...inp(pwdErr),marginBottom:14,textAlign:"center"}}/>
+        <button style={{...btn(),width:"100%",padding:14}} onClick={login}>🔓 دخول</button>
+      </div>
+    </div>
+  );
 
   function exportCSV() {
     var hdr=["الاسم","المحافظة","التخصص","الجامعة","سنة التخرج","الجنس","التوظيف","الحالة","الهاتف","تاريخ التسجيل"];
