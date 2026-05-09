@@ -369,7 +369,7 @@ function SearchModal({onClose}) {
                   <p style={{color:"#166534",margin:"3px 0 0",fontSize:12}}>تسجيل مؤكد في قاعدة البيانات</p>
                 </div>
               </div>
-              <div style={{display:"grid",gridTemplateColumns:"1fr 1fr",gap:10}}>
+              <div style={{display:"grid",gridTemplateColumns:"1fr 1fr",gap:10,marginBottom:16}}>
                 {[
                   {l:"الاسم الكامل",    v:result.full_name},
                   {l:"المحافظة",         v:result.province+(result.sub_district?" — "+result.sub_district:"")},
@@ -384,6 +384,13 @@ function SearchModal({onClose}) {
                     <div style={{fontWeight:700,fontSize:13,color:"#0f172a"}}>{item.v}</div>
                   </div>
                 );})}
+              </div>
+              {/* Download buttons */}
+              <div style={{borderTop:"1px solid #86efac",paddingTop:14}}>
+                <div style={{textAlign:"center",fontSize:12,color:"#15803d",fontWeight:600,marginBottom:10}}>
+                  تحميل الاستمارات
+                </div>
+                <DownloadButtons data={{...result, phone: normalizePhone(phone)}}/>
               </div>
             </div>
           )}
@@ -415,10 +422,11 @@ function NoEnvScreen() {
 // ── Register Page ─────────────────────────────────────────────────────
 function RegisterPage() {
   var INIT = {full_name:"",province:"",sub_district:"",university:"",department:"",specialization:"",graduation_year:"",birth_date:"",phone:"",gender:"ذكر",employment_status:"غير موظف",marital_status:"أعزب",has_wife:false,has_children:false,children_count:0};
-  var [f,setF]     = useState(INIT);
-  var [er,setEr]   = useState({});
-  var [st,setSt]   = useState("idle");
-  var [msg,setMsg] = useState("");
+  var [f,setF]         = useState(INIT);
+  var [er,setEr]       = useState({});
+  var [st,setSt]       = useState("idle");
+  var [msg,setMsg]     = useState("");
+  var [saved,setSaved] = useState(null);
 
   function up(k,v){ setF(p=>({...p,[k]:v})); setEr(p=>({...p,[k]:""})); }
   function setProvince(v){ setF(p=>({...p,province:v,sub_district:""})); setEr(p=>({...p,province:"",sub_district:""})); }
@@ -468,6 +476,7 @@ function RegisterPage() {
         children_count:f.has_children?(parseInt(f.children_count)||0):0
       });
       localStorage.setItem("reg_attempts",JSON.stringify([...attempts,now]));
+      setSaved({...f});
       setSt("success"); setF(INIT);
     } catch(err) {
       setSt("err");
@@ -477,13 +486,24 @@ function RegisterPage() {
 
   if(st==="success") return (
     <div style={pageWrap}>
-      <div style={{...card,textAlign:"center",padding:"56px 24px"}}>
+      <div style={{...card,textAlign:"center",padding:"48px 24px"}}>
         <div style={{width:72,height:72,borderRadius:"50%",background:"#dcfce7",margin:"0 auto 16px",display:"flex",alignItems:"center",justifyContent:"center"}}>
           <SvgIcon d="M5 13l4 4L19 7" size={36} color="#16a34a" sw={2.5}/>
         </div>
         <h2 style={{color:"#16a34a",fontSize:24,marginBottom:8}}>تم التسجيل بنجاح</h2>
-        <p style={{color:"#64748b",marginBottom:28}}>شكراً لانضمامك إلى رابطة الخريجين العراقيين القدماء</p>
-        <button style={btn("#15803d","#16a34a")} onClick={()=>setSt("idle")}>تسجيل عضو آخر</button>
+        <p style={{color:"#64748b",marginBottom:8}}>شكراً لانضمامك إلى رابطة الخريجين العراقيين القدماء</p>
+        <p style={{color:"#94a3b8",fontSize:13,marginBottom:24}}>يمكنك الآن تحميل استمارة تسجيلك أو استمارة التخويل</p>
+
+        {/* Download section */}
+        <div style={{background:"#f8fafc",borderRadius:14,padding:"20px 24px",marginBottom:24,border:"1px solid #e2e8f0"}}>
+          <div style={{display:"flex",alignItems:"center",gap:8,justifyContent:"center",marginBottom:14}}>
+            <SvgIcon d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" size={18} color="#1d4ed8"/>
+            <span style={{fontWeight:700,fontSize:14,color:"#0f172a"}}>تحميل الاستمارات</span>
+          </div>
+          {saved && <DownloadButtons data={saved}/>}
+        </div>
+
+        <button style={btn("#15803d","#16a34a")} onClick={function(){setSt("idle");}}>تسجيل عضو آخر</button>
       </div>
     </div>
   );
@@ -1421,6 +1441,147 @@ function CoordinatorsPage() {
       <div style={{textAlign:"center",marginTop:28,color:"#94a3b8",fontSize:12,padding:"12px"}}>
         للانضمام إلى مجموعة واتساب محافظتك، تواصل مع المنسق المسؤول عن منطقتك
       </div>
+    </div>
+  );
+}
+
+// ── Print / Download Helpers ──────────────────────────────────────────
+function fmtBirthDate(bd) {
+  if(!bd) return {day:"......",month:"......",year:"............"};
+  var s = bd.includes("-")
+    ? (function(){ var p=bd.split("-"); return p[2]+"/"+p[1]+"/"+p[0]; })()
+    : bd;
+  var parts = s.split("/");
+  return {day:parts[0]||"....",month:parts[1]||"....",year:parts[2]||"............"};
+}
+
+function openRegistrationPrint(data) {
+  var bd   = fmtBirthDate(data.birth_date||"");
+  var today= new Date().toLocaleDateString("ar-IQ",{year:"numeric",month:"long",day:"numeric"});
+  var html = '<!DOCTYPE html><html lang="ar" dir="rtl"><head><meta charset="UTF-8"/><title>استمارة تسجيل — '+
+    (data.full_name||"")+
+    '</title><style>'+
+    '*{margin:0;padding:0;box-sizing:border-box;}'+
+    'body{font-family:"Traditional Arabic","Arial",sans-serif;background:#ddd5be;min-height:100vh;display:flex;flex-direction:column;align-items:center;padding:24px;direction:rtl;}'+
+    '.print-btn{margin-bottom:16px;padding:10px 30px;background:#1d4ed8;color:#fff;border:none;border-radius:8px;font-size:15px;cursor:pointer;font-family:inherit;box-shadow:0 2px 8px rgba(29,78,216,.3);}'+
+    '.page{width:700px;background:#f5efd8;border:7px double #8b7044;box-shadow:inset 0 0 0 4px #c9a84c,0 8px 40px rgba(0,0,0,.25);overflow:hidden;}'+
+    '.inner{border:2px solid #c9a84c;margin:8px;overflow:hidden;}'+
+    '.hdr{display:flex;align-items:center;justify-content:space-between;padding:14px 20px 6px;}'+
+    '.hdr-txt{font-size:18px;font-weight:bold;color:#1a1505;line-height:1.55;text-align:center;}'+
+    '.hdr-logo{font-size:72px;line-height:1;text-align:center;}'+
+    '.ribbon{background:linear-gradient(to bottom,#111,#2a2a2a);padding:5px 0;text-align:center;border-top:2.5px solid #c9a84c;border-bottom:2.5px solid #c9a84c;}'+
+    '.ribbon-txt{color:#c9a84c;font-size:13px;letter-spacing:3px;}'+
+    '.body{padding:14px 26px;}'+
+    '.row{display:flex;align-items:baseline;padding:8px 0 4px;border-bottom:1.5px dashed #9a8060;margin-bottom:4px;gap:10px;min-height:38px;}'+
+    '.lbl{font-size:16px;font-weight:bold;color:#1a1505;white-space:nowrap;flex-shrink:0;}'+
+    '.val{flex:1;font-size:16px;color:#1a1505;text-align:right;}'+
+    '.row2{display:flex;gap:20px;padding:8px 0 4px;border-bottom:1.5px dashed #9a8060;margin-bottom:4px;min-height:38px;align-items:baseline;}'+
+    '.pledge{text-align:center;font-size:16px;font-weight:bold;color:#1a1505;padding:10px 0 6px;border-bottom:1.5px dashed #9a8060;margin:4px 0;}'+
+    '.btm{background:linear-gradient(to bottom,#111,#222);color:#c9a84c;text-align:center;padding:18px 20px;font-size:19px;font-weight:bold;border-top:3px solid #c9a84c;line-height:1.6;}'+
+    '@media print{body{background:#fff;padding:0;}.print-btn{display:none;}.page{width:100%;box-shadow:none;border:6px double #8b7044;}}'+
+    '</style></head><body>'+
+    '<button class="print-btn" onclick="window.print()">🖨️ طباعة / حفظ كـ PDF</button>'+
+    '<div class="page"><div class="inner">'+
+    '<div class="hdr">'+
+      '<div class="hdr-txt">استمارة قاعدة<br/>البيانات</div>'+
+      '<div class="hdr-logo">🎓</div>'+
+      '<div class="hdr-txt">الخريجين القدامى<br/>في العراق</div>'+
+    '</div>'+
+    '<div class="ribbon"><span class="ribbon-txt">— رابطة الخريجين العراقيين القدامى —</span></div>'+
+    '<div class="body">'+
+      '<div class="row"><span class="lbl">الاسم الثلاثي واللقب:</span><span class="val">'+(data.full_name||"")+'</span></div>'+
+      '<div class="row2">'+
+        '<div style="display:flex;align-items:baseline;gap:6px"><span class="lbl">المواليد — اليوم:</span><span style="font-size:16px;min-width:34px;text-align:center;font-weight:bold">'+bd.day+'</span></div>'+
+        '<div style="display:flex;align-items:baseline;gap:6px"><span class="lbl">الشهر:</span><span style="font-size:16px;min-width:34px;text-align:center;font-weight:bold">'+bd.month+'</span></div>'+
+        '<div style="display:flex;align-items:baseline;gap:6px"><span class="lbl">السنة:</span><span style="font-size:16px;min-width:60px;text-align:center;font-weight:bold">'+bd.year+'</span></div>'+
+      '</div>'+
+      '<div class="row2">'+
+        '<div style="flex:1;display:flex;align-items:baseline;gap:8px"><span class="lbl">المحافظة:</span><span style="font-size:16px;font-weight:bold">'+(data.province||"")+'</span></div>'+
+        '<div style="flex:1;display:flex;align-items:baseline;gap:8px"><span class="lbl">القضاء:</span><span style="font-size:16px;font-weight:bold">'+(data.sub_district||"")+'</span></div>'+
+      '</div>'+
+      '<div class="row"><span class="lbl">الحالة الاجتماعية:</span><span class="val">'+(data.marital_status||"")+'</span></div>'+
+      '<div class="row" style="flex-direction:column;align-items:flex-start;gap:4px">'+
+        '<span class="lbl">التحصيل الدراسي:</span>'+
+        '<span style="font-size:15px;padding-right:8px;color:#1a1505">'+(data.university||"")+(data.department?" — "+data.department:"")+'</span>'+
+        '<div style="display:flex;gap:28px;font-size:16px;font-weight:bold;padding-right:8px;margin-top:2px">'+
+          '<span>☑ جامعة</span><span>☐ معهد</span>'+
+        '</div>'+
+      '</div>'+
+      '<div class="row"><span class="lbl">الاختصاص:</span><span class="val">'+(data.specialization||data.department||"")+'</span></div>'+
+      '<div class="row"><span class="lbl">سنة التخرج:</span><span class="val">'+(data.graduation_year||"")+'</span></div>'+
+      '<div class="row"><span class="lbl">رقم الهاتف:</span><span class="val" style="direction:ltr;text-align:left">'+(data.phone||"")+'</span></div>'+
+      '<div class="pledge">اتعهد بأن جميع المعلومات صحيحة</div>'+
+      '<div class="row"><span class="lbl">التوقيع:</span><span class="val"></span></div>'+
+      '<div class="row"><span class="lbl">التاريخ:</span><span class="val" style="direction:ltr;text-align:left">______ / ______ / 2026</span></div>'+
+      '<div class="row" style="margin-bottom:12px"><span class="lbl">ملاحظة//:</span><span class="val"></span></div>'+
+    '</div>'+
+    '<div class="btm">تسلم بيد الممثل او أعضاء اللجنة التنسيقية المعرفين حصرا</div>'+
+    '</div></div>'+
+    '</body></html>';
+  var w = window.open("","_blank");
+  w.document.open(); w.document.write(html); w.document.close();
+}
+
+function openAuthorizationPrint(data) {
+  var html = '<!DOCTYPE html><html lang="ar" dir="rtl"><head><meta charset="UTF-8"/>'+
+    '<title>استمارة تخويل — '+(data.full_name||"")+'</title><style>'+
+    '*{margin:0;padding:0;box-sizing:border-box;}'+
+    'body{font-family:"Traditional Arabic","Arial",sans-serif;background:#f0ebe0;display:flex;flex-direction:column;align-items:center;padding:28px;direction:rtl;}'+
+    '.print-btn{margin-bottom:18px;padding:10px 30px;background:#1d4ed8;color:#fff;border:none;border-radius:8px;font-size:15px;cursor:pointer;font-family:inherit;}'+
+    '.page{width:700px;background:#fff;border:3px solid #8b7044;padding:52px 60px;line-height:2.1;font-size:17px;color:#1a1a1a;box-shadow:0 4px 28px rgba(0,0,0,.12);}'+
+    '.bismillah{text-align:center;font-size:22px;font-weight:bold;margin-bottom:36px;color:#1a1505;}'+
+    '.subj{font-size:18px;font-weight:bold;text-decoration:underline;margin-bottom:24px;color:#1a1505;}'+
+    '.para{text-align:justify;margin-bottom:20px;line-height:2.3;}'+
+    '.sig-row{display:flex;align-items:baseline;margin:18px 0;gap:8px;}'+
+    '.sig-lbl{font-weight:bold;white-space:nowrap;color:#1a1505;}'+
+    '.dots{flex:1;border-bottom:1.5px solid #555;margin:0 8px 3px;}'+
+    '.name-fill{font-size:18px;font-weight:bold;color:#0f2c54;padding:0 14px;}'+
+    '.stamp{margin-top:36px;border:1.5px dashed #8b7044;border-radius:10px;padding:18px;text-align:center;color:#8b7044;font-size:14px;}'+
+    '@media print{body{background:#fff;padding:0;}.print-btn{display:none;}.page{box-shadow:none;width:100%;}}'+
+    '</style></head><body>'+
+    '<button class="print-btn" onclick="window.print()">🖨️ طباعة / حفظ كـ PDF</button>'+
+    '<div class="page">'+
+      '<div class="bismillah">بسم الله الرحمن الرحيم</div>'+
+      '<div class="subj">م/ تخويل</div>'+
+      '<p class="para">أنا الموقع أدناه</p>'+
+      '<div class="sig-row"><span class="sig-lbl">الخريج:</span><span class="name-fill">'+(data.full_name||"")+'</span><span class="dots"></span></div>'+
+      '<p class="para" style="margin-top:18px">أخوّل بموجب هذا التخويل</p>'+
+      '<div class="sig-row"><span class="sig-lbl">الأستاذ:</span><span class="dots"></span></div>'+
+      '<p class="para" style="margin-top:18px">'+
+        'بتمثيلي والمطالبة بحقوق الخريجين في جمهورية العراق والمحافظة، '+
+        '<span style="display:inline-block;width:100px;border-bottom:1.5px solid #555;vertical-align:bottom"></span> '+
+        'ومتابعة جميع الأمور المتعلقة بهذا الشأن أمام الجهات المختصة، '+
+        'واتخاذ ما يلزم من إجراءات قانونية وإدارية بما يخدم مطالب الخريجين.'+
+      '</p>'+
+      '<p class="para">ويُعمل بهذا التخويل من تاريخ تحريره.</p>'+
+      '<div style="margin-top:40px">'+
+        '<div class="sig-row"><span class="sig-lbl">الاسم:</span><span class="dots"></span></div>'+
+        '<div class="sig-row"><span class="sig-lbl">التوقيع:</span><span class="dots"></span></div>'+
+        '<div class="sig-row"><span class="sig-lbl">التاريخ:</span><span style="margin:0 10px;font-size:17px">........ / ........ / .............</span></div>'+
+      '</div>'+
+      '<div class="stamp">مكان الختم الرسمي</div>'+
+    '</div>'+
+    '</body></html>';
+  var w = window.open("","_blank");
+  w.document.open(); w.document.write(html); w.document.close();
+}
+
+// ── Download Buttons Component ─────────────────────────────────────────
+function DownloadButtons({data}) {
+  return (
+    <div style={{display:"flex",gap:12,justifyContent:"center",flexWrap:"wrap",marginTop:20}}>
+      <button
+        onClick={function(){openRegistrationPrint(data);}}
+        style={{background:"linear-gradient(135deg,#1d4ed8,#1e40af)",color:"#fff",border:"none",padding:"12px 24px",borderRadius:12,fontSize:14,fontWeight:700,cursor:"pointer",display:"flex",alignItems:"center",gap:8,boxShadow:"0 4px 16px rgba(29,78,216,.3)"}}>
+        <SvgIcon d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" size={18} color="#fff"/>
+        استمارة التسجيل
+      </button>
+      <button
+        onClick={function(){openAuthorizationPrint(data);}}
+        style={{background:"linear-gradient(135deg,#7c3aed,#6d28d9)",color:"#fff",border:"none",padding:"12px 24px",borderRadius:12,fontSize:14,fontWeight:700,cursor:"pointer",display:"flex",alignItems:"center",gap:8,boxShadow:"0 4px 16px rgba(124,58,237,.3)"}}>
+        <SvgIcon d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" size={18} color="#fff"/>
+        استمارة التخويل
+      </button>
     </div>
   );
 }
