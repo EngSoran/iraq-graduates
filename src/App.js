@@ -296,7 +296,7 @@ function SearchModal({onClose}) {
 
   return (
     <div style={{position:"fixed",inset:0,background:"rgba(0,0,0,.6)",zIndex:1000,display:"flex",alignItems:"center",justifyContent:"center",padding:16,direction:"rtl"}} onClick={function(e){if(e.target===e.currentTarget)onClose();}}>
-      <div style={{background:"#fff",borderRadius:20,width:"100%",maxWidth:500,boxShadow:"0 20px 60px rgba(0,0,0,.25)",overflow:"hidden"}}>
+      <div style={{background:"#fff",borderRadius:20,width:"100%",maxWidth:500,boxShadow:"0 20px 60px rgba(0,0,0,.25)",overflow:"hidden",maxHeight:"90vh",display:"flex",flexDirection:"column"}}>
         <div style={{background:"linear-gradient(135deg,#0f2c54,#1e40af)",padding:"22px 24px",position:"relative"}}>
           <button onClick={onClose} style={{position:"absolute",top:14,left:14,background:"rgba(239,68,68,.85)",border:"none",color:"#fff",borderRadius:8,padding:"5px 14px",fontSize:12,cursor:"pointer",fontWeight:600,display:"flex",alignItems:"center",gap:6}}>
             <SvgIcon d="M6 18L18 6M6 6l12 12" size={13} color="#fff"/> إغلاق
@@ -312,7 +312,7 @@ function SearchModal({onClose}) {
           </div>
         </div>
 
-        <div style={{padding:"24px"}}>
+        <div style={{padding:"24px",overflowY:"auto",flex:1}}>
           <div style={{marginBottom:14}}>
             <label style={{display:"block",fontSize:13,fontWeight:600,color:"#374151",marginBottom:6}}>الاسم الرباعي الكامل</label>
             <input value={name} onChange={function(e){setName(e.target.value);reset();}}
