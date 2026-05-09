@@ -3,7 +3,8 @@ import { useState, useEffect, useCallback, useMemo } from "react";
 // ── Config ────────────────────────────────────────────────────────────
 var SUPABASE_URL = process.env.REACT_APP_SUPABASE_URL;
 var SUPABASE_KEY = process.env.REACT_APP_SUPABASE_KEY;
-var ADMIN_PASS   = process.env.REACT_APP_ADMIN_PASS || "";
+var ADMIN_PASS        = process.env.REACT_APP_ADMIN_PASS || "";
+var READONLY_PASS     = process.env.REACT_APP_READONLY_PASS || "";
 var READY = Boolean(SUPABASE_URL && SUPABASE_KEY);
 
 // ── Constants ─────────────────────────────────────────────────────────
@@ -52,6 +53,8 @@ var P = {
   info:       "M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z",
   privacy:    "M12 11c0 3.517-1.009 6.799-2.753 9.571m-3.44-2.04l.054-.09A13.916 13.916 0 008 11a4 4 0 118 0c0 1.017-.07 2.019-.203 3m-2.118 6.844A21.88 21.88 0 0015.171 17m3.839 1.132c.645-2.266.99-4.659.99-7.132A8 8 0 008 4.07M3 15.364c.64-1.319 1-2.8 1-4.364 0-1.457.39-2.823 1.07-4",
   edit:       "M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z",
+  phone:      "M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.948V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 7V5z",
+  coord:      "M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0z",
 };
 
 function SvgIcon({d, size, color, sw}) {
@@ -648,7 +651,9 @@ function DashboardPage() {
 
 // ── Admin Page ────────────────────────────────────────────────────────
 function AdminPage() {
-  var [authed,setAuthed]         = useState(()=>sessionStorage.getItem("admin_ok")==="1");
+  var [role,setRole]             = useState(()=>sessionStorage.getItem("admin_role")||"");
+  var authed                     = role==="full"||role==="readonly";
+  var isReadonly                 = role==="readonly";
   var [pwd,setPwd]               = useState("");
   var [pwdErr,setPwdErr]         = useState("");
   var [members,setMembers]       = useState([]);
@@ -665,8 +670,20 @@ function AdminPage() {
 
   function login() {
     if(!ADMIN_PASS){setPwdErr("لم يتم تعيين كلمة مرور في إعدادات الموقع");return;}
-    if(pwd===ADMIN_PASS){sessionStorage.setItem("admin_ok","1");setAuthed(true);}
-    else setPwdErr("كلمة المرور غير صحيحة");
+    if(pwd===ADMIN_PASS){
+      sessionStorage.setItem("admin_role","full");
+      setRole("full");
+    } else if(READONLY_PASS && pwd===READONLY_PASS){
+      sessionStorage.setItem("admin_role","readonly");
+      setRole("readonly");
+    } else {
+      setPwdErr("كلمة المرور غير صحيحة");
+    }
+  }
+
+  function logout() {
+    sessionStorage.removeItem("admin_role");
+    setRole("");
   }
 
   // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -714,12 +731,13 @@ function AdminPage() {
   },[members]);
 
   if(!authed) return (
-    <div style={{...pageWrap,maxWidth:420}}>
+    <div style={{...pageWrap,maxWidth:440}}>
       <div style={{...card,textAlign:"center"}}>
         <div style={{width:64,height:64,borderRadius:"50%",background:"#dbeafe",margin:"0 auto 16px",display:"flex",alignItems:"center",justifyContent:"center"}}>
           <SvgIcon d={P.lock} size={30} color="#1d4ed8"/>
         </div>
-        <h2 style={{marginBottom:20,color:"#0f172a"}}>لوحة الإدارة</h2>
+        <h2 style={{marginBottom:6,color:"#0f172a"}}>لوحة الإدارة</h2>
+        <p style={{color:"#94a3b8",fontSize:13,marginBottom:20}}>ادخل كلمة المرور المخصصة لك</p>
         {pwdErr && <div style={{background:"#fef2f2",border:"1px solid #fecaca",color:"#dc2626",padding:"10px 14px",borderRadius:8,marginBottom:14,fontSize:13}}>{pwdErr}</div>}
         <input type="password" value={pwd} onChange={e=>{setPwd(e.target.value);setPwdErr("");}}
           onKeyDown={e=>e.key==="Enter"&&login()}
@@ -727,6 +745,10 @@ function AdminPage() {
         <button style={{...btn(),width:"100%",padding:14,display:"flex",alignItems:"center",justifyContent:"center",gap:8}} onClick={login}>
           <SvgIcon d={P.shield} size={18} color="#fff"/> دخول
         </button>
+        <div style={{marginTop:16,display:"flex",gap:8,justifyContent:"center",flexWrap:"wrap"}}>
+          <span style={{background:"#f0fdf4",color:"#16a34a",borderRadius:20,padding:"4px 14px",fontSize:11,fontWeight:600}}>مدير كامل: صلاحيات شاملة</span>
+          <span style={{background:"#eff6ff",color:"#2563eb",borderRadius:20,padding:"4px 14px",fontSize:11,fontWeight:600}}>مدير قراءة: عرض بدون تعديل</span>
+        </div>
       </div>
     </div>
   );
@@ -758,21 +780,29 @@ function AdminPage() {
   }
 
   var adminTabs = [
-    {k:"list",  l:"قائمة الأعضاء",    icon:P.users},
-    {k:"dups",  l:"التكرارات ("+dupIds.size+")",icon:P.users},
-    {k:"ticker",l:"شريط الأخبار",      icon:P.news},
+    {k:"list",  l:"قائمة الأعضاء",          icon:P.users},
+    {k:"dups",  l:"التكرارات ("+dupIds.size+")", icon:P.users},
+    ...(!isReadonly ? [{k:"ticker", l:"شريط الأخبار", icon:P.news}] : []),
   ];
 
   return (
     <div style={pageWrap}>
       <div style={{display:"flex",justifyContent:"space-between",alignItems:"center",marginBottom:20,flexWrap:"wrap",gap:10}}>
-        <h2 style={{margin:0,color:"#0f172a",display:"flex",alignItems:"center",gap:10}}>
-          <SvgIcon d={P.shield} size={22} color="#1d4ed8"/> لوحة الإدارة
-        </h2>
+        <div>
+          <h2 style={{margin:0,color:"#0f172a",display:"flex",alignItems:"center",gap:10}}>
+            <SvgIcon d={P.shield} size={22} color="#1d4ed8"/> لوحة الإدارة
+          </h2>
+          <div style={{marginTop:6}}>
+            {isReadonly
+              ? <span style={{background:"#eff6ff",color:"#2563eb",borderRadius:20,padding:"3px 12px",fontSize:11,fontWeight:700}}>مدير قراءة فقط — لا يمكن التعديل أو الحذف</span>
+              : <span style={{background:"#f0fdf4",color:"#16a34a",borderRadius:20,padding:"3px 12px",fontSize:11,fontWeight:700}}>مدير كامل الصلاحيات</span>
+            }
+          </div>
+        </div>
         <div style={{display:"flex",gap:8,flexWrap:"wrap"}}>
           <button style={btn("#6366f1","#4f46e5")} onClick={loadAll}>تحديث</button>
           <button style={btn("#15803d","#16a34a")} onClick={exportCSV}>تصدير CSV</button>
-          <button style={btn("#dc2626","#b91c1c")} onClick={()=>{sessionStorage.removeItem("admin_ok");setAuthed(false);}}>خروج</button>
+          <button style={btn("#dc2626","#b91c1c")} onClick={logout}>خروج</button>
         </div>
       </div>
 
@@ -854,10 +884,13 @@ function AdminPage() {
                         <td style={{padding:"8px 9px",direction:"ltr",textAlign:"left",color:"#0369a1",fontFamily:"monospace",whiteSpace:"nowrap"}}>{r.phone}</td>
                         <td style={{padding:"8px 9px",color:"#94a3b8",fontSize:11,whiteSpace:"nowrap"}}>{new Date(r.created_at).toLocaleDateString("en-GB")}</td>
                         <td style={{padding:"8px 9px"}}>
-                          <button onClick={async function(e){e.stopPropagation();if(!window.confirm("هل تريد حذف سجل "+r.full_name+"؟\nلا يمكن التراجع عن هذا الإجراء.")){return;}try{await db.deleteGraduate(r.id);setMembers(function(prev){return prev.filter(function(m){return m.id!==r.id;});});}catch(err){alert("حدث خطأ أثناء الحذف");}}}
-                            style={{background:"#fef2f2",border:"1px solid #fecaca",color:"#dc2626",borderRadius:7,padding:"5px 10px",cursor:"pointer",fontSize:11,fontWeight:600,whiteSpace:"nowrap",display:"flex",alignItems:"center",gap:5}}>
-                            <SvgIcon d={P.trash} size={12} color="#dc2626"/> حذف
-                          </button>
+                          {isReadonly
+                            ? <span style={{color:"#cbd5e1",fontSize:11}}>—</span>
+                            : <button onClick={async function(e){e.stopPropagation();if(!window.confirm("هل تريد حذف سجل "+r.full_name+"؟\nلا يمكن التراجع عن هذا الإجراء.")){return;}try{await db.deleteGraduate(r.id);setMembers(function(prev){return prev.filter(function(m){return m.id!==r.id;});});}catch(err){alert("حدث خطأ أثناء الحذف");}}}
+                                style={{background:"#fef2f2",border:"1px solid #fecaca",color:"#dc2626",borderRadius:7,padding:"5px 10px",cursor:"pointer",fontSize:11,fontWeight:600,whiteSpace:"nowrap",display:"flex",alignItems:"center",gap:5}}>
+                                <SvgIcon d={P.trash} size={12} color="#dc2626"/> حذف
+                              </button>
+                          }
                         </td>
                       </tr>
                     );
@@ -1021,6 +1054,236 @@ function PrivacyPage() {
   );
 }
 
+// ── Coordinators Data ─────────────────────────────────────────────────
+var COORDINATORS = {
+  "بغداد":       [],
+  "البصرة":      [],
+  "نينوى":       [],
+  "أربيل":       [],
+  "السليمانية":  [],
+  "كركوك":       [],
+  "الأنبار":     [],
+  "ديالى": [
+    {name:"محمد البياتي",        district:"بعقوبة",              phone:"07710507568"},
+    {name:"مصطفى شهاب",          district:"قضاء شهربان",          phone:"07718519377"},
+    {name:"اياد هجول شلكام",     district:"خان بني سعد",          phone:"07703456718"},
+    {name:"ابراهيم زكي حميد",    district:"قضاء الخالص",          phone:"07705525630"},
+    {name:"مصطفى هاشم عثمان",    district:"منصورية (دلي عباس)",   phone:"07707732986"},
+    {name:"مصطفى سعيد محسن",     district:"قضاء كنعان",           phone:"07711894896"},
+    {name:"عثمان حسين حسن",      district:"بلدروز",               phone:"07810102302"},
+    {name:"عبد الرحمن القيسي",   district:"جلولاء والسعدية",      phone:"07719840286"},
+    {name:"سيف صلاح أحمد",       district:"قضاء خانقين",          phone:"07727273990"},
+  ],
+  "بابل":        [],
+  "كربلاء":      [],
+  "النجف":       [],
+  "واسط":        [],
+  "ذي قار":      [],
+  "ميسان":       [],
+  "المثنى":      [],
+  "القادسية":    [],
+  "صلاح الدين":  [],
+  "دهوك":        [],
+};
+
+var PROVINCE_COLORS = {
+  "ديالى":        "#0d9488",
+  "بغداد":        "#1d4ed8",
+  "البصرة":       "#7c3aed",
+  "نينوى":        "#d97706",
+  "كركوك":        "#dc2626",
+  "الأنبار":      "#059669",
+  "بابل":         "#0369a1",
+  "كربلاء":       "#9333ea",
+  "النجف":        "#b45309",
+  "واسط":         "#0891b2",
+  "ذي قار":       "#16a34a",
+  "ميسان":        "#ca8a04",
+  "المثنى":       "#4f46e5",
+  "القادسية":     "#be185d",
+  "صلاح الدين":   "#15803d",
+  "دهوك":         "#7c3aed",
+  "أربيل":        "#ea580c",
+  "السليمانية":   "#0f766e",
+};
+
+// ── Coordinators Page ─────────────────────────────────────────────────
+function CoordinatorsPage() {
+  var allProvinces = Object.keys(COORDINATORS);
+  var totalCoords  = Object.values(COORDINATORS).reduce(function(s,a){return s+a.length;},0);
+  var activeProvinces = allProvinces.filter(function(p){return COORDINATORS[p].length>0;});
+
+  var [selProv, setSelProv] = useState("ديالى");
+  var [search,  setSearch]  = useState("");
+
+  var list = COORDINATORS[selProv] || [];
+  var filtered = search.trim()
+    ? list.filter(function(c){
+        var q = search.trim();
+        return c.name.includes(q) || c.district.includes(q) || c.phone.includes(q);
+      })
+    : list;
+
+  var col = PROVINCE_COLORS[selProv] || "#1d4ed8";
+  var isEmpty = list.length === 0;
+
+  return (
+    <div style={pageWrap}>
+      {/* Header */}
+      <div style={{...card, background:"linear-gradient(135deg,#0d9488,#065f46)", color:"#fff", textAlign:"center", marginBottom:20}}>
+        <div style={{width:68, height:68, borderRadius:"50%", background:"rgba(255,255,255,.15)", margin:"0 auto 14px", display:"flex", alignItems:"center", justifyContent:"center"}}>
+          <SvgIcon d={P.coord} size={34} color="#fff"/>
+        </div>
+        <h1 style={{fontSize:24, marginBottom:8}}>منسقو المحافظات</h1>
+        <p style={{opacity:.85, fontSize:14, maxWidth:560, margin:"0 auto", lineHeight:1.8}}>
+          اختر محافظتك للتواصل مع المنسق المسؤول عن قضائك والانضمام إلى مجموعة الواتساب.
+        </p>
+        <div style={{marginTop:16, display:"flex", gap:12, justifyContent:"center", flexWrap:"wrap"}}>
+          <span style={{background:"rgba(255,255,255,.15)", borderRadius:20, padding:"4px 16px", fontSize:13}}>
+            {totalCoords} منسق مسجّل
+          </span>
+          <span style={{background:"rgba(255,255,255,.15)", borderRadius:20, padding:"4px 16px", fontSize:13}}>
+            {activeProvinces.length} محافظة مفعّلة من {allProvinces.length}
+          </span>
+        </div>
+      </div>
+
+      {/* Province Selector */}
+      <div style={{...card, padding:"18px 20px", marginBottom:16}}>
+        <div style={{display:"flex", gap:12, flexWrap:"wrap", alignItems:"center"}}>
+          <div style={{flex:"1 1 220px"}}>
+            <label style={{display:"block", fontSize:12, fontWeight:600, color:"#64748b", marginBottom:6}}>اختر المحافظة</label>
+            <div style={{position:"relative"}}>
+              <select value={selProv} onChange={function(e){setSelProv(e.target.value); setSearch("");}}
+                style={{...inp(false), marginBottom:0, paddingRight:36, cursor:"pointer",
+                  borderColor:col, fontWeight:700, color:"#0f172a"}}>
+                {allProvinces.map(function(p){
+                  var hasData = COORDINATORS[p].length > 0;
+                  return (
+                    <option key={p} value={p}>
+                      {hasData ? "✓ " : "○ "}{p}{hasData ? " ("+COORDINATORS[p].length+")" : " — قريباً"}
+                    </option>
+                  );
+                })}
+              </select>
+              <div style={{position:"absolute", right:10, top:"50%", transform:"translateY(-50%)", pointerEvents:"none"}}>
+                <div style={{width:22, height:22, borderRadius:"50%", background:col, display:"flex", alignItems:"center", justifyContent:"center"}}>
+                  <SvgIcon d={P.map} size={12} color="#fff"/>
+                </div>
+              </div>
+            </div>
+          </div>
+          {!isEmpty && (
+            <div style={{flex:"1 1 220px"}}>
+              <label style={{display:"block", fontSize:12, fontWeight:600, color:"#64748b", marginBottom:6}}>بحث في المنسقين</label>
+              <div style={{display:"flex", alignItems:"center", gap:8, background:"#f8fafc", border:"1.5px solid #e2e8f0", borderRadius:10, padding:"0 12px"}}>
+                <SvgIcon d={P.search} size={15} color="#94a3b8"/>
+                <input value={search} onChange={function(e){setSearch(e.target.value);}}
+                  placeholder="اسم أو قضاء أو هاتف..."
+                  style={{border:"none", outline:"none", background:"transparent", flex:1, padding:"11px 0", fontSize:14}}/>
+                {search && (
+                  <button onClick={function(){setSearch("");}}
+                    style={{background:"none", border:"none", cursor:"pointer", color:"#94a3b8", padding:"4px", fontSize:16, lineHeight:1}}>×</button>
+                )}
+              </div>
+            </div>
+          )}
+        </div>
+
+        {/* Province pills — quick access to active provinces */}
+        <div style={{marginTop:14, display:"flex", gap:6, flexWrap:"wrap"}}>
+          {activeProvinces.map(function(p){
+            var c = PROVINCE_COLORS[p] || "#1d4ed8";
+            var active = selProv === p;
+            return (
+              <button key={p} onClick={function(){setSelProv(p); setSearch("");}}
+                style={{padding:"5px 14px", borderRadius:20, border:"1.5px solid "+(active?c:"#e2e8f0"),
+                  background:active?c+"22":"#fff", color:active?c:"#64748b",
+                  fontWeight:active?700:500, fontSize:12, cursor:"pointer"}}>
+                {p} <span style={{opacity:.7}}>({COORDINATORS[p].length})</span>
+              </button>
+            );
+          })}
+        </div>
+      </div>
+
+      {/* Province Label */}
+      <div style={{display:"flex", alignItems:"center", gap:10, marginBottom:16}}>
+        <div style={{width:4, height:28, borderRadius:2, background:col}}/>
+        <h2 style={{fontSize:17, fontWeight:700, color:"#0f172a", margin:0}}>
+          محافظة {selProv}
+        </h2>
+        {!isEmpty && (
+          <span style={{background:col+"22", color:col, borderRadius:20, padding:"3px 12px", fontSize:12, fontWeight:700}}>
+            {filtered.length} منسق
+          </span>
+        )}
+      </div>
+
+      {/* Empty Province */}
+      {isEmpty ? (
+        <div style={{...card, textAlign:"center", padding:"56px 24px"}}>
+          <div style={{width:64, height:64, borderRadius:"50%", background:"#f1f5f9", margin:"0 auto 16px", display:"flex", alignItems:"center", justifyContent:"center"}}>
+            <SvgIcon d={P.coord} size={30} color="#94a3b8"/>
+          </div>
+          <h3 style={{color:"#64748b", marginBottom:8, fontSize:17}}>لم يُضف منسقو محافظة {selProv} بعد</h3>
+          <p style={{color:"#94a3b8", fontSize:13, margin:0}}>سيتم إضافة المنسقين قريباً — تابع الموقع للتحديثات</p>
+        </div>
+      ) : filtered.length === 0 ? (
+        <div style={{...card, textAlign:"center", padding:"40px 24px", color:"#94a3b8"}}>
+          لا توجد نتائج مطابقة للبحث
+        </div>
+      ) : (
+        <div style={{display:"grid", gridTemplateColumns:"repeat(auto-fill,minmax(280px,1fr))", gap:16}}>
+          {filtered.map(function(c, i){
+            return (
+              <div key={i} style={{background:"#fff", borderRadius:16, padding:"20px", boxShadow:"0 2px 14px rgba(0,0,0,.07)", border:"1px solid #f1f5f9", borderTop:"4px solid "+col, display:"flex", flexDirection:"column", gap:12}}>
+                <div style={{display:"flex", alignItems:"center", gap:12}}>
+                  <div style={{width:50, height:50, borderRadius:"50%", background:col+"22", display:"flex", alignItems:"center", justifyContent:"center", flexShrink:0}}>
+                    <span style={{fontSize:20, fontWeight:800, color:col}}>{c.name.trim()[0]}</span>
+                  </div>
+                  <div>
+                    <div style={{fontWeight:700, fontSize:15, color:"#0f172a", lineHeight:1.3}}>{c.name}</div>
+                    <div style={{fontSize:12, color:"#64748b", marginTop:3, display:"flex", alignItems:"center", gap:5}}>
+                      <SvgIcon d={P.map} size={12} color="#94a3b8"/>
+                      {c.district}
+                    </div>
+                  </div>
+                </div>
+
+                <div style={{background:col+"11", borderRadius:10, padding:"8px 12px", display:"flex", alignItems:"center", gap:8}}>
+                  <SvgIcon d={P.map} size={15} color={col}/>
+                  <span style={{fontSize:13, color:col, fontWeight:600}}>منسق {c.district}</span>
+                </div>
+
+                <a href={"tel:"+c.phone} style={{textDecoration:"none"}}>
+                  <div style={{background:"#f0fdf4", border:"1px solid #86efac", borderRadius:10, padding:"10px 14px", display:"flex", alignItems:"center", justifyContent:"space-between", cursor:"pointer"}}>
+                    <span style={{fontFamily:"monospace", fontSize:15, fontWeight:700, color:"#15803d", direction:"ltr"}}>{c.phone}</span>
+                    <div style={{width:32, height:32, borderRadius:"50%", background:"#16a34a", display:"flex", alignItems:"center", justifyContent:"center"}}>
+                      <SvgIcon d={P.phone} size={16} color="#fff"/>
+                    </div>
+                  </div>
+                </a>
+
+                <a href={"tel:"+c.phone} style={{textDecoration:"none"}}>
+                  <button style={{...btn("#15803d","#16a34a"), width:"100%", display:"flex", alignItems:"center", justifyContent:"center", gap:8, padding:"10px"}}>
+                    <SvgIcon d={P.phone} size={16} color="#fff"/>
+                    اتصل الآن
+                  </button>
+                </a>
+              </div>
+            );
+          })}
+        </div>
+      )}
+
+      <div style={{textAlign:"center", marginTop:28, color:"#94a3b8", fontSize:12, padding:"12px"}}>
+        للانضمام إلى مجموعة واتساب محافظتك، تواصل مع المنسق المسؤول عن منطقتك
+      </div>
+    </div>
+  );
+}
+
 // ── App Root ──────────────────────────────────────────────────────────
 export default function App() {
   var [page,setPage]         = useState("register");
@@ -1028,11 +1291,12 @@ export default function App() {
   if(!READY) return <NoEnvScreen/>;
 
   var navItems = [
-    {k:"register",  l:"تسجيل",   icon:P.edit},
-    {k:"dashboard", l:"الإحصائيات", icon:P.chart},
-    {k:"admin",     l:"الإدارة", icon:P.shield},
-    {k:"about",     l:"عن الرابطة",icon:P.info},
-    {k:"privacy",   l:"الخصوصية",  icon:P.privacy},
+    {k:"register",     l:"تسجيل",        icon:P.edit},
+    {k:"dashboard",    l:"الإحصائيات",   icon:P.chart},
+    {k:"coordinators", l:"المنسقون",     icon:P.coord},
+    {k:"admin",        l:"الإدارة",      icon:P.shield},
+    {k:"about",        l:"عن الرابطة",   icon:P.info},
+    {k:"privacy",      l:"الخصوصية",     icon:P.privacy},
   ];
 
   return (
@@ -1060,11 +1324,12 @@ export default function App() {
 
       <Ticker/>
 
-      {page==="register"  && <RegisterPage/>}
-      {page==="dashboard" && <DashboardPage/>}
-      {page==="admin"     && <AdminPage/>}
-      {page==="about"     && <AboutPage/>}
-      {page==="privacy"   && <PrivacyPage/>}
+      {page==="register"     && <RegisterPage/>}
+      {page==="dashboard"    && <DashboardPage/>}
+      {page==="coordinators" && <CoordinatorsPage/>}
+      {page==="admin"        && <AdminPage/>}
+      {page==="about"        && <AboutPage/>}
+      {page==="privacy"      && <PrivacyPage/>}
 
       {showSearch && <SearchModal onClose={()=>setSearch(false)}/>}
 
