@@ -1425,39 +1425,234 @@ function CoordinatorsPage() {
   );
 }
 
+// ── Home Page ─────────────────────────────────────────────────────────
+function HomePage({setPage, openSearch}) {
+  var [stats, setStats]   = useState(null);
+  var [hover,  setHover]  = useState("");
+
+  useEffect(function(){
+    db.getStats().then(setStats).catch(function(){});
+  }, []);
+
+  var total    = stats ? parseInt(stats.total)||0    : null;
+  var employed = stats ? parseInt(stats.employed)||0 : null;
+  var provinces= stats ? (stats.by_province||[]).length : null;
+
+  var featureCards = [
+    {
+      k:"register",
+      icon:P.edit,
+      title:"سجّل الآن",
+      desc:"انضم إلى قاعدة بيانات رابطة الخريجين العراقيين القدماء. التسجيل مجاني وسريع ولا يستغرق أكثر من دقيقتين.",
+      cta:"ابدأ التسجيل",
+      grad:"linear-gradient(135deg,#1d4ed8,#1e40af)",
+      light:"#eff6ff",
+      accent:"#1d4ed8",
+    },
+    {
+      k:"dashboard",
+      icon:P.chart,
+      title:"الإحصائيات",
+      desc:"اطّلع على إحصائيات شاملة ومحدّثة لحظياً حول أعداد الخريجين وتوزيعهم الجغرافي ونسب التوظيف.",
+      cta:"عرض الإحصائيات",
+      grad:"linear-gradient(135deg,#0d9488,#0f766e)",
+      light:"#f0fdfa",
+      accent:"#0d9488",
+    },
+    {
+      k:"coordinators",
+      icon:P.coord,
+      title:"المنسقون",
+      desc:"تواصل مع منسق محافظتك مباشرةً للاستفسار والانضمام إلى مجموعة الواتساب الخاصة بمنطقتك.",
+      cta:"اعثر على منسقك",
+      grad:"linear-gradient(135deg,#7c3aed,#6d28d9)",
+      light:"#f5f3ff",
+      accent:"#7c3aed",
+    },
+    {
+      k:"about",
+      icon:P.info,
+      title:"عن الرابطة",
+      desc:"تعرّف على رسالة رابطة الخريجين العراقيين القدماء ورؤيتها وأهدافها الوطنية في توثيق وخدمة الخريجين.",
+      cta:"اقرأ أكثر",
+      grad:"linear-gradient(135deg,#d97706,#b45309)",
+      light:"#fffbeb",
+      accent:"#d97706",
+    },
+  ];
+
+  var quickStats = [
+    {label:"إجمالي المسجلين",  val:total,     icon:P.users,  color:"#1d4ed8", suffix:""},
+    {label:"محافظة مسجّلة",   val:provinces, icon:P.map,    color:"#0d9488", suffix:""},
+    {label:"موظف في الرابطة", val:employed,  icon:P.person, color:"#16a34a", suffix:""},
+  ];
+
+  return (
+    <div style={{direction:"rtl"}}>
+
+      {/* ── Hero ── */}
+      <div style={{background:"linear-gradient(160deg,#0f2c54 0%,#0a1a35 55%,#1e3a5f 100%)",padding:"64px 24px 80px",textAlign:"center",position:"relative",overflow:"hidden"}}>
+        {/* decorative circles */}
+        <div style={{position:"absolute",top:-60,right:-60,width:220,height:220,borderRadius:"50%",background:"rgba(255,255,255,.03)",pointerEvents:"none"}}/>
+        <div style={{position:"absolute",bottom:-80,left:-40,width:300,height:300,borderRadius:"50%",background:"rgba(251,191,36,.04)",pointerEvents:"none"}}/>
+
+        <div style={{maxWidth:720,margin:"0 auto",position:"relative"}}>
+          {/* Logo */}
+          <div style={{width:90,height:90,borderRadius:22,background:"rgba(255,255,255,.1)",border:"2px solid rgba(255,255,255,.15)",display:"flex",alignItems:"center",justifyContent:"center",margin:"0 auto 28px",boxShadow:"0 8px 32px rgba(0,0,0,.3)"}}>
+            <SvgIcon d={P.grad} size={46} color="#fbbf24"/>
+          </div>
+
+          {/* Title */}
+          <h1 style={{color:"#fff",fontSize:"clamp(24px,5vw,42px)",fontWeight:800,marginBottom:16,lineHeight:1.2,letterSpacing:"-0.5px"}}>
+            رابطة الخريجين العراقيين القدماء
+          </h1>
+          <p style={{color:"#93c5fd",fontSize:"clamp(14px,2.5vw,18px)",marginBottom:40,lineHeight:1.9,maxWidth:580,margin:"0 auto 40px"}}>
+            منصة وطنية لتوثيق وإحصاء خريجي الجامعات العراقية من جميع المحافظات — سجّل بياناتك وكن جزءاً من أكبر قاعدة بيانات للخريجين في العراق.
+          </p>
+
+          {/* CTA Buttons */}
+          <div style={{display:"flex",gap:14,justifyContent:"center",flexWrap:"wrap",marginBottom:52}}>
+            <button onClick={function(){setPage("register");}}
+              style={{background:"linear-gradient(135deg,#fbbf24,#f59e0b)",color:"#0f172a",border:"none",padding:"14px 36px",borderRadius:12,fontSize:16,fontWeight:800,cursor:"pointer",boxShadow:"0 4px 20px rgba(251,191,36,.4)",display:"flex",alignItems:"center",gap:10}}>
+              <SvgIcon d={P.edit} size={18} color="#0f172a"/>
+              سجّل الآن — مجاناً
+            </button>
+            <button onClick={openSearch}
+              style={{background:"rgba(255,255,255,.1)",color:"#fff",border:"2px solid rgba(255,255,255,.25)",padding:"14px 32px",borderRadius:12,fontSize:15,fontWeight:700,cursor:"pointer",display:"flex",alignItems:"center",gap:10,backdropFilter:"blur(4px)"}}>
+              <SvgIcon d={P.search} size={18} color="#fff"/>
+              ابحث عن اسمك
+            </button>
+          </div>
+
+          {/* Quick Stats */}
+          <div style={{display:"flex",gap:16,justifyContent:"center",flexWrap:"wrap"}}>
+            {quickStats.map(function(s){
+              return (
+                <div key={s.label} style={{background:"rgba(255,255,255,.08)",border:"1px solid rgba(255,255,255,.12)",borderRadius:16,padding:"18px 28px",textAlign:"center",minWidth:140,backdropFilter:"blur(4px)"}}>
+                  <div style={{width:38,height:38,borderRadius:"50%",background:s.color+"33",display:"flex",alignItems:"center",justifyContent:"center",margin:"0 auto 10px"}}>
+                    <SvgIcon d={s.icon} size={18} color={s.color}/>
+                  </div>
+                  <div style={{fontSize:s.val===null?"22px":"30px",fontWeight:800,color:"#fff",lineHeight:1,marginBottom:6}}>
+                    {s.val===null
+                      ? <span style={{display:"inline-block",width:40,height:28,background:"rgba(255,255,255,.1)",borderRadius:6}}/>
+                      : s.val.toLocaleString("en-US")+s.suffix
+                    }
+                  </div>
+                  <div style={{fontSize:12,color:"#93c5fd",fontWeight:500}}>{s.label}</div>
+                </div>
+              );
+            })}
+          </div>
+        </div>
+      </div>
+
+      {/* ── Feature Cards ── */}
+      <div style={{maxWidth:1100,margin:"0 auto",padding:"48px 20px"}}>
+        <div style={{textAlign:"center",marginBottom:40}}>
+          <h2 style={{fontSize:26,fontWeight:800,color:"#0f172a",marginBottom:10}}>ماذا تريد أن تفعل؟</h2>
+          <p style={{color:"#64748b",fontSize:15}}>اختر من الخدمات المتاحة أدناه</p>
+        </div>
+
+        <div style={{display:"grid",gridTemplateColumns:"repeat(auto-fit,minmax(240px,1fr))",gap:20}}>
+          {featureCards.map(function(fc){
+            var isHov = hover===fc.k;
+            return (
+              <div key={fc.k}
+                onMouseEnter={function(){setHover(fc.k);}}
+                onMouseLeave={function(){setHover("");}}
+                onClick={function(){setPage(fc.k);}}
+                style={{background:"#fff",borderRadius:20,padding:"32px 24px",boxShadow:isHov?"0 16px 48px rgba(0,0,0,.12)":"0 2px 16px rgba(0,0,0,.06)",border:"1.5px solid "+(isHov?fc.accent+"44":"#f1f5f9"),cursor:"pointer",transition:"all .2s",transform:isHov?"translateY(-4px)":"none",display:"flex",flexDirection:"column",gap:16}}>
+
+                {/* Icon */}
+                <div style={{width:60,height:60,borderRadius:16,background:fc.grad,display:"flex",alignItems:"center",justifyContent:"center",boxShadow:"0 4px 16px rgba(0,0,0,.15)",flexShrink:0}}>
+                  <SvgIcon d={fc.icon} size={28} color="#fff"/>
+                </div>
+
+                {/* Text */}
+                <div>
+                  <h3 style={{fontSize:20,fontWeight:800,color:"#0f172a",marginBottom:10}}>{fc.title}</h3>
+                  <p style={{color:"#64748b",fontSize:14,lineHeight:1.8,margin:0}}>{fc.desc}</p>
+                </div>
+
+                {/* CTA */}
+                <div style={{marginTop:"auto",paddingTop:8}}>
+                  <div style={{display:"inline-flex",alignItems:"center",gap:8,color:fc.accent,fontWeight:700,fontSize:14}}>
+                    {fc.cta}
+                    <SvgIcon d="M19 12H5m7-7l7 7-7 7" size={16} color={fc.accent}/>
+                  </div>
+                </div>
+
+                {/* Bottom accent bar */}
+                <div style={{height:3,borderRadius:2,background:isHov?fc.grad:"#f1f5f9",transition:"background .2s",marginTop:-8}}/>
+              </div>
+            );
+          })}
+        </div>
+      </div>
+
+      {/* ── Info Strip ── */}
+      <div style={{background:"linear-gradient(135deg,#0f2c54,#1e3a5f)",padding:"40px 24px",marginTop:8}}>
+        <div style={{maxWidth:900,margin:"0 auto",display:"grid",gridTemplateColumns:"repeat(auto-fit,minmax(200px,1fr))",gap:28,textAlign:"center"}}>
+          {[
+            {icon:P.lock,   title:"بيانات محمية",   text:"تُخزَّن بياناتك بأمان على خوادم مشفّرة. رقم هاتفك لا يظهر للعموم أبداً."},
+            {icon:P.heart,  title:"غير حكومية",     text:"الرابطة مستقلة وغير تابعة لأي جهة حكومية أو حزبية."},
+            {icon:P.chart,  title:"إحصاء وطني",    text:"نهدف لبناء قاعدة بيانات وطنية شاملة تخدم سوق العمل والتخطيط الأكاديمي."},
+          ].map(function(item){return(
+            <div key={item.title} style={{color:"#fff"}}>
+              <div style={{width:48,height:48,borderRadius:14,background:"rgba(255,255,255,.1)",display:"flex",alignItems:"center",justifyContent:"center",margin:"0 auto 14px"}}>
+                <SvgIcon d={item.icon} size={22} color="#fbbf24"/>
+              </div>
+              <h4 style={{fontSize:15,fontWeight:700,marginBottom:8}}>{item.title}</h4>
+              <p style={{opacity:.75,fontSize:13,lineHeight:1.8,margin:0}}>{item.text}</p>
+            </div>
+          );})}
+        </div>
+      </div>
+
+    </div>
+  );
+}
+
 // ── App Root ──────────────────────────────────────────────────────────
 export default function App() {
-  var [page,setPage]         = useState("register");
+  var [page,setPage]         = useState("home");
   var [showSearch,setSearch] = useState(false);
   if(!READY) return <NoEnvScreen/>;
 
   var navItems = [
+    {k:"home",         l:"الرئيسية",     icon:P.heart},
     {k:"register",     l:"تسجيل",        icon:P.edit},
     {k:"dashboard",    l:"الإحصائيات",   icon:P.chart},
     {k:"coordinators", l:"المنسقون",     icon:P.coord},
     {k:"admin",        l:"الإدارة",      icon:P.shield},
     {k:"about",        l:"عن الرابطة",   icon:P.info},
-    {k:"privacy",      l:"الخصوصية",     icon:P.privacy},
   ];
 
   return (
     <div style={{fontFamily:"'Segoe UI',Tahoma,Arial,sans-serif",minHeight:"100vh",background:"#f1f5f9",color:"#1e293b",direction:"rtl"}}>
-      <nav style={{background:"linear-gradient(135deg,#0f2c54,#0a1a35)",padding:"0 24px",display:"flex",alignItems:"center",justifyContent:"space-between",boxShadow:"0 2px 16px rgba(0,0,0,.35)",flexWrap:"wrap",gap:4,paddingTop:6,paddingBottom:6}}>
-        <div style={{color:"#fff",fontSize:15,fontWeight:700,padding:"10px 0",display:"flex",alignItems:"center",gap:12}}>
-          <div style={{width:34,height:34,borderRadius:8,background:"rgba(255,255,255,.12)",display:"flex",alignItems:"center",justifyContent:"center"}}>
-            <SvgIcon d={P.grad} size={20} color="#fff"/>
+      <nav style={{background:"linear-gradient(135deg,#0f2c54,#0a1a35)",padding:"0 20px",display:"flex",alignItems:"center",justifyContent:"space-between",boxShadow:"0 2px 16px rgba(0,0,0,.35)",flexWrap:"wrap",gap:4,paddingTop:6,paddingBottom:6}}>
+        {/* Logo — click to go home */}
+        <div onClick={function(){setPage("home");}} style={{color:"#fff",fontSize:15,fontWeight:700,padding:"8px 0",display:"flex",alignItems:"center",gap:10,cursor:"pointer",userSelect:"none"}}>
+          <div style={{width:36,height:36,borderRadius:10,background:"linear-gradient(135deg,rgba(251,191,36,.25),rgba(255,255,255,.1))",border:"1px solid rgba(255,255,255,.15)",display:"flex",alignItems:"center",justifyContent:"center"}}>
+            <SvgIcon d={P.grad} size={20} color="#fbbf24"/>
           </div>
-          رابطة الخريجين العراقيين
-          <span style={{fontSize:10,background:"rgba(34,197,94,.2)",color:"#4ade80",padding:"2px 8px",borderRadius:20}}>LIVE</span>
+          <span style={{display:"flex",flexDirection:"column",lineHeight:1.2}}>
+            <span style={{fontSize:13,fontWeight:800}}>رابطة الخريجين العراقيين</span>
+            <span style={{fontSize:10,color:"rgba(255,255,255,.5)",fontWeight:400}}>Iraqi Graduates Association</span>
+          </span>
+          <span style={{fontSize:9,background:"rgba(34,197,94,.2)",color:"#4ade80",padding:"2px 8px",borderRadius:20,fontWeight:700,letterSpacing:1}}>LIVE</span>
         </div>
+
         <div style={{display:"flex",gap:2,flexWrap:"wrap",alignItems:"center"}}>
-          {navItems.map(n=>(
-            <button key={n.k} style={{...navBtn(page===n.k),display:"flex",alignItems:"center",gap:7}} onClick={()=>setPage(n.k)}>
-              <SvgIcon d={n.icon} size={14} color={page===n.k?"#fff":"rgba(255,255,255,.7)"}/>{n.l}
-            </button>
-          ))}
-          <button onClick={()=>setSearch(true)} style={{background:"rgba(251,191,36,.15)",border:"1px solid rgba(251,191,36,.4)",color:"#fbbf24",padding:"8px 16px",borderRadius:8,cursor:"pointer",fontSize:13,fontWeight:600,marginRight:8,display:"flex",alignItems:"center",gap:7}}>
-            <SvgIcon d={P.search} size={14} color="#fbbf24"/>
+          {navItems.map(function(n){
+            return (
+              <button key={n.k} style={{...navBtn(page===n.k),display:"flex",alignItems:"center",gap:6,fontSize:12}} onClick={function(){setPage(n.k);}}>
+                <SvgIcon d={n.icon} size={13} color={page===n.k?"#fff":"rgba(255,255,255,.7)"}/>{n.l}
+              </button>
+            );
+          })}
+          <button onClick={function(){setSearch(true);}} style={{background:"rgba(251,191,36,.15)",border:"1px solid rgba(251,191,36,.4)",color:"#fbbf24",padding:"8px 14px",borderRadius:8,cursor:"pointer",fontSize:12,fontWeight:700,marginRight:6,display:"flex",alignItems:"center",gap:6}}>
+            <SvgIcon d={P.search} size={13} color="#fbbf24"/>
             ابحث عن اسمك
           </button>
         </div>
@@ -1465,6 +1660,7 @@ export default function App() {
 
       <Ticker/>
 
+      {page==="home"         && <HomePage setPage={setPage} openSearch={function(){setSearch(true);}}/>}
       {page==="register"     && <RegisterPage/>}
       {page==="dashboard"    && <DashboardPage/>}
       {page==="coordinators" && <CoordinatorsPage/>}
@@ -1472,12 +1668,15 @@ export default function App() {
       {page==="about"        && <AboutPage/>}
       {page==="privacy"      && <PrivacyPage/>}
 
-      {showSearch && <SearchModal onClose={()=>setSearch(false)}/>}
+      {showSearch && <SearchModal onClose={function(){setSearch(false);}}/>}
 
-      <footer style={{textAlign:"center",padding:"16px",color:"#94a3b8",fontSize:11,borderTop:"1px solid #e2e8f0",background:"#fff",marginTop:8}}>
-        رابطة الخريجين العراقيين القدماء &copy; {CUR_YEAR} &nbsp;·&nbsp;
-        <span style={{cursor:"pointer",color:"#0ea5e9"}} onClick={()=>setPage("privacy")}>سياسة الخصوصية</span> &nbsp;·&nbsp;
-        <span style={{cursor:"pointer",color:"#0ea5e9"}} onClick={()=>setPage("about")}>عن الرابطة</span>
+      <footer style={{textAlign:"center",padding:"20px 16px",color:"#94a3b8",fontSize:11,borderTop:"1px solid #e2e8f0",background:"#fff",marginTop:0}}>
+        <div style={{marginBottom:8,display:"flex",gap:16,justifyContent:"center",flexWrap:"wrap"}}>
+          <span style={{cursor:"pointer",color:"#0ea5e9"}} onClick={function(){setPage("about");}}>عن الرابطة</span>
+          <span style={{cursor:"pointer",color:"#0ea5e9"}} onClick={function(){setPage("privacy");}}>سياسة الخصوصية</span>
+          <span style={{cursor:"pointer",color:"#0ea5e9"}} onClick={function(){setPage("coordinators");}}>المنسقون</span>
+        </div>
+        رابطة الخريجين العراقيين القدماء &copy; {CUR_YEAR} — جميع الحقوق محفوظة
       </footer>
     </div>
   );
