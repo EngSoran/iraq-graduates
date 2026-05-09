@@ -1455,114 +1455,153 @@ function fmtBirthDate(bd) {
   return {day:parts[0]||"....",month:parts[1]||"....",year:parts[2]||"............"};
 }
 
+function openPrintWindow(html) {
+  try {
+    var blob = new Blob([html], {type:"text/html;charset=utf-8"});
+    var url  = URL.createObjectURL(blob);
+    var w    = window.open(url, "_blank");
+    if(!w) alert("يرجى السماح بفتح النوافذ المنبثقة في إعدادات المتصفح ثم أعد المحاولة");
+    else   setTimeout(function(){ URL.revokeObjectURL(url); }, 60000);
+  } catch(e) { alert("حدث خطأ أثناء فتح الاستمارة: "+e.message); }
+}
+
 function openRegistrationPrint(data) {
-  var bd   = fmtBirthDate(data.birth_date||"");
-  var html = '<!DOCTYPE html><html lang="ar" dir="rtl"><head><meta charset="UTF-8"/><title>استمارة تسجيل — '+
-    (data.full_name||"")+
-    '</title><style>'+
-    '*{margin:0;padding:0;box-sizing:border-box;}'+
-    'body{font-family:"Traditional Arabic","Arial",sans-serif;background:#ddd5be;min-height:100vh;display:flex;flex-direction:column;align-items:center;padding:24px;direction:rtl;}'+
-    '.print-btn{margin-bottom:16px;padding:10px 30px;background:#1d4ed8;color:#fff;border:none;border-radius:8px;font-size:15px;cursor:pointer;font-family:inherit;box-shadow:0 2px 8px rgba(29,78,216,.3);}'+
-    '.page{width:700px;background:#f5efd8;border:7px double #8b7044;box-shadow:inset 0 0 0 4px #c9a84c,0 8px 40px rgba(0,0,0,.25);overflow:hidden;}'+
-    '.inner{border:2px solid #c9a84c;margin:8px;overflow:hidden;}'+
-    '.hdr{display:flex;align-items:center;justify-content:space-between;padding:14px 20px 6px;}'+
-    '.hdr-txt{font-size:18px;font-weight:bold;color:#1a1505;line-height:1.55;text-align:center;}'+
-    '.hdr-logo{font-size:72px;line-height:1;text-align:center;}'+
-    '.ribbon{background:linear-gradient(to bottom,#111,#2a2a2a);padding:5px 0;text-align:center;border-top:2.5px solid #c9a84c;border-bottom:2.5px solid #c9a84c;}'+
-    '.ribbon-txt{color:#c9a84c;font-size:13px;letter-spacing:3px;}'+
-    '.body{padding:14px 26px;}'+
-    '.row{display:flex;align-items:baseline;padding:8px 0 4px;border-bottom:1.5px dashed #9a8060;margin-bottom:4px;gap:10px;min-height:38px;}'+
-    '.lbl{font-size:16px;font-weight:bold;color:#1a1505;white-space:nowrap;flex-shrink:0;}'+
-    '.val{flex:1;font-size:16px;color:#1a1505;text-align:right;}'+
-    '.row2{display:flex;gap:20px;padding:8px 0 4px;border-bottom:1.5px dashed #9a8060;margin-bottom:4px;min-height:38px;align-items:baseline;}'+
-    '.pledge{text-align:center;font-size:16px;font-weight:bold;color:#1a1505;padding:10px 0 6px;border-bottom:1.5px dashed #9a8060;margin:4px 0;}'+
-    '.btm{background:linear-gradient(to bottom,#111,#222);color:#c9a84c;text-align:center;padding:18px 20px;font-size:19px;font-weight:bold;border-top:3px solid #c9a84c;line-height:1.6;}'+
-    '@media print{body{background:#fff;padding:0;}.print-btn{display:none;}.page{width:100%;box-shadow:none;border:6px double #8b7044;}}'+
-    '</style></head><body>'+
-    '<button class="print-btn" onclick="window.print()">🖨️ طباعة / حفظ كـ PDF</button>'+
-    '<div class="page"><div class="inner">'+
-    '<div class="hdr">'+
-      '<div class="hdr-txt">استمارة قاعدة<br/>البيانات</div>'+
-      '<div class="hdr-logo">🎓</div>'+
-      '<div class="hdr-txt">الخريجين القدامى<br/>في العراق</div>'+
-    '</div>'+
-    '<div class="ribbon"><span class="ribbon-txt">— رابطة الخريجين العراقيين القدامى —</span></div>'+
-    '<div class="body">'+
-      '<div class="row"><span class="lbl">الاسم الثلاثي واللقب:</span><span class="val">'+(data.full_name||"")+'</span></div>'+
-      '<div class="row2">'+
-        '<div style="display:flex;align-items:baseline;gap:6px"><span class="lbl">المواليد — اليوم:</span><span style="font-size:16px;min-width:34px;text-align:center;font-weight:bold">'+bd.day+'</span></div>'+
-        '<div style="display:flex;align-items:baseline;gap:6px"><span class="lbl">الشهر:</span><span style="font-size:16px;min-width:34px;text-align:center;font-weight:bold">'+bd.month+'</span></div>'+
-        '<div style="display:flex;align-items:baseline;gap:6px"><span class="lbl">السنة:</span><span style="font-size:16px;min-width:60px;text-align:center;font-weight:bold">'+bd.year+'</span></div>'+
-      '</div>'+
-      '<div class="row2">'+
-        '<div style="flex:1;display:flex;align-items:baseline;gap:8px"><span class="lbl">المحافظة:</span><span style="font-size:16px;font-weight:bold">'+(data.province||"")+'</span></div>'+
-        '<div style="flex:1;display:flex;align-items:baseline;gap:8px"><span class="lbl">القضاء:</span><span style="font-size:16px;font-weight:bold">'+(data.sub_district||"")+'</span></div>'+
-      '</div>'+
-      '<div class="row"><span class="lbl">الحالة الاجتماعية:</span><span class="val">'+(data.marital_status||"")+'</span></div>'+
-      '<div class="row" style="flex-direction:column;align-items:flex-start;gap:4px">'+
-        '<span class="lbl">التحصيل الدراسي:</span>'+
-        '<span style="font-size:15px;padding-right:8px;color:#1a1505">'+(data.university||"")+(data.department?" — "+data.department:"")+'</span>'+
-        '<div style="display:flex;gap:28px;font-size:16px;font-weight:bold;padding-right:8px;margin-top:2px">'+
-          '<span>☑ جامعة</span><span>☐ معهد</span>'+
-        '</div>'+
-      '</div>'+
-      '<div class="row"><span class="lbl">الاختصاص:</span><span class="val">'+(data.specialization||data.department||"")+'</span></div>'+
-      '<div class="row"><span class="lbl">سنة التخرج:</span><span class="val">'+(data.graduation_year||"")+'</span></div>'+
-      '<div class="row"><span class="lbl">رقم الهاتف:</span><span class="val" style="direction:ltr;text-align:left">'+(data.phone||"")+'</span></div>'+
-      '<div class="pledge">اتعهد بأن جميع المعلومات صحيحة</div>'+
-      '<div class="row"><span class="lbl">التوقيع:</span><span class="val"></span></div>'+
-      '<div class="row"><span class="lbl">التاريخ:</span><span class="val" style="direction:ltr;text-align:left">______ / ______ / 2026</span></div>'+
-      '<div class="row" style="margin-bottom:12px"><span class="lbl">ملاحظة//:</span><span class="val"></span></div>'+
-    '</div>'+
-    '<div class="btm">تسلم بيد الممثل او أعضاء اللجنة التنسيقية المعرفين حصرا</div>'+
-    '</div></div>'+
-    '</body></html>';
-  var w = window.open("","_blank");
-  w.document.open(); w.document.write(html); w.document.close();
+  var bd = fmtBirthDate(data.birth_date||"");
+  var esc = function(v){ return String(v||"").replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;"); };
+  var n   = esc(data.full_name);
+  var uni = esc(data.university);
+  var dep = esc(data.department);
+  var spc = esc(data.specialization||data.department);
+  var prov= esc(data.province);
+  var sub = esc(data.sub_district);
+  var mar = esc(data.marital_status);
+  var yr  = esc(data.graduation_year);
+  var ph  = esc(data.phone);
+
+  var html = [
+    '<!DOCTYPE html><html lang="ar" dir="rtl">',
+    '<head><meta charset="UTF-8">',
+    '<title>استمارة تسجيل</title>',
+    '<style>',
+    '*{margin:0;padding:0;box-sizing:border-box}',
+    'body{font-family:"Traditional Arabic","Arial",sans-serif;background:#ddd5be;',
+    'min-height:100vh;display:flex;flex-direction:column;align-items:center;padding:24px;direction:rtl}',
+    '.pbtn{margin-bottom:16px;padding:10px 32px;background:#1d4ed8;color:#fff;border:none;',
+    'border-radius:8px;font-size:15px;cursor:pointer;font-family:inherit}',
+    '.page{width:700px;background:#f5efd8;border:7px double #8b7044;',
+    'box-shadow:inset 0 0 0 4px #c9a84c,0 8px 40px rgba(0,0,0,.25);overflow:hidden}',
+    '.inner{border:2px solid #c9a84c;margin:8px;overflow:hidden}',
+    '.hdr{display:flex;align-items:center;justify-content:space-between;padding:14px 20px 6px}',
+    '.ht{font-size:18px;font-weight:bold;color:#1a1505;line-height:1.6;text-align:center}',
+    '.hl{font-size:68px;line-height:1;text-align:center}',
+    '.rib{background:linear-gradient(to bottom,#111,#2a2a2a);padding:5px 0;text-align:center;',
+    'border-top:2.5px solid #c9a84c;border-bottom:2.5px solid #c9a84c;',
+    'color:#c9a84c;font-size:13px;letter-spacing:3px}',
+    '.bd{padding:14px 26px}',
+    '.row{display:flex;align-items:baseline;padding:8px 0 4px;',
+    'border-bottom:1.5px dashed #9a8060;margin-bottom:4px;gap:10px;min-height:36px}',
+    '.lb{font-size:16px;font-weight:bold;color:#1a1505;white-space:nowrap;flex-shrink:0}',
+    '.vl{flex:1;font-size:16px;color:#1a1505;text-align:right}',
+    '.r2{display:flex;gap:18px;padding:8px 0 4px;border-bottom:1.5px dashed #9a8060;',
+    'margin-bottom:4px;min-height:36px;align-items:baseline}',
+    '.plg{text-align:center;font-size:15px;font-weight:bold;color:#1a1505;',
+    'padding:10px 0;border-bottom:1.5px dashed #9a8060;margin:4px 0}',
+    '.btm{background:linear-gradient(to bottom,#111,#222);color:#c9a84c;text-align:center;',
+    'padding:18px 20px;font-size:18px;font-weight:bold;border-top:3px solid #c9a84c;line-height:1.7}',
+    '@media print{body{background:#fff;padding:0}.pbtn{display:none}',
+    '.page{width:100%;box-shadow:none;border:6px double #8b7044}}',
+    '</style></head><body>',
+    '<button class="pbtn" onclick="window.print()">&#128424; طباعة / حفظ كـ PDF</button>',
+    '<div class="page"><div class="inner">',
+    '<div class="hdr">',
+    '<div class="ht">استمارة قاعدة<br>البيانات</div>',
+    '<div class="hl">&#127891;</div>',
+    '<div class="ht">الخريجين القدامى<br>في العراق</div>',
+    '</div>',
+    '<div class="rib">&#8213; رابطة الخريجين العراقيين القدامى &#8213;</div>',
+    '<div class="bd">',
+    '<div class="row"><span class="lb">الاسم الثلاثي واللقب:</span><span class="vl">'+n+'</span></div>',
+    '<div class="r2">',
+    '<span class="lb">المواليد &mdash; اليوم: </span><b style="font-size:16px">'+bd.day+'</b>',
+    '<span class="lb">&nbsp;&nbsp;الشهر: </span><b style="font-size:16px">'+bd.month+'</b>',
+    '<span class="lb">&nbsp;&nbsp;السنة: </span><b style="font-size:16px">'+bd.year+'</b>',
+    '</div>',
+    '<div class="r2">',
+    '<div style="flex:1;display:flex;gap:8px;align-items:baseline"><span class="lb">المحافظة:</span><span style="font-size:16px;font-weight:bold">'+prov+'</span></div>',
+    '<div style="flex:1;display:flex;gap:8px;align-items:baseline"><span class="lb">القضاء:</span><span style="font-size:16px;font-weight:bold">'+sub+'</span></div>',
+    '</div>',
+    '<div class="row"><span class="lb">الحالة الاجتماعية:</span><span class="vl">'+mar+'</span></div>',
+    '<div class="row" style="flex-direction:column;align-items:flex-start;gap:6px">',
+    '<span class="lb">التحصيل الدراسي:</span>',
+    '<span style="font-size:15px;padding-right:10px">'+uni+(dep?' &mdash; '+dep:'')+'</span>',
+    '<div style="display:flex;gap:28px;font-size:16px;font-weight:bold;padding-right:10px">',
+    '<span>&#9745; جامعة</span><span>&#9744; معهد</span></div>',
+    '</div>',
+    '<div class="row"><span class="lb">الاختصاص:</span><span class="vl">'+spc+'</span></div>',
+    '<div class="row"><span class="lb">سنة التخرج:</span><span class="vl">'+yr+'</span></div>',
+    '<div class="row"><span class="lb">رقم الهاتف:</span><span class="vl" style="direction:ltr;text-align:left">'+ph+'</span></div>',
+    '<div class="plg">اتعهد بأن جميع المعلومات صحيحة</div>',
+    '<div class="row"><span class="lb">التوقيع:</span><span class="vl"></span></div>',
+    '<div class="row"><span class="lb">التاريخ:</span><span class="vl" style="direction:ltr;text-align:left">______ / ______ / 2026</span></div>',
+    '<div class="row" style="margin-bottom:12px"><span class="lb">ملاحظة//:</span><span class="vl"></span></div>',
+    '</div>',
+    '<div class="btm">تسلم بيد الممثل او أعضاء اللجنة التنسيقية المعرفين حصرا</div>',
+    '</div></div></body></html>'
+  ].join("");
+  openPrintWindow(html);
 }
 
 function openAuthorizationPrint(data) {
-  var html = '<!DOCTYPE html><html lang="ar" dir="rtl"><head><meta charset="UTF-8"/>'+
-    '<title>استمارة تخويل — '+(data.full_name||"")+'</title><style>'+
-    '*{margin:0;padding:0;box-sizing:border-box;}'+
-    'body{font-family:"Traditional Arabic","Arial",sans-serif;background:#f0ebe0;display:flex;flex-direction:column;align-items:center;padding:28px;direction:rtl;}'+
-    '.print-btn{margin-bottom:18px;padding:10px 30px;background:#1d4ed8;color:#fff;border:none;border-radius:8px;font-size:15px;cursor:pointer;font-family:inherit;}'+
-    '.page{width:700px;background:#fff;border:3px solid #8b7044;padding:52px 60px;line-height:2.1;font-size:17px;color:#1a1a1a;box-shadow:0 4px 28px rgba(0,0,0,.12);}'+
-    '.bismillah{text-align:center;font-size:22px;font-weight:bold;margin-bottom:36px;color:#1a1505;}'+
-    '.subj{font-size:18px;font-weight:bold;text-decoration:underline;margin-bottom:24px;color:#1a1505;}'+
-    '.para{text-align:justify;margin-bottom:20px;line-height:2.3;}'+
-    '.sig-row{display:flex;align-items:baseline;margin:18px 0;gap:8px;}'+
-    '.sig-lbl{font-weight:bold;white-space:nowrap;color:#1a1505;}'+
-    '.dots{flex:1;border-bottom:1.5px solid #555;margin:0 8px 3px;}'+
-    '.name-fill{font-size:18px;font-weight:bold;color:#0f2c54;padding:0 14px;}'+
-    '.stamp{margin-top:36px;border:1.5px dashed #8b7044;border-radius:10px;padding:18px;text-align:center;color:#8b7044;font-size:14px;}'+
-    '@media print{body{background:#fff;padding:0;}.print-btn{display:none;}.page{box-shadow:none;width:100%;}}'+
-    '</style></head><body>'+
-    '<button class="print-btn" onclick="window.print()">🖨️ طباعة / حفظ كـ PDF</button>'+
-    '<div class="page">'+
-      '<div class="bismillah">بسم الله الرحمن الرحيم</div>'+
-      '<div class="subj">م/ تخويل</div>'+
-      '<p class="para">أنا الموقع أدناه</p>'+
-      '<div class="sig-row"><span class="sig-lbl">الخريج:</span><span class="name-fill">'+(data.full_name||"")+'</span><span class="dots"></span></div>'+
-      '<p class="para" style="margin-top:18px">أخوّل بموجب هذا التخويل</p>'+
-      '<div class="sig-row"><span class="sig-lbl">الأستاذ:</span><span class="dots"></span></div>'+
-      '<p class="para" style="margin-top:18px">'+
-        'بتمثيلي والمطالبة بحقوق الخريجين في جمهورية العراق والمحافظة، '+
-        '<span style="display:inline-block;width:100px;border-bottom:1.5px solid #555;vertical-align:bottom"></span> '+
-        'ومتابعة جميع الأمور المتعلقة بهذا الشأن أمام الجهات المختصة، '+
-        'واتخاذ ما يلزم من إجراءات قانونية وإدارية بما يخدم مطالب الخريجين.'+
-      '</p>'+
-      '<p class="para">ويُعمل بهذا التخويل من تاريخ تحريره.</p>'+
-      '<div style="margin-top:40px">'+
-        '<div class="sig-row"><span class="sig-lbl">الاسم:</span><span class="dots"></span></div>'+
-        '<div class="sig-row"><span class="sig-lbl">التوقيع:</span><span class="dots"></span></div>'+
-        '<div class="sig-row"><span class="sig-lbl">التاريخ:</span><span style="margin:0 10px;font-size:17px">........ / ........ / .............</span></div>'+
-      '</div>'+
-      '<div class="stamp">مكان الختم الرسمي</div>'+
-    '</div>'+
-    '</body></html>';
-  var w = window.open("","_blank");
-  w.document.open(); w.document.write(html); w.document.close();
+  var esc = function(v){ return String(v||"").replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;"); };
+  var n   = esc(data.full_name);
+  var html = [
+    '<!DOCTYPE html><html lang="ar" dir="rtl">',
+    '<head><meta charset="UTF-8"><title>استمارة تخويل</title>',
+    '<style>',
+    '*{margin:0;padding:0;box-sizing:border-box}',
+    'body{font-family:"Traditional Arabic","Arial",sans-serif;background:#f0ebe0;',
+    'display:flex;flex-direction:column;align-items:center;padding:28px;direction:rtl}',
+    '.pbtn{margin-bottom:18px;padding:10px 32px;background:#7c3aed;color:#fff;border:none;',
+    'border-radius:8px;font-size:15px;cursor:pointer;font-family:inherit}',
+    '.page{width:700px;background:#fff;border:3px solid #8b7044;padding:52px 60px;',
+    'line-height:2.2;font-size:17px;color:#1a1a1a;box-shadow:0 4px 28px rgba(0,0,0,.12)}',
+    '.bsm{text-align:center;font-size:22px;font-weight:bold;margin-bottom:36px;color:#1a1505}',
+    '.subj{font-size:18px;font-weight:bold;text-decoration:underline;margin-bottom:24px;color:#1a1505}',
+    '.para{text-align:justify;margin-bottom:20px;line-height:2.3}',
+    '.sr{display:flex;align-items:baseline;margin:18px 0;gap:8px}',
+    '.sl{font-weight:bold;white-space:nowrap;color:#1a1505}',
+    '.dt{flex:1;border-bottom:1.5px solid #555;margin:0 8px 3px}',
+    '.nf{font-size:18px;font-weight:bold;color:#0f2c54;padding:0 14px}',
+    '.stamp{margin-top:36px;border:1.5px dashed #8b7044;border-radius:10px;',
+    'padding:18px;text-align:center;color:#8b7044;font-size:14px}',
+    '@media print{body{background:#fff;padding:0}.pbtn{display:none}',
+    '.page{box-shadow:none;width:100%}}',
+    '</style></head><body>',
+    '<button class="pbtn" onclick="window.print()">&#128424; طباعة / حفظ كـ PDF</button>',
+    '<div class="page">',
+    '<div class="bsm">بسم الله الرحمن الرحيم</div>',
+    '<div class="subj">م/ تخويل</div>',
+    '<p class="para">أنا الموقع أدناه</p>',
+    '<div class="sr"><span class="sl">الخريج:</span><span class="nf">'+n+'</span><span class="dt"></span></div>',
+    '<p class="para" style="margin-top:18px">أخوّل بموجب هذا التخويل</p>',
+    '<div class="sr"><span class="sl">الأستاذ:</span><span class="dt"></span></div>',
+    '<p class="para" style="margin-top:20px">',
+    'بتمثيلي والمطالبة بحقوق الخريجين في جمهورية العراق والمحافظة، ',
+    '<span style="display:inline-block;width:120px;border-bottom:1.5px solid #555;vertical-align:bottom"></span> ',
+    'ومتابعة جميع الأمور المتعلقة بهذا الشأن أمام الجهات المختصة، ',
+    'واتخاذ ما يلزم من إجراءات قانونية وإدارية بما يخدم مطالب الخريجين.',
+    '</p>',
+    '<p class="para">ويُعمل بهذا التخويل من تاريخ تحريره.</p>',
+    '<div style="margin-top:40px">',
+    '<div class="sr"><span class="sl">الاسم:</span><span class="dt"></span></div>',
+    '<div class="sr"><span class="sl">التوقيع:</span><span class="dt"></span></div>',
+    '<div class="sr"><span class="sl">التاريخ:</span>',
+    '<span style="margin:0 10px;font-size:17px">........ / ........ / .............</span></div>',
+    '</div>',
+    '<div class="stamp">مكان الختم الرسمي</div>',
+    '</div></body></html>'
+  ].join("");
+  openPrintWindow(html);
 }
 
 // ── Download Buttons Component ─────────────────────────────────────────
