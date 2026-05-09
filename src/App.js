@@ -1457,7 +1457,6 @@ function fmtBirthDate(bd) {
 
 function openRegistrationPrint(data) {
   var bd   = fmtBirthDate(data.birth_date||"");
-  var today= new Date().toLocaleDateString("ar-IQ",{year:"numeric",month:"long",day:"numeric"});
   var html = '<!DOCTYPE html><html lang="ar" dir="rtl"><head><meta charset="UTF-8"/><title>استمارة تسجيل — '+
     (data.full_name||"")+
     '</title><style>'+
