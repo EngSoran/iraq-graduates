@@ -143,6 +143,27 @@ var db = {
     });
     if(!r.ok) throw new Error("delete_ticker_failed");
     return true;
+  },
+  getCoordinators: async function() {
+    var r = await fetch(SUPABASE_URL+"/rest/v1/coordinators?select=*&order=province.asc,created_at.asc",{headers:H()});
+    if(!r.ok) throw new Error("coordinators_failed");
+    return r.json();
+  },
+  addCoordinator: async function(data) {
+    var r = await fetch(SUPABASE_URL+"/rest/v1/coordinators",{
+      method:"POST",
+      headers:Object.assign({},H(),{"Prefer":"return=representation"}),
+      body:JSON.stringify(data)
+    });
+    if(!r.ok) throw new Error("add_coordinator_failed");
+    return r.json();
+  },
+  deleteCoordinator: async function(id) {
+    var r = await fetch(SUPABASE_URL+"/rest/v1/coordinators?id=eq."+id,{
+      method:"DELETE",headers:H()
+    });
+    if(!r.ok) throw new Error("delete_coordinator_failed");
+    return true;
   }
 };
 
@@ -664,9 +685,14 @@ function AdminPage() {
   var [filterGen,setFilterGen]   = useState("");
   var [filterDept,setFilterDept] = useState("");
   var [tab,setTab]               = useState("list");
-  var [tickerMsgs,setTickerMsgs] = useState([]);
-  var [newMsg,setNewMsg]         = useState("");
-  var [tickerLoading,setTL]      = useState(false);
+  var [tickerMsgs,setTickerMsgs]   = useState([]);
+  var [newMsg,setNewMsg]           = useState("");
+  var [tickerLoading,setTL]        = useState(false);
+  var [coords,setCoords]           = useState([]);
+  var [coordLoading,setCoordLoad]  = useState(false);
+  var [coordErr,setCoordErr]       = useState("");
+  var [newCoord,setNewCoord]       = useState({province:"ديالى",district:"",name:"",phone:""});
+  var [coordSearchProv,setCSP]     = useState("");
 
   function login() {
     if(!ADMIN_PASS){setPwdErr("لم يتم تعيين كلمة مرور في إعدادات الموقع");return;}
@@ -705,6 +731,16 @@ function AdminPage() {
   },[authed]);
 
   useEffect(()=>{ if(tab==="ticker") loadTicker(); },[tab,loadTicker]);
+
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  var loadCoords = useCallback(async function(){
+    if(!authed) return;
+    setCoordLoad(true);
+    try{ setCoords(await db.getCoordinators()); }catch(e){console.error(e);}
+    setCoordLoad(false);
+  },[authed]);
+
+  useEffect(()=>{ if(tab==="coords") loadCoords(); },[tab,loadCoords]);
 
   // Hooks before conditional return
   // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -779,9 +815,33 @@ function AdminPage() {
     setTL(false);
   }
 
+  async function addCoord() {
+    setCoordErr("");
+    if(!newCoord.province.trim()) return setCoordErr("اختر المحافظة");
+    if(!newCoord.district.trim()) return setCoordErr("أدخل القضاء أو المدينة");
+    if(!newCoord.name.trim())     return setCoordErr("أدخل اسم المنسق");
+    if(!/^07[3-9]\d{8}$/.test(newCoord.phone.trim())) return setCoordErr("رقم الهاتف غير صحيح — يبدأ بـ 07");
+    setCoordLoad(true);
+    try {
+      await db.addCoordinator({province:newCoord.province.trim(),district:newCoord.district.trim(),name:newCoord.name.trim(),phone:newCoord.phone.trim()});
+      setNewCoord({province:newCoord.province,district:"",name:"",phone:""});
+      await loadCoords();
+    } catch(e){ setCoordErr("حدث خطأ أثناء الإضافة"); }
+    setCoordLoad(false);
+  }
+
+  async function deleteCoord(id, name) {
+    if(!window.confirm("هل تريد حذف المنسق "+name+"؟")) return;
+    setCoordLoad(true);
+    try { await db.deleteCoordinator(id); await loadCoords(); }
+    catch(e){ alert("حدث خطأ أثناء الحذف"); }
+    setCoordLoad(false);
+  }
+
   var adminTabs = [
-    {k:"list",  l:"قائمة الأعضاء",          icon:P.users},
-    {k:"dups",  l:"التكرارات ("+dupIds.size+")", icon:P.users},
+    {k:"list",   l:"قائمة الأعضاء",              icon:P.users},
+    {k:"dups",   l:"التكرارات ("+dupIds.size+")", icon:P.users},
+    {k:"coords", l:"المنسقون",                    icon:P.coord},
     ...(!isReadonly ? [{k:"ticker", l:"شريط الأخبار", icon:P.news}] : []),
   ];
 
@@ -936,6 +996,107 @@ function AdminPage() {
         </div>
       )}
 
+      {/* Coordinators Management Tab */}
+      {tab==="coords" && (
+        <div>
+          {/* Add Form — full admin only */}
+          {!isReadonly && (
+            <div style={card}>
+              <SectionHeader icon={P.plus} title="إضافة منسق جديد" color="#0d9488"/>
+              {coordErr && <div style={{background:"#fef2f2",border:"1px solid #fecaca",color:"#dc2626",padding:"10px 14px",borderRadius:8,marginBottom:12,fontSize:13}}>{coordErr}</div>}
+              <div style={{display:"grid",gridTemplateColumns:"repeat(auto-fill,minmax(200px,1fr))",gap:12,marginBottom:12}}>
+                <div>
+                  <label style={{display:"block",fontSize:12,fontWeight:600,color:"#64748b",marginBottom:5}}>المحافظة</label>
+                  <select value={newCoord.province} onChange={function(e){setNewCoord(function(p){return{...p,province:e.target.value,district:""};});}}
+                    style={{...inp(false),marginBottom:0,cursor:"pointer"}}>
+                    {PROVINCES.map(function(p){return <option key={p} value={p}>{p}</option>;})}
+                  </select>
+                </div>
+                <div>
+                  <label style={{display:"block",fontSize:12,fontWeight:600,color:"#64748b",marginBottom:5}}>القضاء / المدينة</label>
+                  <input value={newCoord.district}
+                    onChange={function(e){setNewCoord(function(p){return{...p,district:e.target.value};});setCoordErr("");}}
+                    placeholder="مثال: بعقوبة" style={{...inp(false),marginBottom:0}}/>
+                </div>
+                <div>
+                  <label style={{display:"block",fontSize:12,fontWeight:600,color:"#64748b",marginBottom:5}}>اسم المنسق</label>
+                  <input value={newCoord.name}
+                    onChange={function(e){setNewCoord(function(p){return{...p,name:e.target.value};});setCoordErr("");}}
+                    placeholder="الاسم الكامل" style={{...inp(false),marginBottom:0}}/>
+                </div>
+                <div>
+                  <label style={{display:"block",fontSize:12,fontWeight:600,color:"#64748b",marginBottom:5}}>رقم الهاتف</label>
+                  <input value={newCoord.phone}
+                    onChange={function(e){setNewCoord(function(p){return{...p,phone:e.target.value};});setCoordErr("");}}
+                    placeholder="07XXXXXXXXX" style={{...inp(false),marginBottom:0,direction:"ltr",textAlign:"right"}}/>
+                </div>
+              </div>
+              <button onClick={addCoord} disabled={coordLoading}
+                style={{...btn("#0d9488","#065f46"),display:"flex",alignItems:"center",gap:8,opacity:coordLoading?.6:1}}>
+                <SvgIcon d={P.plus} size={16} color="#fff"/>
+                {coordLoading?"جاري الإضافة...":"إضافة المنسق"}
+              </button>
+            </div>
+          )}
+
+          {/* Coordinators Table */}
+          <div style={card}>
+            <div style={{display:"flex",justifyContent:"space-between",alignItems:"center",marginBottom:14,flexWrap:"wrap",gap:10}}>
+              <SectionHeader icon={P.coord} title={"قائمة المنسقين ("+coords.length+")"} color="#0d9488"/>
+              <div style={{display:"flex",gap:8}}>
+                <select value={coordSearchProv} onChange={function(e){setCSP(e.target.value);}}
+                  style={{...inp(false),marginBottom:0,width:"auto",minWidth:140,cursor:"pointer"}}>
+                  <option value="">كل المحافظات</option>
+                  {PROVINCES.map(function(p){return <option key={p} value={p}>{p}</option>;})}
+                </select>
+                <button onClick={loadCoords} style={btn("#6366f1","#4f46e5")}>تحديث</button>
+              </div>
+            </div>
+            {coordLoading ? (
+              <div style={{textAlign:"center",padding:36,color:"#94a3b8"}}>جاري التحميل...</div>
+            ) : (
+              <div style={{overflowX:"auto"}}>
+                <table style={{width:"100%",borderCollapse:"collapse",fontSize:13}}>
+                  <thead>
+                    <tr style={{background:"#f0fdfa"}}>
+                      {["#","المحافظة","القضاء / المدينة","اسم المنسق","رقم الهاتف","تاريخ الإضافة",...(!isReadonly?["حذف"]:[])].map(function(h){
+                        return <th key={h} style={{padding:"10px",textAlign:"right",borderBottom:"2px solid #99f6e4",fontWeight:700,color:"#0f766e",whiteSpace:"nowrap"}}>{h}</th>;
+                      })}
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {(coordSearchProv ? coords.filter(function(c){return c.province===coordSearchProv;}) : coords)
+                      .map(function(c,i){
+                        return (
+                          <tr key={c.id} style={{borderBottom:"1px solid #f0fdfa",background:i%2?"#f0fdfa22":"#fff"}}>
+                            <td style={{padding:"8px 10px",color:"#94a3b8"}}>{i+1}</td>
+                            <td style={{padding:"8px 10px"}}>
+                              <span style={{background:(PROVINCE_COLORS[c.province]||"#0d9488")+"22",color:PROVINCE_COLORS[c.province]||"#0d9488",padding:"2px 8px",borderRadius:20,fontSize:12,fontWeight:600}}>{c.province}</span>
+                            </td>
+                            <td style={{padding:"8px 10px",fontWeight:600}}>{c.district}</td>
+                            <td style={{padding:"8px 10px"}}>{c.name}</td>
+                            <td style={{padding:"8px 10px",direction:"ltr",fontFamily:"monospace",color:"#0369a1"}}>{c.phone}</td>
+                            <td style={{padding:"8px 10px",color:"#94a3b8",fontSize:11}}>{new Date(c.created_at).toLocaleDateString("en-GB")}</td>
+                            {!isReadonly && (
+                              <td style={{padding:"8px 10px"}}>
+                                <button onClick={function(){deleteCoord(c.id,c.name);}}
+                                  style={{background:"#fef2f2",border:"1px solid #fecaca",color:"#dc2626",borderRadius:7,padding:"5px 10px",cursor:"pointer",fontSize:11,fontWeight:600,display:"flex",alignItems:"center",gap:5}}>
+                                  <SvgIcon d={P.trash} size={12} color="#dc2626"/> حذف
+                                </button>
+                              </td>
+                            )}
+                          </tr>
+                        );
+                      })}
+                    {coords.length===0 && <tr><td colSpan={7} style={{padding:36,textAlign:"center",color:"#94a3b8"}}>لا توجد منسقون مسجلون</td></tr>}
+                  </tbody>
+                </table>
+              </div>
+            )}
+          </div>
+        </div>
+      )}
+
       {/* Ticker Management Tab */}
       {tab==="ticker" && (
         <div>
@@ -1054,37 +1215,7 @@ function PrivacyPage() {
   );
 }
 
-// ── Coordinators Data ─────────────────────────────────────────────────
-var COORDINATORS = {
-  "بغداد":       [],
-  "البصرة":      [],
-  "نينوى":       [],
-  "أربيل":       [],
-  "السليمانية":  [],
-  "كركوك":       [],
-  "الأنبار":     [],
-  "ديالى": [
-    {name:"محمد البياتي",        district:"بعقوبة",              phone:"07710507568"},
-    {name:"مصطفى شهاب",          district:"قضاء شهربان",          phone:"07718519377"},
-    {name:"اياد هجول شلكام",     district:"خان بني سعد",          phone:"07703456718"},
-    {name:"ابراهيم زكي حميد",    district:"قضاء الخالص",          phone:"07705525630"},
-    {name:"مصطفى هاشم عثمان",    district:"منصورية (دلي عباس)",   phone:"07707732986"},
-    {name:"مصطفى سعيد محسن",     district:"قضاء كنعان",           phone:"07711894896"},
-    {name:"عثمان حسين حسن",      district:"بلدروز",               phone:"07810102302"},
-    {name:"عبد الرحمن القيسي",   district:"جلولاء والسعدية",      phone:"07719840286"},
-    {name:"سيف صلاح أحمد",       district:"قضاء خانقين",          phone:"07727273990"},
-  ],
-  "بابل":        [],
-  "كربلاء":      [],
-  "النجف":       [],
-  "واسط":        [],
-  "ذي قار":      [],
-  "ميسان":       [],
-  "المثنى":      [],
-  "القادسية":    [],
-  "صلاح الدين":  [],
-  "دهوك":        [],
-};
+// COORDINATORS removed — data is now fetched from Supabase coordinators table
 
 var PROVINCE_COLORS = {
   "ديالى":        "#0d9488",
@@ -1109,65 +1240,85 @@ var PROVINCE_COLORS = {
 
 // ── Coordinators Page ─────────────────────────────────────────────────
 function CoordinatorsPage() {
-  var allProvinces = Object.keys(COORDINATORS);
-  var totalCoords  = Object.values(COORDINATORS).reduce(function(s,a){return s+a.length;},0);
-  var activeProvinces = allProvinces.filter(function(p){return COORDINATORS[p].length>0;});
+  var [allCoords,  setAllCoords] = useState([]);
+  var [loadingDB,  setLoadingDB] = useState(true);
+  var [selProv,    setSelProv]   = useState("ديالى");
+  var [search,     setSearch]    = useState("");
 
-  var [selProv, setSelProv] = useState("ديالى");
-  var [search,  setSearch]  = useState("");
+  useEffect(function(){
+    setLoadingDB(true);
+    db.getCoordinators()
+      .then(function(data){ setAllCoords(data); })
+      .catch(function(){ setAllCoords([]); })
+      .finally(function(){ setLoadingDB(false); });
+  }, []);
 
-  var list = COORDINATORS[selProv] || [];
-  var filtered = search.trim()
-    ? list.filter(function(c){
-        var q = search.trim();
-        return c.name.includes(q) || c.district.includes(q) || c.phone.includes(q);
-      })
-    : list;
+  var activeProvinces = useMemo(function(){
+    var set = new Set(allCoords.map(function(c){return c.province;}));
+    return PROVINCES.filter(function(p){return set.has(p);});
+  }, [allCoords]);
 
-  var col = PROVINCE_COLORS[selProv] || "#1d4ed8";
-  var isEmpty = list.length === 0;
+  var list = useMemo(function(){
+    return allCoords.filter(function(c){return c.province===selProv;});
+  }, [allCoords, selProv]);
+
+  var filtered = useMemo(function(){
+    if(!search.trim()) return list;
+    var q = search.trim();
+    return list.filter(function(c){
+      return c.name.includes(q)||c.district.includes(q)||c.phone.includes(q);
+    });
+  }, [list, search]);
+
+  var col     = PROVINCE_COLORS[selProv] || "#1d4ed8";
+  var isEmpty = !loadingDB && list.length === 0;
+
+  if(loadingDB) return (
+    <div style={{textAlign:"center",padding:"80px 20px",color:"#94a3b8"}}>
+      <div style={{fontSize:15}}>جاري تحميل بيانات المنسقين...</div>
+    </div>
+  );
 
   return (
     <div style={pageWrap}>
       {/* Header */}
-      <div style={{...card, background:"linear-gradient(135deg,#0d9488,#065f46)", color:"#fff", textAlign:"center", marginBottom:20}}>
-        <div style={{width:68, height:68, borderRadius:"50%", background:"rgba(255,255,255,.15)", margin:"0 auto 14px", display:"flex", alignItems:"center", justifyContent:"center"}}>
+      <div style={{...card,background:"linear-gradient(135deg,#0d9488,#065f46)",color:"#fff",textAlign:"center",marginBottom:20}}>
+        <div style={{width:68,height:68,borderRadius:"50%",background:"rgba(255,255,255,.15)",margin:"0 auto 14px",display:"flex",alignItems:"center",justifyContent:"center"}}>
           <SvgIcon d={P.coord} size={34} color="#fff"/>
         </div>
-        <h1 style={{fontSize:24, marginBottom:8}}>منسقو المحافظات</h1>
-        <p style={{opacity:.85, fontSize:14, maxWidth:560, margin:"0 auto", lineHeight:1.8}}>
+        <h1 style={{fontSize:24,marginBottom:8}}>منسقو المحافظات</h1>
+        <p style={{opacity:.85,fontSize:14,maxWidth:560,margin:"0 auto",lineHeight:1.8}}>
           اختر محافظتك للتواصل مع المنسق المسؤول عن قضائك والانضمام إلى مجموعة الواتساب.
         </p>
-        <div style={{marginTop:16, display:"flex", gap:12, justifyContent:"center", flexWrap:"wrap"}}>
-          <span style={{background:"rgba(255,255,255,.15)", borderRadius:20, padding:"4px 16px", fontSize:13}}>
-            {totalCoords} منسق مسجّل
+        <div style={{marginTop:16,display:"flex",gap:12,justifyContent:"center",flexWrap:"wrap"}}>
+          <span style={{background:"rgba(255,255,255,.15)",borderRadius:20,padding:"4px 16px",fontSize:13}}>
+            {allCoords.length} منسق مسجّل
           </span>
-          <span style={{background:"rgba(255,255,255,.15)", borderRadius:20, padding:"4px 16px", fontSize:13}}>
-            {activeProvinces.length} محافظة مفعّلة من {allProvinces.length}
+          <span style={{background:"rgba(255,255,255,.15)",borderRadius:20,padding:"4px 16px",fontSize:13}}>
+            {activeProvinces.length} محافظة مفعّلة من {PROVINCES.length}
           </span>
         </div>
       </div>
 
       {/* Province Selector */}
-      <div style={{...card, padding:"18px 20px", marginBottom:16}}>
-        <div style={{display:"flex", gap:12, flexWrap:"wrap", alignItems:"center"}}>
+      <div style={{...card,padding:"18px 20px",marginBottom:16}}>
+        <div style={{display:"flex",gap:12,flexWrap:"wrap",alignItems:"center"}}>
           <div style={{flex:"1 1 220px"}}>
-            <label style={{display:"block", fontSize:12, fontWeight:600, color:"#64748b", marginBottom:6}}>اختر المحافظة</label>
+            <label style={{display:"block",fontSize:12,fontWeight:600,color:"#64748b",marginBottom:6}}>اختر المحافظة</label>
             <div style={{position:"relative"}}>
-              <select value={selProv} onChange={function(e){setSelProv(e.target.value); setSearch("");}}
-                style={{...inp(false), marginBottom:0, paddingRight:36, cursor:"pointer",
-                  borderColor:col, fontWeight:700, color:"#0f172a"}}>
-                {allProvinces.map(function(p){
-                  var hasData = COORDINATORS[p].length > 0;
+              <select value={selProv} onChange={function(e){setSelProv(e.target.value);setSearch("");}}
+                style={{...inp(false),marginBottom:0,paddingRight:36,cursor:"pointer",borderColor:col,fontWeight:700,color:"#0f172a"}}>
+                {PROVINCES.map(function(p){
+                  var cnt = allCoords.filter(function(c){return c.province===p;}).length;
                   return (
                     <option key={p} value={p}>
-                      {hasData ? "✓ " : "○ "}{p}{hasData ? " ("+COORDINATORS[p].length+")" : " — قريباً"}
+                      {cnt>0?"✓ ":"○ "}{p}{cnt>0?" ("+cnt+")":"  — قريباً"}
                     </option>
                   );
                 })}
               </select>
-              <div style={{position:"absolute", right:10, top:"50%", transform:"translateY(-50%)", pointerEvents:"none"}}>
-                <div style={{width:22, height:22, borderRadius:"50%", background:col, display:"flex", alignItems:"center", justifyContent:"center"}}>
+              <div style={{position:"absolute",right:10,top:"50%",transform:"translateY(-50%)",pointerEvents:"none"}}>
+                <div style={{width:22,height:22,borderRadius:"50%",background:col,display:"flex",alignItems:"center",justifyContent:"center"}}>
                   <SvgIcon d={P.map} size={12} color="#fff"/>
                 </div>
               </div>
@@ -1175,100 +1326,90 @@ function CoordinatorsPage() {
           </div>
           {!isEmpty && (
             <div style={{flex:"1 1 220px"}}>
-              <label style={{display:"block", fontSize:12, fontWeight:600, color:"#64748b", marginBottom:6}}>بحث في المنسقين</label>
-              <div style={{display:"flex", alignItems:"center", gap:8, background:"#f8fafc", border:"1.5px solid #e2e8f0", borderRadius:10, padding:"0 12px"}}>
+              <label style={{display:"block",fontSize:12,fontWeight:600,color:"#64748b",marginBottom:6}}>بحث في المنسقين</label>
+              <div style={{display:"flex",alignItems:"center",gap:8,background:"#f8fafc",border:"1.5px solid #e2e8f0",borderRadius:10,padding:"0 12px"}}>
                 <SvgIcon d={P.search} size={15} color="#94a3b8"/>
                 <input value={search} onChange={function(e){setSearch(e.target.value);}}
                   placeholder="اسم أو قضاء أو هاتف..."
-                  style={{border:"none", outline:"none", background:"transparent", flex:1, padding:"11px 0", fontSize:14}}/>
-                {search && (
-                  <button onClick={function(){setSearch("");}}
-                    style={{background:"none", border:"none", cursor:"pointer", color:"#94a3b8", padding:"4px", fontSize:16, lineHeight:1}}>×</button>
-                )}
+                  style={{border:"none",outline:"none",background:"transparent",flex:1,padding:"11px 0",fontSize:14}}/>
+                {search && <button onClick={function(){setSearch("");}} style={{background:"none",border:"none",cursor:"pointer",color:"#94a3b8",padding:"4px",fontSize:16,lineHeight:1}}>×</button>}
               </div>
             </div>
           )}
         </div>
-
-        {/* Province pills — quick access to active provinces */}
-        <div style={{marginTop:14, display:"flex", gap:6, flexWrap:"wrap"}}>
-          {activeProvinces.map(function(p){
-            var c = PROVINCE_COLORS[p] || "#1d4ed8";
-            var active = selProv === p;
-            return (
-              <button key={p} onClick={function(){setSelProv(p); setSearch("");}}
-                style={{padding:"5px 14px", borderRadius:20, border:"1.5px solid "+(active?c:"#e2e8f0"),
-                  background:active?c+"22":"#fff", color:active?c:"#64748b",
-                  fontWeight:active?700:500, fontSize:12, cursor:"pointer"}}>
-                {p} <span style={{opacity:.7}}>({COORDINATORS[p].length})</span>
-              </button>
-            );
-          })}
-        </div>
+        {/* Active province pills */}
+        {activeProvinces.length>0 && (
+          <div style={{marginTop:14,display:"flex",gap:6,flexWrap:"wrap"}}>
+            {activeProvinces.map(function(p){
+              var c=PROVINCE_COLORS[p]||"#1d4ed8";
+              var cnt=allCoords.filter(function(x){return x.province===p;}).length;
+              var active=selProv===p;
+              return (
+                <button key={p} onClick={function(){setSelProv(p);setSearch("");}}
+                  style={{padding:"5px 14px",borderRadius:20,border:"1.5px solid "+(active?c:"#e2e8f0"),
+                    background:active?c+"22":"#fff",color:active?c:"#64748b",
+                    fontWeight:active?700:500,fontSize:12,cursor:"pointer"}}>
+                  {p} <span style={{opacity:.7}}>({cnt})</span>
+                </button>
+              );
+            })}
+          </div>
+        )}
       </div>
 
       {/* Province Label */}
-      <div style={{display:"flex", alignItems:"center", gap:10, marginBottom:16}}>
-        <div style={{width:4, height:28, borderRadius:2, background:col}}/>
-        <h2 style={{fontSize:17, fontWeight:700, color:"#0f172a", margin:0}}>
-          محافظة {selProv}
-        </h2>
+      <div style={{display:"flex",alignItems:"center",gap:10,marginBottom:16}}>
+        <div style={{width:4,height:28,borderRadius:2,background:col}}/>
+        <h2 style={{fontSize:17,fontWeight:700,color:"#0f172a",margin:0}}>محافظة {selProv}</h2>
         {!isEmpty && (
-          <span style={{background:col+"22", color:col, borderRadius:20, padding:"3px 12px", fontSize:12, fontWeight:700}}>
+          <span style={{background:col+"22",color:col,borderRadius:20,padding:"3px 12px",fontSize:12,fontWeight:700}}>
             {filtered.length} منسق
           </span>
         )}
       </div>
 
-      {/* Empty Province */}
       {isEmpty ? (
-        <div style={{...card, textAlign:"center", padding:"56px 24px"}}>
-          <div style={{width:64, height:64, borderRadius:"50%", background:"#f1f5f9", margin:"0 auto 16px", display:"flex", alignItems:"center", justifyContent:"center"}}>
+        <div style={{...card,textAlign:"center",padding:"56px 24px"}}>
+          <div style={{width:64,height:64,borderRadius:"50%",background:"#f1f5f9",margin:"0 auto 16px",display:"flex",alignItems:"center",justifyContent:"center"}}>
             <SvgIcon d={P.coord} size={30} color="#94a3b8"/>
           </div>
-          <h3 style={{color:"#64748b", marginBottom:8, fontSize:17}}>لم يُضف منسقو محافظة {selProv} بعد</h3>
-          <p style={{color:"#94a3b8", fontSize:13, margin:0}}>سيتم إضافة المنسقين قريباً — تابع الموقع للتحديثات</p>
+          <h3 style={{color:"#64748b",marginBottom:8,fontSize:17}}>لم يُضف منسقو محافظة {selProv} بعد</h3>
+          <p style={{color:"#94a3b8",fontSize:13,margin:0}}>سيتم إضافة المنسقين قريباً — تابع الموقع للتحديثات</p>
         </div>
-      ) : filtered.length === 0 ? (
-        <div style={{...card, textAlign:"center", padding:"40px 24px", color:"#94a3b8"}}>
-          لا توجد نتائج مطابقة للبحث
-        </div>
+      ) : filtered.length===0 ? (
+        <div style={{...card,textAlign:"center",padding:"40px 24px",color:"#94a3b8"}}>لا توجد نتائج مطابقة للبحث</div>
       ) : (
-        <div style={{display:"grid", gridTemplateColumns:"repeat(auto-fill,minmax(280px,1fr))", gap:16}}>
-          {filtered.map(function(c, i){
+        <div style={{display:"grid",gridTemplateColumns:"repeat(auto-fill,minmax(280px,1fr))",gap:16}}>
+          {filtered.map(function(c,i){
             return (
-              <div key={i} style={{background:"#fff", borderRadius:16, padding:"20px", boxShadow:"0 2px 14px rgba(0,0,0,.07)", border:"1px solid #f1f5f9", borderTop:"4px solid "+col, display:"flex", flexDirection:"column", gap:12}}>
-                <div style={{display:"flex", alignItems:"center", gap:12}}>
-                  <div style={{width:50, height:50, borderRadius:"50%", background:col+"22", display:"flex", alignItems:"center", justifyContent:"center", flexShrink:0}}>
-                    <span style={{fontSize:20, fontWeight:800, color:col}}>{c.name.trim()[0]}</span>
+              <div key={c.id||i} style={{background:"#fff",borderRadius:16,padding:"20px",boxShadow:"0 2px 14px rgba(0,0,0,.07)",border:"1px solid #f1f5f9",borderTop:"4px solid "+col,display:"flex",flexDirection:"column",gap:12}}>
+                <div style={{display:"flex",alignItems:"center",gap:12}}>
+                  <div style={{width:50,height:50,borderRadius:"50%",background:col+"22",display:"flex",alignItems:"center",justifyContent:"center",flexShrink:0}}>
+                    <span style={{fontSize:20,fontWeight:800,color:col}}>{c.name.trim()[0]}</span>
                   </div>
                   <div>
-                    <div style={{fontWeight:700, fontSize:15, color:"#0f172a", lineHeight:1.3}}>{c.name}</div>
-                    <div style={{fontSize:12, color:"#64748b", marginTop:3, display:"flex", alignItems:"center", gap:5}}>
+                    <div style={{fontWeight:700,fontSize:15,color:"#0f172a",lineHeight:1.3}}>{c.name}</div>
+                    <div style={{fontSize:12,color:"#64748b",marginTop:3,display:"flex",alignItems:"center",gap:5}}>
                       <SvgIcon d={P.map} size={12} color="#94a3b8"/>
                       {c.district}
                     </div>
                   </div>
                 </div>
-
-                <div style={{background:col+"11", borderRadius:10, padding:"8px 12px", display:"flex", alignItems:"center", gap:8}}>
+                <div style={{background:col+"11",borderRadius:10,padding:"8px 12px",display:"flex",alignItems:"center",gap:8}}>
                   <SvgIcon d={P.map} size={15} color={col}/>
-                  <span style={{fontSize:13, color:col, fontWeight:600}}>منسق {c.district}</span>
+                  <span style={{fontSize:13,color:col,fontWeight:600}}>منسق {c.district}</span>
                 </div>
-
                 <a href={"tel:"+c.phone} style={{textDecoration:"none"}}>
-                  <div style={{background:"#f0fdf4", border:"1px solid #86efac", borderRadius:10, padding:"10px 14px", display:"flex", alignItems:"center", justifyContent:"space-between", cursor:"pointer"}}>
-                    <span style={{fontFamily:"monospace", fontSize:15, fontWeight:700, color:"#15803d", direction:"ltr"}}>{c.phone}</span>
-                    <div style={{width:32, height:32, borderRadius:"50%", background:"#16a34a", display:"flex", alignItems:"center", justifyContent:"center"}}>
+                  <div style={{background:"#f0fdf4",border:"1px solid #86efac",borderRadius:10,padding:"10px 14px",display:"flex",alignItems:"center",justifyContent:"space-between",cursor:"pointer"}}>
+                    <span style={{fontFamily:"monospace",fontSize:15,fontWeight:700,color:"#15803d",direction:"ltr"}}>{c.phone}</span>
+                    <div style={{width:32,height:32,borderRadius:"50%",background:"#16a34a",display:"flex",alignItems:"center",justifyContent:"center"}}>
                       <SvgIcon d={P.phone} size={16} color="#fff"/>
                     </div>
                   </div>
                 </a>
-
                 <a href={"tel:"+c.phone} style={{textDecoration:"none"}}>
-                  <button style={{...btn("#15803d","#16a34a"), width:"100%", display:"flex", alignItems:"center", justifyContent:"center", gap:8, padding:"10px"}}>
-                    <SvgIcon d={P.phone} size={16} color="#fff"/>
-                    اتصل الآن
+                  <button style={{...btn("#15803d","#16a34a"),width:"100%",display:"flex",alignItems:"center",justifyContent:"center",gap:8,padding:"10px"}}>
+                    <SvgIcon d={P.phone} size={16} color="#fff"/>اتصل الآن
                   </button>
                 </a>
               </div>
@@ -1277,7 +1418,7 @@ function CoordinatorsPage() {
         </div>
       )}
 
-      <div style={{textAlign:"center", marginTop:28, color:"#94a3b8", fontSize:12, padding:"12px"}}>
+      <div style={{textAlign:"center",marginTop:28,color:"#94a3b8",fontSize:12,padding:"12px"}}>
         للانضمام إلى مجموعة واتساب محافظتك، تواصل مع المنسق المسؤول عن منطقتك
       </div>
     </div>
