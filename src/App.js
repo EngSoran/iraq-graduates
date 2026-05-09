@@ -1455,14 +1455,16 @@ function fmtBirthDate(bd) {
   return {day:parts[0]||"....",month:parts[1]||"....",year:parts[2]||"............"};
 }
 
-function openPrintWindow(html) {
-  try {
-    var blob = new Blob([html], {type:"text/html;charset=utf-8"});
-    var url  = URL.createObjectURL(blob);
-    var w    = window.open(url, "_blank");
-    if(!w) alert("يرجى السماح بفتح النوافذ المنبثقة في إعدادات المتصفح ثم أعد المحاولة");
-    else   setTimeout(function(){ URL.revokeObjectURL(url); }, 60000);
-  } catch(e) { alert("حدث خطأ أثناء فتح الاستمارة: "+e.message); }
+function openPrintWindow(html, filename) {
+  var blob = new Blob([html], {type:"text/html;charset=utf-8"});
+  var url  = URL.createObjectURL(blob);
+  var a    = document.createElement("a");
+  a.href   = url;
+  a.download = (filename||"استمارة")+".html";
+  document.body.appendChild(a);
+  a.click();
+  document.body.removeChild(a);
+  setTimeout(function(){ URL.revokeObjectURL(url); }, 10000);
 }
 
 function openRegistrationPrint(data) {
@@ -1548,7 +1550,7 @@ function openRegistrationPrint(data) {
     '<div class="btm">تسلم بيد الممثل او أعضاء اللجنة التنسيقية المعرفين حصرا</div>',
     '</div></div></body></html>'
   ].join("");
-  openPrintWindow(html);
+  openPrintWindow(html, "استمارة-تسجيل-"+((data.full_name||"").split(" ")[0]));
 }
 
 function openAuthorizationPrint(data) {
@@ -1601,7 +1603,7 @@ function openAuthorizationPrint(data) {
     '<div class="stamp">مكان الختم الرسمي</div>',
     '</div></body></html>'
   ].join("");
-  openPrintWindow(html);
+  openPrintWindow(html, "استمارة-تخويل-"+((data.full_name||"").split(" ")[0]));
 }
 
 // ── Download Buttons Component ─────────────────────────────────────────
