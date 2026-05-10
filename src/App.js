@@ -1,4 +1,5 @@
 import { useState, useEffect, useCallback, useMemo } from "react";
+import { Analytics } from "@vercel/analytics/react";
 
 // ── Config ────────────────────────────────────────────────────────────
 var SUPABASE_URL = process.env.REACT_APP_SUPABASE_URL;
@@ -1879,6 +1880,7 @@ export default function App() {
         </div>
         رابطة الخريجين العراقيين القدماء &copy; {CUR_YEAR} — جميع الحقوق محفوظة
       </footer>
+      <Analytics/>
     </div>
   );
 }
