@@ -8,44 +8,69 @@ var ADMIN_PASS        = process.env.REACT_APP_ADMIN_PASS || "";
 var READONLY_PASS     = process.env.REACT_APP_READONLY_PASS || "";
 var READY = Boolean(SUPABASE_URL && SUPABASE_KEY);
 
-// ── Design Tokens ─────────────────────────────────────────────────────
+// ── Design Tokens — Bauhaus Civic Engineering ─────────────────────────
 var T = {
-  // Palette — Engineering Authority
-  ink:       "#0a2540",
-  ink2:      "#102a4c",
-  ink3:      "#1e3a5f",
-  gold:      "#c9a14a",
-  gold2:     "#d4b169",
-  goldDark:  "#a07e2f",
-  blue:      "#1e40af",
-  blueLight: "#3b82f6",
-  teal:      "#0d9488",
-  red:       "#b91c1c",
-  green:     "#047857",
-  amber:     "#d97706",
-  surface:   "#ffffff",
-  bg:        "#f6f7fb",
-  bg2:       "#eef2f7",
-  border:    "#e2e8f0",
-  border2:   "#cbd5e1",
-  text:      "#0f172a",
-  text2:     "#334155",
-  text3:     "#64748b",
-  text4:     "#94a3b8",
+  // Palette — Modern, harmonious, engineering
+  ink:       "#0e1a3a",   // deep midnight indigo (primary)
+  ink2:      "#1a2752",   // secondary deep
+  ink3:      "#2a3a6b",   // tertiary
+  copper:    "#b87333",   // burnished copper accent (engineering brass)
+  copperLt:  "#d49154",   // light copper
+  copperDk:  "#8a5424",   // dark copper
+  sage:      "#4a7c74",   // calm sage teal (secondary accent)
+  sageLt:    "#6ba095",
+  crimson:   "#9b2c3a",   // muted Iraqi crimson (cultural highlight)
+  stone:     "#6b6660",   // warm grey neutral
+  cream:     "#f6f1e8",   // warm cream background
+  cream2:    "#ece5d6",   // deeper cream
+  paper:     "#fbf8f1",   // surface (warmer than white)
+  ivory:     "#ffffff",   // pure white when needed
+  border:    "#e0d8c8",   // warm border
+  border2:   "#c8bfaa",   // stronger border
+  text:      "#0a0a0a",   // near-black
+  text2:     "#332f29",   // body text
+  text3:     "#6b6660",   // muted (= stone)
+  text4:     "#a39c91",   // very muted
+  // Status colors (harmonized with palette)
+  success:   "#3d6b4a",
+  warning:   "#a06b2a",
+  danger:    "#9b2c3a",
+  info:      "#2a5680",
   // Effects
-  shadow:    "0 1px 2px rgba(15,23,42,.04),0 4px 16px rgba(15,23,42,.05)",
-  shadowLg:  "0 4px 12px rgba(15,23,42,.06),0 20px 48px rgba(15,23,42,.08)",
-  shadowGold:"0 6px 20px rgba(201,161,74,.30)",
-  radius:    10,
+  shadow:    "0 1px 2px rgba(14,26,58,.04),0 4px 14px rgba(14,26,58,.06)",
+  shadowLg:  "0 4px 18px rgba(14,26,58,.07),0 24px 56px rgba(14,26,58,.10)",
+  shadowCopper:"0 8px 24px rgba(184,115,51,.28)",
+  radius:    8,
   radiusLg:  14,
-  // Font stack
-  font:      "'Cairo','Tajawal','Segoe UI',Tahoma,Arial,sans-serif",
+  // Font stack — Reem Kufi (display) + Tajawal (body) + JetBrains Mono (numbers)
+  font:      "'Tajawal','Segoe UI',Tahoma,Arial,sans-serif",
+  fontDisp:  "'Reem Kufi Fun','Tajawal','Segoe UI',sans-serif",
   fontMono:  "'JetBrains Mono','Cascadia Code','Consolas',monospace",
 };
 
-// Subtle blueprint grid pattern (used in hero backgrounds)
-var BLUEPRINT_BG = "linear-gradient(rgba(201,161,74,.06) 1px,transparent 1px),linear-gradient(90deg,rgba(201,161,74,.06) 1px,transparent 1px)";
-var BLUEPRINT_SIZE = "40px 40px";
+// Backward-compat aliases for legacy color names used throughout the file
+T.gold     = T.copper;
+T.gold2    = T.copperLt;
+T.goldDark = T.copperDk;
+T.green    = T.success;
+T.blue     = T.info;
+T.teal     = T.sage;
+T.red      = T.danger;
+T.amber    = T.warning;
+T.surface  = T.paper;
+T.bg       = T.cream;
+T.bg2      = T.cream2;
+T.shadowGold = T.shadowCopper;
+
+// Isometric grid pattern (more refined than flat blueprint)
+var ISO_GRID = "linear-gradient(30deg,rgba(14,26,58,.04) 1px,transparent 1px),linear-gradient(150deg,rgba(14,26,58,.04) 1px,transparent 1px)";
+var ISO_GRID_SIZE = "48px 28px";
+// Blueprint grid for dark sections
+var BLUEPRINT_BG = "linear-gradient(rgba(184,115,51,.07) 1px,transparent 1px),linear-gradient(90deg,rgba(184,115,51,.07) 1px,transparent 1px)";
+var BLUEPRINT_SIZE = "48px 48px";
+// Fine dotted grid
+var DOT_GRID = "radial-gradient(rgba(14,26,58,.10) 1px,transparent 1px)";
+var DOT_GRID_SIZE = "20px 20px";
 
 // ── Constants ─────────────────────────────────────────────────────────
 var PROVINCES = ["بغداد","البصرة","نينوى","أربيل","السليمانية","كركوك","الأنبار","ديالى","بابل","كربلاء","النجف","واسط","ذي قار","ميسان","المثنى","القادسية","صلاح الدين","دهوك"];
@@ -115,6 +140,136 @@ function SvgIcon({d, size, color, sw}) {
     <svg width={size||20} height={size||20} viewBox="0 0 24 24" fill="none" stroke={color||"currentColor"} strokeWidth={sw||2} strokeLinecap="round" strokeLinejoin="round">
       <path d={d}/>
     </svg>
+  );
+}
+
+// ── Engineering Illustrations ─────────────────────────────────────────
+// Architectural Compass Rose — main hero emblem
+function CompassRose({size, color, accent}) {
+  var s = size||140;
+  var c = color||"#0e1a3a";
+  var a = accent||"#b87333";
+  return (
+    <svg width={s} height={s} viewBox="0 0 200 200" fill="none" xmlns="http://www.w3.org/2000/svg">
+      {/* outer ring */}
+      <circle cx="100" cy="100" r="92" stroke={c} strokeWidth="1" opacity=".25"/>
+      <circle cx="100" cy="100" r="86" stroke={c} strokeWidth="2"/>
+      {/* tick marks every 15° */}
+      {Array.from({length:24}).map(function(_,i){
+        var ang = i * 15;
+        var rad = ang * Math.PI/180;
+        var inner = i%2===0 ? 78 : 82;
+        var outer = 86;
+        var x1 = 100 + Math.cos(rad)*inner;
+        var y1 = 100 + Math.sin(rad)*inner;
+        var x2 = 100 + Math.cos(rad)*outer;
+        var y2 = 100 + Math.sin(rad)*outer;
+        return <line key={i} x1={x1} y1={y1} x2={x2} y2={y2} stroke={c} strokeWidth={i%2===0?1.8:1} opacity={i%2===0?1:.5}/>;
+      })}
+      {/* cardinal directions text */}
+      <text x="100" y="22"  fill={c} fontFamily="JetBrains Mono, monospace" fontSize="10" fontWeight="700" textAnchor="middle">N</text>
+      <text x="184" y="104" fill={c} fontFamily="JetBrains Mono, monospace" fontSize="10" fontWeight="700" textAnchor="middle">E</text>
+      <text x="100" y="188" fill={c} fontFamily="JetBrains Mono, monospace" fontSize="10" fontWeight="700" textAnchor="middle">S</text>
+      <text x="16"  y="104" fill={c} fontFamily="JetBrains Mono, monospace" fontSize="10" fontWeight="700" textAnchor="middle">W</text>
+      {/* compass needle — north arm (copper) */}
+      <polygon points="100,30 108,100 100,108 92,100" fill={a}/>
+      {/* south arm (ink) */}
+      <polygon points="100,170 108,100 100,92 92,100" fill={c}/>
+      {/* east-west subtle arms */}
+      <polygon points="170,100 100,108 92,100 100,92" fill={c} opacity=".35"/>
+      <polygon points="30,100  100,108 92,100 100,92" fill={c} opacity=".35"/>
+      {/* center hub */}
+      <circle cx="100" cy="100" r="10" fill={c}/>
+      <circle cx="100" cy="100" r="4" fill={a}/>
+      <circle cx="100" cy="100" r="1.5" fill="#fff"/>
+      {/* inner ring */}
+      <circle cx="100" cy="100" r="58" stroke={c} strokeWidth="1" strokeDasharray="2 4" opacity=".4"/>
+    </svg>
+  );
+}
+
+// Isometric structural cube — secondary motif
+function IsoCube({size, color}) {
+  var s = size||60;
+  var c = color||"#b87333";
+  return (
+    <svg width={s} height={s} viewBox="0 0 60 60" fill="none">
+      <path d="M30 5 L55 19 L55 41 L30 55 L5 41 L5 19 Z" stroke={c} strokeWidth="1.4" opacity=".5"/>
+      <path d="M30 5 L30 30 L5 19" stroke={c} strokeWidth="1.4"/>
+      <path d="M30 30 L55 19" stroke={c} strokeWidth="1.4"/>
+      <path d="M30 30 L30 55" stroke={c} strokeWidth="1.4"/>
+    </svg>
+  );
+}
+
+// T-square + Triangle drafting tools (decorative)
+function DraftingTools({size, color, accent}) {
+  var s = size||120;
+  var c = color||"#0e1a3a";
+  var a = accent||"#b87333";
+  return (
+    <svg width={s} height={s} viewBox="0 0 120 120" fill="none">
+      {/* T-square horizontal arm */}
+      <rect x="10" y="20" width="100" height="6" rx="1" stroke={c} strokeWidth="1.4" fill="none"/>
+      {/* T-square vertical arm */}
+      <rect x="55" y="20" width="10" height="80" rx="1" stroke={c} strokeWidth="1.4" fill="none"/>
+      {/* ticks on horizontal */}
+      {Array.from({length:9}).map(function(_,i){
+        return <line key={i} x1={20+i*10} y1="26" x2={20+i*10} y2={i%2?30:32} stroke={c} strokeWidth="0.8"/>;
+      })}
+      {/* 30-60-90 triangle */}
+      <path d="M70 45 L105 90 L70 90 Z" stroke={a} strokeWidth="1.5" fill={a} fillOpacity=".06"/>
+      {/* triangle inner hole */}
+      <path d="M77 60 L97 85 L77 85 Z" stroke={a} strokeWidth="0.8" opacity=".5" fill="none"/>
+      {/* labels */}
+      <text x="60" y="16" fill={c} fontFamily="JetBrains Mono, monospace" fontSize="6" textAnchor="middle">T-SQUARE</text>
+    </svg>
+  );
+}
+
+// Caliper-style horizontal divider
+function CaliperDivider({color, width}) {
+  var c = color||"#b87333";
+  return (
+    <svg width="100%" height="20" viewBox="0 0 400 20" preserveAspectRatio="none" style={{width:width||"100%",display:"block"}}>
+      <line x1="0" y1="10" x2="400" y2="10" stroke={c} strokeWidth="1" opacity=".6"/>
+      {Array.from({length:21}).map(function(_,i){
+        var x = i*20;
+        var h = i%5===0 ? 8 : 4;
+        return <line key={i} x1={x} y1={10-h/2} x2={x} y2={10+h/2} stroke={c} strokeWidth={i%5===0?1.2:0.8} opacity={i%5===0?1:.5}/>;
+      })}
+      {/* end caps */}
+      <line x1="0" y1="4" x2="0" y2="16" stroke={c} strokeWidth="1.5"/>
+      <line x1="400" y1="4" x2="400" y2="16" stroke={c} strokeWidth="1.5"/>
+    </svg>
+  );
+}
+
+// Section eyebrow with tick marks (replaces simple uppercase label)
+function Eyebrow({text, color, align}) {
+  var c = color||"#b87333";
+  return (
+    <div style={{
+      display:"inline-flex",alignItems:"center",gap:10,
+      justifyContent:align||"center",marginBottom:14
+    }}>
+      <svg width="28" height="8" viewBox="0 0 28 8" fill="none">
+        <line x1="0" y1="4" x2="20" y2="4" stroke={c} strokeWidth="1"/>
+        <line x1="20" y1="1" x2="20" y2="7" stroke={c} strokeWidth="1.5"/>
+        <line x1="24" y1="2" x2="24" y2="6" stroke={c} strokeWidth="1"/>
+        <line x1="27" y1="3" x2="27" y2="5" stroke={c} strokeWidth="1"/>
+      </svg>
+      <span style={{
+        fontSize:11,fontWeight:600,letterSpacing:"3px",color:c,
+        textTransform:"uppercase",fontFamily:"'JetBrains Mono',monospace"
+      }}>{text}</span>
+      <svg width="28" height="8" viewBox="0 0 28 8" fill="none">
+        <line x1="8" y1="4" x2="28" y2="4" stroke={c} strokeWidth="1"/>
+        <line x1="8" y1="1" x2="8" y2="7" stroke={c} strokeWidth="1.5"/>
+        <line x1="4" y1="2" x2="4" y2="6" stroke={c} strokeWidth="1"/>
+        <line x1="1" y1="3" x2="1" y2="5" stroke={c} strokeWidth="1"/>
+      </svg>
+    </div>
   );
 }
 
@@ -223,21 +378,21 @@ var db = {
 // ── Style helpers ─────────────────────────────────────────────────────
 function navBtn(a) {
   return {
-    background:a?"rgba(201,161,74,.18)":"transparent",
-    border:"1px solid "+(a?"rgba(201,161,74,.45)":"transparent"),
-    color:a?"#fde68a":"rgba(255,255,255,.78)",
-    padding:"8px 14px",borderRadius:8,cursor:"pointer",
-    fontSize:13,fontWeight:a?700:500,transition:"all .2s",fontFamily:T.font,
+    background:a?"rgba(184,115,51,.18)":"transparent",
+    border:"1px solid "+(a?"rgba(184,115,51,.40)":"transparent"),
+    color:a?T.copperLt:"rgba(255,255,255,.72)",
+    padding:"8px 14px",borderRadius:6,cursor:"pointer",
+    fontSize:12.5,fontWeight:a?700:500,transition:"all .2s",fontFamily:T.font,
     letterSpacing:".2px"
   };
 }
 function inp(err) {
   return {
     width:"100%",padding:"12px 14px",borderRadius:T.radius,
-    border:"1.5px solid "+(err?"#ef4444":T.border),
-    fontSize:14,outline:"none",background:"#fff",boxSizing:"border-box",
+    border:"1.5px solid "+(err?T.danger:T.border2),
+    fontSize:14,outline:"none",background:T.paper,boxSizing:"border-box",
     color:T.text,fontFamily:T.font,transition:"border-color .15s, box-shadow .15s",
-    boxShadow:err?"0 0 0 3px rgba(239,68,68,.12)":"none"
+    boxShadow:err?"0 0 0 3px rgba(155,44,58,.12)":"none"
   };
 }
 function btn(bg1,bg2) {
@@ -245,17 +400,17 @@ function btn(bg1,bg2) {
     background:"linear-gradient(135deg,"+(bg1||T.ink2)+","+(bg2||T.ink)+")",
     color:"#fff",border:"none",padding:"11px 22px",borderRadius:T.radius,
     fontSize:13,fontWeight:700,cursor:"pointer",
-    boxShadow:"0 4px 14px rgba(15,23,42,.12)",
+    boxShadow:"0 4px 14px rgba(14,26,58,.12)",
     transition:"transform .15s, box-shadow .2s",fontFamily:T.font,
     letterSpacing:".3px"
   };
 }
 function btnGold() {
   return {
-    background:"linear-gradient(135deg,#d4b169,#c9a14a)",
-    color:T.ink,border:"none",padding:"12px 24px",borderRadius:T.radius,
-    fontSize:14,fontWeight:800,cursor:"pointer",
-    boxShadow:T.shadowGold,fontFamily:T.font,letterSpacing:".3px",
+    background:"linear-gradient(135deg,"+T.copperLt+","+T.copper+")",
+    color:"#fff",border:"none",padding:"12px 24px",borderRadius:T.radius,
+    fontSize:14,fontWeight:700,cursor:"pointer",
+    boxShadow:T.shadowCopper,fontFamily:T.font,letterSpacing:".3px",
     transition:"transform .15s, box-shadow .2s"
   };
 }
@@ -337,25 +492,24 @@ function Ticker() {
 
   return (
     <div style={{
-      background:"linear-gradient(90deg,"+T.ink+","+T.ink2+")",
-      borderBottom:"2px solid "+T.gold,
-      overflow:"hidden",height:36,display:"flex",alignItems:"center"
+      background:T.ink2,
+      borderBottom:"1px solid "+T.copper,
+      overflow:"hidden",height:34,display:"flex",alignItems:"center"
     }}>
       <div style={{
-        background:"linear-gradient(135deg,#d4b169,#c9a14a)",
-        color:T.ink,padding:"0 16px",fontSize:11,fontWeight:800,
+        background:"linear-gradient(135deg,"+T.copperLt+","+T.copper+")",
+        color:"#fff",padding:"0 16px",fontSize:10.5,fontWeight:700,
         whiteSpace:"nowrap",height:"100%",display:"flex",alignItems:"center",
-        flexShrink:0,gap:6,letterSpacing:".5px",
-        boxShadow:"0 0 12px rgba(201,161,74,.3)"
+        flexShrink:0,gap:6,letterSpacing:"1.5px",fontFamily:T.fontMono
       }}>
-        <SvgIcon d={P.news} size={13} color={T.ink}/>
-        إشعار
+        <SvgIcon d={P.news} size={12} color="#fff"/>
+        NOTICE / إشعار
       </div>
       <div style={{overflow:"hidden",flex:1,height:"100%",display:"flex",alignItems:"center"}}>
         <span style={{
-          display:"inline-block",whiteSpace:"nowrap",color:"#fde68a",
+          display:"inline-block",whiteSpace:"nowrap",color:"#e7d9c4",
           fontSize:12,fontWeight:500,animation:"ticker-ltr 40s linear infinite",
-          letterSpacing:".2px"
+          letterSpacing:".2px",fontFamily:T.font
         }}>
           {text}
         </span>
@@ -1911,7 +2065,7 @@ function DownloadButtons({data}) {
   );
 }
 
-// ── Home Page ─────────────────────────────────────────────────────────
+// ── Home Page — Bauhaus Civic Engineering edition ─────────────────────
 function HomePage({setPage, openSearch}) {
   var [stats, setStats]   = useState(null);
   var [hover,  setHover]  = useState("");
@@ -1926,235 +2080,288 @@ function HomePage({setPage, openSearch}) {
 
   var featureCards = [
     {
-      k:"register",
-      icon:P.edit,
+      k:"register", num:"01", icon:P.edit,
       title:"سجّل اسمك في القائمة الوطنية",
       desc:"أضف بياناتك إلى الأرشيف الرسمي لمهندسي العراق غير المعينين. التسجيل مجاني وسري ولا يستغرق سوى دقيقتين.",
       cta:"ابدأ التسجيل الآن",
-      accent:T.ink,
-      gradFrom:T.ink2, gradTo:T.ink,
+      accent:T.ink, accentBg:T.ink+"08",
     },
     {
-      k:"dashboard",
-      icon:P.chart,
+      k:"dashboard", num:"02", icon:P.chart,
       title:"الأرقام والإحصائيات",
       desc:"اطّلع على الحجم الحقيقي للكفاءات الهندسية غير المستثمرة في العراق — موزّعة حسب المحافظة والتخصص وسنة التخرج.",
       cta:"عرض الإحصائيات",
-      accent:T.teal,
-      gradFrom:"#0d9488", gradTo:"#065f46",
+      accent:T.copper, accentBg:T.copper+"10",
     },
     {
-      k:"coordinators",
-      icon:P.coord,
+      k:"coordinators", num:"03", icon:P.coord,
       title:"منسقو المحافظات",
       desc:"تواصل مع المنسق المسؤول عن محافظتك للانضمام إلى مجموعة مهندسي منطقتك ومتابعة المستجدات.",
       cta:"اعثر على منسقك",
-      accent:T.blue,
-      gradFrom:T.blue, gradTo:"#1e3a8a",
+      accent:T.sage, accentBg:T.sage+"10",
     },
     {
-      k:"about",
-      icon:P.voice,
+      k:"about", num:"04", icon:P.voice,
       title:"رسالتنا وأهدافنا",
       desc:"تعرّف على مهمة المنصة كصوت موحّد للمهندسين العراقيين، وحلقة وصل بين الخريج وصناع القرار.",
       cta:"اقرأ عن المنصة",
-      accent:T.gold,
-      gradFrom:T.gold, gradTo:T.goldDark,
+      accent:T.crimson, accentBg:T.crimson+"10",
     },
   ];
 
   var quickStats = [
-    {label:"مهندس مسجّل",            val:total,      icon:P.users},
-    {label:"مهندس بانتظار التعيين",   val:unemployed, icon:P.briefcase},
-    {label:"محافظة مفعّلة",           val:provinces,  icon:P.map},
+    {label:"مهندس مسجّل",            spec:"REG-01", val:total,      icon:P.users},
+    {label:"بانتظار التعيين",         spec:"WAIT-02", val:unemployed, icon:P.briefcase},
+    {label:"محافظة مفعّلة",           spec:"PROV-03", val:provinces,  icon:P.map},
   ];
 
   return (
-    <div style={{direction:"rtl",fontFamily:T.font}}>
+    <div style={{direction:"rtl",fontFamily:T.font,background:T.cream}}>
 
-      {/* ── Hero ── */}
+      {/* ── HERO — Editorial Bauhaus Layout ── */}
       <div style={{
-        background:"linear-gradient(160deg,"+T.ink+" 0%,"+T.ink2+" 50%,"+T.ink3+" 100%)",
-        padding:"72px 20px 90px",position:"relative",overflow:"hidden"
+        position:"relative",overflow:"hidden",
+        background:T.cream,
+        borderBottom:"1px solid "+T.border
       }}>
-        {/* Blueprint grid overlay */}
+        {/* Isometric grid backdrop */}
         <div style={{
           position:"absolute",inset:0,
-          backgroundImage:BLUEPRINT_BG,
-          backgroundSize:BLUEPRINT_SIZE,
-          opacity:.55,pointerEvents:"none"
+          backgroundImage:ISO_GRID,backgroundSize:ISO_GRID_SIZE,
+          opacity:.6,pointerEvents:"none"
         }}/>
-        {/* Gold radial accent */}
+        {/* Diagonal copper accent stripe (top-right) */}
         <div style={{
-          position:"absolute",top:"-180px",left:"-100px",width:520,height:520,
-          background:"radial-gradient(circle,rgba(201,161,74,.18) 0%,transparent 65%)",
-          pointerEvents:"none"
-        }}/>
-        <div style={{
-          position:"absolute",bottom:"-200px",right:"-120px",width:560,height:560,
-          background:"radial-gradient(circle,rgba(30,64,175,.22) 0%,transparent 65%)",
+          position:"absolute",top:0,right:0,width:"40%",height:6,
+          background:"linear-gradient(90deg,transparent,"+T.copper+")",
           pointerEvents:"none"
         }}/>
 
-        <div style={{maxWidth:980,margin:"0 auto",position:"relative",textAlign:"center"}}>
-          {/* Official badge */}
-          <div style={{
-            display:"inline-flex",alignItems:"center",gap:10,
-            background:"rgba(201,161,74,.12)",
-            border:"1px solid rgba(201,161,74,.4)",
-            padding:"7px 18px",borderRadius:30,marginBottom:24
-          }}>
-            <span style={{width:7,height:7,borderRadius:"50%",background:"#fbbf24",boxShadow:"0 0 12px #fbbf24"}}/>
-            <span style={{color:"#fde68a",fontSize:12,fontWeight:700,letterSpacing:".5px"}}>
-              المنصة الوطنية — صوت المهندسين
-            </span>
-          </div>
+        <div style={{
+          maxWidth:1200,margin:"0 auto",padding:"56px 24px 72px",
+          display:"grid",
+          gridTemplateColumns:"minmax(0,1fr) auto",
+          alignItems:"center",gap:48,position:"relative"
+        }}>
+          {/* LEFT — Editorial text block */}
+          <div style={{maxWidth:680,minWidth:0,animation:"fade-up .6s ease-out"}}>
+            {/* Spec line — like a technical drawing label */}
+            <div style={{
+              display:"flex",alignItems:"center",gap:14,marginBottom:28,
+              fontFamily:T.fontMono,fontSize:11,color:T.text3,letterSpacing:"1.5px"
+            }}>
+              <span style={{color:T.copper,fontWeight:700}}>● LIVE</span>
+              <span style={{flex:1,height:1,background:T.border}}/>
+              <span>DOC-001 / IQ-ENG-2026</span>
+            </div>
 
-          {/* Logo emblem */}
-          <div style={{
-            width:96,height:96,borderRadius:22,
-            background:"linear-gradient(135deg,rgba(201,161,74,.22),rgba(201,161,74,.08))",
-            border:"1.5px solid rgba(201,161,74,.45)",
-            display:"flex",alignItems:"center",justifyContent:"center",
-            margin:"0 auto 26px",
-            boxShadow:"0 12px 40px rgba(0,0,0,.4),inset 0 1px 0 rgba(255,255,255,.12)"
-          }}>
-            <SvgIcon d={P.compass} size={50} color="#fbbf24" sw={1.7}/>
-          </div>
-
-          {/* Title */}
-          <h1 style={{
-            color:"#fff",fontSize:"clamp(28px,5.5vw,52px)",fontWeight:900,
-            marginBottom:18,lineHeight:1.15,letterSpacing:"-.5px"
-          }}>
-            المنصة الوطنية<br/>
-            <span style={{color:"#fbbf24"}}>لمهندسي العراق غير المعينين</span>
-          </h1>
-
-          {/* Gold separator */}
-          <div style={{
-            width:80,height:3,background:"linear-gradient(90deg,transparent,#c9a14a,transparent)",
-            margin:"0 auto 24px"
-          }}/>
-
-          <p style={{
-            color:"#cbd5e1",fontSize:"clamp(15px,2.2vw,19px)",
-            lineHeight:1.9,maxWidth:720,margin:"0 auto 18px",fontWeight:400
-          }}>
-            صوت موحّد للكفاءات الهندسية الشابة في العراق — منصة إلكترونية تجمع خريجي كليات الهندسة
-            الباحثين عن فرص التعيين، وتعمل كحلقة وصل بين المهندس وصنّاع القرار.
-          </p>
-          <p style={{
-            color:"#94a3b8",fontSize:"clamp(13px,1.8vw,15px)",
-            lineHeight:1.8,maxWidth:680,margin:"0 auto 44px",fontStyle:"italic"
-          }}>
-            هدفنا: أرشفة وإحصاء الكفاءات الهندسية رسمياً، لتسهيل المطالبة بالحقوق في التعيينات المركزية والمشاريع التنموية.
-          </p>
-
-          {/* CTA Buttons */}
-          <div style={{display:"flex",gap:14,justifyContent:"center",flexWrap:"wrap",marginBottom:64}}>
-            <button onClick={function(){setPage("register");}}
-              style={{
-                background:"linear-gradient(135deg,#d4b169,#c9a14a)",
-                color:T.ink,border:"none",padding:"15px 36px",borderRadius:T.radius,
-                fontSize:15,fontWeight:800,cursor:"pointer",
-                boxShadow:"0 8px 28px rgba(201,161,74,.45)",
-                display:"flex",alignItems:"center",gap:10,letterSpacing:".3px"
+            {/* Big display title */}
+            <h1 style={{
+              fontFamily:T.fontDisp,
+              color:T.ink,
+              fontSize:"clamp(34px,6vw,68px)",
+              fontWeight:700,
+              lineHeight:1.05,
+              letterSpacing:"-1px",
+              marginBottom:22
+            }}>
+              المنصّة الوطنيّة <br/>
+              <span style={{
+                background:"linear-gradient(135deg,"+T.copper+","+T.copperDk+")",
+                WebkitBackgroundClip:"text",
+                WebkitTextFillColor:"transparent",
+                backgroundClip:"text"
               }}>
-              <SvgIcon d={P.edit} size={18} color={T.ink}/>
-              سجّل اسمك الآن
-            </button>
-            <button onClick={openSearch}
-              style={{
-                background:"rgba(255,255,255,.06)",color:"#fff",
-                border:"1.5px solid rgba(255,255,255,.22)",
-                padding:"15px 32px",borderRadius:T.radius,
-                fontSize:14,fontWeight:700,cursor:"pointer",
-                display:"flex",alignItems:"center",gap:10,
-                backdropFilter:"blur(8px)"
-              }}>
-              <SvgIcon d={P.search} size={17} color="#fff"/>
-              تحقّق من تسجيلك
-            </button>
-          </div>
+                لمهندسي العراق
+              </span>
+              <br/>
+              <span style={{fontSize:".7em",color:T.stone,fontWeight:500}}>
+                — غير المعيّنين —
+              </span>
+            </h1>
 
-          {/* Quick Stats — Engineering-style strip */}
-          <div style={{
-            display:"grid",gridTemplateColumns:"repeat(auto-fit,minmax(180px,1fr))",gap:14,
-            background:"rgba(15,23,42,.4)",
-            border:"1px solid rgba(255,255,255,.08)",
-            borderRadius:T.radiusLg,padding:"20px",
-            backdropFilter:"blur(10px)"
-          }}>
-            {quickStats.map(function(s,i){
-              return (
-                <div key={s.label} style={{
-                  textAlign:"center",
-                  borderLeft:i<quickStats.length-1?"1px solid rgba(255,255,255,.08)":"none",
-                  padding:"4px 8px"
+            <p style={{
+              color:T.text2,fontSize:"clamp(15px,1.6vw,18px)",
+              lineHeight:1.9,marginBottom:14,fontWeight:400,maxWidth:560
+            }}>
+              صوت موحّد للكفاءات الهندسيّة الشابة في العراق. منصّة تجمع خرّيجي كليّات الهندسة الباحثين عن
+              فرص التعيين، وتعمل كحلقة وصل بين <strong style={{color:T.ink,fontWeight:700}}>المهندس</strong> و<strong style={{color:T.ink,fontWeight:700}}>صنّاع القرار</strong>.
+            </p>
+
+            {/* Goal pill with copper indicator */}
+            <div style={{
+              display:"flex",gap:12,alignItems:"flex-start",
+              background:T.paper,border:"1px solid "+T.border,
+              borderRight:"3px solid "+T.copper,
+              padding:"14px 16px",borderRadius:8,marginBottom:32,maxWidth:560
+            }}>
+              <SvgIcon d={P.target} size={18} color={T.copper}/>
+              <p style={{color:T.text2,fontSize:13.5,lineHeight:1.7,margin:0,fontWeight:500}}>
+                <span style={{color:T.copper,fontWeight:700}}>الهدف:</span> أرشفة وإحصاء كفاءات الهندسة العراقيّة رسميّاً،
+                لتسهيل المطالبة بالحقوق في التعيينات المركزيّة والمشاريع التنمويّة.
+              </p>
+            </div>
+
+            {/* CTAs */}
+            <div style={{display:"flex",gap:14,flexWrap:"wrap",marginBottom:36}}>
+              <button onClick={function(){setPage("register");}}
+                onMouseEnter={function(e){e.currentTarget.style.transform="translateY(-2px)";e.currentTarget.style.boxShadow="0 12px 32px rgba(184,115,51,.35)";}}
+                onMouseLeave={function(e){e.currentTarget.style.transform="none";e.currentTarget.style.boxShadow="0 6px 20px rgba(184,115,51,.25)";}}
+                style={{
+                  background:"linear-gradient(135deg,"+T.copper+","+T.copperDk+")",
+                  color:"#fff",border:"none",padding:"15px 30px",borderRadius:8,
+                  fontSize:14.5,fontWeight:700,cursor:"pointer",
+                  boxShadow:"0 6px 20px rgba(184,115,51,.25)",
+                  display:"inline-flex",alignItems:"center",gap:10,
+                  letterSpacing:".3px",fontFamily:T.font,
+                  transition:"transform .2s, box-shadow .2s"
                 }}>
-                  <div style={{
-                    display:"inline-flex",alignItems:"center",justifyContent:"center",
-                    width:34,height:34,borderRadius:8,
-                    background:"rgba(201,161,74,.15)",
-                    border:"1px solid rgba(201,161,74,.3)",
-                    marginBottom:10
-                  }}>
-                    <SvgIcon d={s.icon} size={17} color="#fbbf24"/>
-                  </div>
-                  <div style={{
-                    fontSize:s.val===null?"26px":"36px",fontWeight:900,color:"#fff",
-                    lineHeight:1,marginBottom:6,fontFamily:T.fontMono,letterSpacing:"-.5px"
-                  }}>
-                    {s.val===null
-                      ? <span style={{display:"inline-block",width:50,height:30,background:"rgba(255,255,255,.06)",borderRadius:6}}/>
-                      : s.val.toLocaleString("en-US")
-                    }
-                  </div>
-                  <div style={{fontSize:12,color:"#94a3b8",fontWeight:500,letterSpacing:".3px"}}>{s.label}</div>
-                </div>
-              );
-            })}
+                <SvgIcon d={P.edit} size={17} color="#fff"/>
+                سجّل اسمك الآن
+                <span style={{
+                  display:"inline-block",width:1,height:18,background:"rgba(255,255,255,.3)",margin:"0 4px"
+                }}/>
+                <SvgIcon d={P.arrow} size={15} color="#fff"/>
+              </button>
+              <button onClick={openSearch}
+                onMouseEnter={function(e){e.currentTarget.style.borderColor=T.ink;e.currentTarget.style.color=T.ink;}}
+                onMouseLeave={function(e){e.currentTarget.style.borderColor=T.border2;e.currentTarget.style.color=T.text2;}}
+                style={{
+                  background:"transparent",color:T.text2,
+                  border:"1.5px solid "+T.border2,
+                  padding:"14px 26px",borderRadius:8,
+                  fontSize:14,fontWeight:600,cursor:"pointer",
+                  display:"inline-flex",alignItems:"center",gap:10,
+                  fontFamily:T.font,transition:"all .2s"
+                }}>
+                <SvgIcon d={P.search} size={16}/>
+                تحقّق من تسجيلك
+              </button>
+            </div>
+
+            {/* Spec stats row — engineering data sheet style */}
+            <div style={{borderTop:"1px solid "+T.border,paddingTop:24}}>
+              <div style={{
+                display:"grid",gridTemplateColumns:"repeat(auto-fit,minmax(140px,1fr))",
+                gap:0
+              }}>
+                {quickStats.map(function(s,i){
+                  return (
+                    <div key={s.label} style={{
+                      padding:"4px 14px 4px 0",
+                      borderRight:i<quickStats.length-1?"1px solid "+T.border:"none"
+                    }}>
+                      <div style={{
+                        fontSize:10,color:T.copper,fontFamily:T.fontMono,
+                        letterSpacing:"1.5px",marginBottom:6,fontWeight:600
+                      }}>{s.spec}</div>
+                      <div style={{
+                        fontSize:s.val===null?"28px":"38px",fontWeight:700,color:T.ink,
+                        lineHeight:1,marginBottom:6,fontFamily:T.fontDisp,letterSpacing:"-1px"
+                      }}>
+                        {s.val===null
+                          ? <span style={{display:"inline-block",width:50,height:30,background:T.bg2,borderRadius:4,opacity:.5}}/>
+                          : s.val.toLocaleString("en-US")
+                        }
+                      </div>
+                      <div style={{fontSize:12.5,color:T.text3,fontWeight:500}}>{s.label}</div>
+                    </div>
+                  );
+                })}
+              </div>
+            </div>
+          </div>
+
+          {/* RIGHT — Compass Rose with annotations (hidden on mobile) */}
+          <div className="hero-compass" style={{
+            position:"relative",display:"flex",flexDirection:"column",alignItems:"center"
+          }}>
+            <style>{`
+              @media (max-width: 900px) { .hero-compass { display: none !important; } }
+              .compass-spin { animation: spin-slow 80s linear infinite; }
+            `}</style>
+            {/* Spec callout above */}
+            <div style={{
+              fontFamily:T.fontMono,fontSize:10,color:T.stone,
+              letterSpacing:"2px",marginBottom:18,textAlign:"center"
+            }}>
+              IRAQI ENG. PLATFORM<br/>
+              <span style={{color:T.copper}}>EST. 2026</span>
+            </div>
+            <div style={{position:"relative"}}>
+              {/* Outer concentric ring */}
+              <div style={{
+                position:"absolute",inset:-26,
+                border:"1px dashed "+T.border2,borderRadius:"50%",opacity:.6
+              }}/>
+              <div style={{
+                position:"absolute",inset:-46,
+                border:"1px solid "+T.border,borderRadius:"50%",opacity:.4
+              }}/>
+              <div className="compass-spin">
+                <CompassRose size={280} color={T.ink} accent={T.copper}/>
+              </div>
+              {/* Floating iso cube */}
+              <div style={{position:"absolute",top:-14,right:-30,opacity:.7}}>
+                <IsoCube size={50} color={T.copper}/>
+              </div>
+              {/* Floating ruler/tools (left) */}
+              <div style={{position:"absolute",bottom:-10,left:-40,opacity:.6}}>
+                <DraftingTools size={86} color={T.ink} accent={T.copper}/>
+              </div>
+            </div>
+            {/* Bottom annotation */}
+            <div style={{
+              marginTop:24,padding:"8px 14px",
+              background:T.paper,border:"1px solid "+T.border,
+              borderRadius:6,fontFamily:T.fontMono,fontSize:10,color:T.text3,
+              letterSpacing:"1px"
+            }}>
+              ARCHITECTURAL · ENGINEERING · ARCHIVE
+            </div>
           </div>
         </div>
       </div>
 
-      {/* ── Mission Statement ── */}
-      <div style={{background:T.surface,borderBottom:"1px solid "+T.border,padding:"40px 20px"}}>
-        <div style={{maxWidth:880,margin:"0 auto",textAlign:"center"}}>
-          <div style={{
-            display:"inline-block",fontSize:11,fontWeight:700,letterSpacing:"2px",
-            color:T.gold,marginBottom:10,textTransform:"uppercase"
-          }}>
-            رسالتنا
-          </div>
+      {/* ── Caliper Divider ── */}
+      <div style={{maxWidth:1200,margin:"0 auto",padding:"40px 24px 0"}}>
+        <CaliperDivider color={T.copper}/>
+      </div>
+
+      {/* ── Mission strip ── */}
+      <div style={{padding:"56px 20px"}}>
+        <div style={{maxWidth:920,margin:"0 auto",textAlign:"center"}}>
+          <Eyebrow text="رسالتنا" color={T.copper}/>
           <p style={{
-            color:T.text,fontSize:"clamp(15px,2vw,18px)",lineHeight:2,
-            margin:0,fontWeight:500
+            fontFamily:T.fontDisp,
+            color:T.ink,fontSize:"clamp(18px,2.5vw,28px)",lineHeight:1.6,
+            margin:0,fontWeight:500,letterSpacing:"-.2px"
           }}>
-            تأسّست المنصة لتكون <strong style={{color:T.ink}}>صوتاً موحّداً</strong> يعكس حجم الطاقات الهندسية الشابة غير المستغلة في العراق،
-            وحلقة وصل بين <strong style={{color:T.ink}}>الخريج المهندس</strong> و<strong style={{color:T.ink}}>صنّاع القرار</strong> —
-            من خلال أرشفة وإحصاء دقيق للكفاءات الهندسية على المستوى الوطني.
+            تأسّست المنصّة لتكون <em style={{color:T.copper,fontStyle:"normal",fontWeight:600}}>صوتاً موحّداً</em> يعكس
+            حجم الطاقات الهندسيّة الشابة غير المستغلّة في العراق، وحلقة وصل بين <em style={{color:T.copper,fontStyle:"normal",fontWeight:600}}>الخرّيج</em> و
+            <em style={{color:T.copper,fontStyle:"normal",fontWeight:600}}>صنّاع القرار</em>.
           </p>
         </div>
       </div>
 
-      {/* ── Feature Cards ── */}
-      <div style={{maxWidth:1120,margin:"0 auto",padding:"60px 20px 20px"}}>
+      {/* ── Feature Cards — Spec Sheet Style ── */}
+      <div style={{maxWidth:1200,margin:"0 auto",padding:"20px 24px 40px"}}>
         <div style={{textAlign:"center",marginBottom:44}}>
-          <div style={{fontSize:11,fontWeight:700,letterSpacing:"2px",color:T.gold,marginBottom:8,textTransform:"uppercase"}}>
-            الخدمات
-          </div>
-          <h2 style={{fontSize:"clamp(22px,3.5vw,30px)",fontWeight:900,color:T.ink,marginBottom:10,letterSpacing:"-.3px"}}>
+          <Eyebrow text="الخدمات / SERVICES" color={T.copper}/>
+          <h2 style={{
+            fontFamily:T.fontDisp,
+            fontSize:"clamp(26px,4vw,40px)",fontWeight:600,color:T.ink,
+            marginBottom:12,letterSpacing:"-.5px",lineHeight:1.2
+          }}>
             كيف يمكنك المشاركة؟
           </h2>
-          <p style={{color:T.text3,fontSize:15,maxWidth:520,margin:"0 auto",lineHeight:1.8}}>
-            خطوات بسيطة لتنضمّ إلى الأرشيف الوطني وتُسمع صوتك مع آلاف المهندسين
+          <p style={{color:T.text2,fontSize:15,maxWidth:560,margin:"0 auto",lineHeight:1.8}}>
+            أربع خطوات تتيح لك الانضمام إلى الأرشيف الوطنيّ، ومتابعة المؤشّرات، والتواصل مع شبكة المهندسين.
           </p>
         </div>
 
-        <div style={{display:"grid",gridTemplateColumns:"repeat(auto-fit,minmax(250px,1fr))",gap:18}}>
-          {featureCards.map(function(fc){
+        <div style={{display:"grid",gridTemplateColumns:"repeat(auto-fit,minmax(260px,1fr))",gap:16}}>
+          {featureCards.map(function(fc, idx){
             var isHov = hover===fc.k;
             return (
               <div key={fc.k}
@@ -2162,145 +2369,259 @@ function HomePage({setPage, openSearch}) {
                 onMouseLeave={function(){setHover("");}}
                 onClick={function(){setPage(fc.k);}}
                 style={{
-                  background:T.surface,borderRadius:T.radiusLg,padding:"28px 22px",
+                  background:T.paper,borderRadius:10,padding:"28px 24px 22px",
                   boxShadow:isHov?T.shadowLg:T.shadow,
                   border:"1px solid "+(isHov?fc.accent+"55":T.border),
-                  borderTop:"3px solid "+fc.accent,
-                  cursor:"pointer",transition:"all .25s",
-                  transform:isHov?"translateY(-3px)":"none",
-                  display:"flex",flexDirection:"column",gap:14,position:"relative",overflow:"hidden"
+                  cursor:"pointer",transition:"all .25s cubic-bezier(.4,0,.2,1)",
+                  transform:isHov?"translateY(-4px)":"none",
+                  display:"flex",flexDirection:"column",gap:16,
+                  position:"relative",overflow:"hidden",
+                  animation:"fade-up .5s ease-out "+(idx*80)+"ms backwards"
                 }}>
-                {/* corner accent */}
+                {/* Top spec line — number + brackets like blueprint */}
                 <div style={{
-                  position:"absolute",top:0,left:0,width:60,height:60,
-                  background:"linear-gradient(135deg,"+fc.accent+"15,transparent)",
-                  pointerEvents:"none"
-                }}/>
-
-                <div style={{
-                  width:54,height:54,borderRadius:12,
-                  background:"linear-gradient(135deg,"+fc.gradFrom+","+fc.gradTo+")",
-                  display:"flex",alignItems:"center",justifyContent:"center",
-                  boxShadow:"0 6px 18px "+fc.accent+"30",flexShrink:0
+                  display:"flex",justifyContent:"space-between",alignItems:"center",
+                  paddingBottom:14,borderBottom:"1px dashed "+T.border
                 }}>
-                  <SvgIcon d={fc.icon} size={26} color="#fff"/>
-                </div>
-
-                <div>
-                  <h3 style={{fontSize:17,fontWeight:800,color:T.ink,marginBottom:10,lineHeight:1.4}}>{fc.title}</h3>
-                  <p style={{color:T.text3,fontSize:13.5,lineHeight:1.9,margin:0}}>{fc.desc}</p>
-                </div>
-
-                <div style={{marginTop:"auto",paddingTop:10,borderTop:"1px dashed "+T.border}}>
-                  <div style={{display:"inline-flex",alignItems:"center",gap:8,color:fc.accent,fontWeight:700,fontSize:13}}>
-                    {fc.cta}
-                    <SvgIcon d={P.arrow} size={15} color={fc.accent}/>
+                  <div style={{
+                    fontFamily:T.fontMono,fontSize:11,color:fc.accent,
+                    letterSpacing:"1.5px",fontWeight:700
+                  }}>
+                    [ {fc.num} ]
+                  </div>
+                  <div style={{
+                    width:46,height:46,borderRadius:8,
+                    background:fc.accentBg,
+                    border:"1px solid "+fc.accent+"35",
+                    display:"flex",alignItems:"center",justifyContent:"center",
+                    transition:"all .25s",
+                    transform:isHov?"rotate(-6deg) scale(1.05)":"none"
+                  }}>
+                    <SvgIcon d={fc.icon} size={22} color={fc.accent}/>
                   </div>
                 </div>
+
+                <div style={{flex:1}}>
+                  <h3 style={{
+                    fontFamily:T.fontDisp,
+                    fontSize:18,fontWeight:600,color:T.ink,
+                    marginBottom:10,lineHeight:1.4,letterSpacing:"-.2px"
+                  }}>{fc.title}</h3>
+                  <p style={{color:T.text2,fontSize:13.5,lineHeight:1.95,margin:0}}>{fc.desc}</p>
+                </div>
+
+                <div style={{
+                  display:"flex",alignItems:"center",justifyContent:"space-between",
+                  paddingTop:14,borderTop:"1px solid "+T.border
+                }}>
+                  <div style={{
+                    display:"inline-flex",alignItems:"center",gap:8,
+                    color:fc.accent,fontWeight:700,fontSize:13
+                  }}>
+                    {fc.cta}
+                    <SvgIcon d={P.arrow} size={14} color={fc.accent}/>
+                  </div>
+                  <div style={{
+                    fontFamily:T.fontMono,fontSize:10,color:T.text4,
+                    letterSpacing:"1px"
+                  }}>→ GO</div>
+                </div>
+
+                {/* Corner technical tick */}
+                <div style={{
+                  position:"absolute",top:0,right:0,
+                  width:14,height:14,
+                  borderRight:"2px solid "+fc.accent,
+                  borderTop:"2px solid "+fc.accent,
+                  opacity:isHov?1:.5,transition:"opacity .2s"
+                }}/>
+                <div style={{
+                  position:"absolute",bottom:0,left:0,
+                  width:14,height:14,
+                  borderLeft:"2px solid "+fc.accent,
+                  borderBottom:"2px solid "+fc.accent,
+                  opacity:isHov?1:.5,transition:"opacity .2s"
+                }}/>
               </div>
             );
           })}
         </div>
       </div>
 
-      {/* ── Goal Banner (gold accent) ── */}
-      <div style={{maxWidth:1120,margin:"60px auto 20px",padding:"0 20px"}}>
+      {/* ── BIG NUMBER showcase — Editorial style ── */}
+      <div style={{
+        background:T.paper,
+        borderTop:"1px solid "+T.border,
+        borderBottom:"1px solid "+T.border,
+        padding:"64px 24px",position:"relative",overflow:"hidden"
+      }}>
         <div style={{
-          background:"linear-gradient(135deg,"+T.ink+","+T.ink2+")",
-          borderRadius:T.radiusLg,padding:"36px 32px",
-          position:"relative",overflow:"hidden",
-          borderRight:"4px solid "+T.gold
-        }}>
+          position:"absolute",inset:0,
+          backgroundImage:DOT_GRID,backgroundSize:DOT_GRID_SIZE,
+          opacity:.5,pointerEvents:"none"
+        }}/>
+        <div style={{maxWidth:1100,margin:"0 auto",position:"relative"}}>
           <div style={{
-            position:"absolute",top:-40,left:-40,width:200,height:200,borderRadius:"50%",
-            background:"radial-gradient(circle,rgba(201,161,74,.18),transparent 70%)",
-            pointerEvents:"none"
-          }}/>
-          <div style={{position:"relative",display:"flex",alignItems:"flex-start",gap:18,flexWrap:"wrap"}}>
-            <div style={{
-              width:54,height:54,borderRadius:12,
-              background:"rgba(201,161,74,.18)",border:"1px solid rgba(201,161,74,.4)",
-              display:"flex",alignItems:"center",justifyContent:"center",flexShrink:0
-            }}>
-              <SvgIcon d={P.target} size={26} color="#fbbf24"/>
-            </div>
-            <div style={{flex:"1 1 280px"}}>
-              <div style={{fontSize:11,color:"#fde68a",fontWeight:700,letterSpacing:"2px",marginBottom:6,textTransform:"uppercase"}}>الهدف الأساسي</div>
-              <h3 style={{color:"#fff",fontSize:"clamp(17px,2.5vw,22px)",fontWeight:800,marginBottom:12,lineHeight:1.5}}>
-                أرشفة وإحصاء كفاءات الهندسة العراقية رسمياً
-              </h3>
-              <p style={{color:"#cbd5e1",fontSize:14,lineHeight:1.9,margin:0}}>
-                لتسهيل المطالبة بحقوق المهندسين العراقيين في التعيينات المركزية والمشاريع التنموية،
-                وضمان عدم تجاهل أي طاقة هندسية شابة في خطط الدولة.
+            display:"grid",
+            gridTemplateColumns:"minmax(0,1fr) minmax(0,1.2fr)",
+            gap:48,alignItems:"center"
+          }}>
+            <div>
+              <Eyebrow text="السجلّ الحيّ" color={T.copper} align="flex-start"/>
+              <h2 style={{
+                fontFamily:T.fontDisp,
+                fontSize:"clamp(28px,4vw,42px)",fontWeight:600,color:T.ink,
+                marginBottom:18,letterSpacing:"-.5px",lineHeight:1.2
+              }}>
+                كلّ اسم في القائمة <br/>
+                <span style={{color:T.copper}}>صوت إضافيّ</span> في الميزان.
+              </h2>
+              <p style={{color:T.text2,fontSize:15,lineHeight:1.95,margin:0,maxWidth:480}}>
+                كلّما زاد عدد المهندسين المسجّلين، زادت قوّة المطالبة الرسميّة بحقوقهم في التعيينات المركزيّة
+                ومشاريع الإعمار. لا تكتفِ بالانتظار — كن جزءاً من الرقم.
               </p>
+            </div>
+            <div style={{textAlign:"center",position:"relative"}}>
+              {/* Big number with measurement marks */}
+              <div style={{position:"relative",display:"inline-block"}}>
+                <div style={{
+                  position:"absolute",top:-12,left:0,right:0,height:8,
+                  borderTop:"1px solid "+T.copper,
+                  borderLeft:"1px solid "+T.copper,
+                  borderRight:"1px solid "+T.copper
+                }}/>
+                <div style={{
+                  fontFamily:T.fontDisp,
+                  fontSize:"clamp(72px,18vw,180px)",fontWeight:700,
+                  color:T.ink,lineHeight:.95,letterSpacing:"-4px",
+                  background:"linear-gradient(180deg,"+T.ink+" 0%,"+T.copper+" 100%)",
+                  WebkitBackgroundClip:"text",
+                  WebkitTextFillColor:"transparent",
+                  backgroundClip:"text"
+                }}>
+                  {total===null ? "—" : total.toLocaleString("en-US")}
+                </div>
+                <div style={{
+                  position:"absolute",bottom:-12,left:0,right:0,height:8,
+                  borderBottom:"1px solid "+T.copper,
+                  borderLeft:"1px solid "+T.copper,
+                  borderRight:"1px solid "+T.copper
+                }}/>
+              </div>
+              <div style={{
+                marginTop:24,fontFamily:T.fontMono,fontSize:12,
+                color:T.text3,letterSpacing:"3px",fontWeight:600
+              }}>
+                مهندس مسجّل · LIVE COUNT
+              </div>
             </div>
           </div>
         </div>
       </div>
 
-      {/* ── Info Strip ── */}
-      <div style={{background:T.bg2,padding:"56px 20px 64px",marginTop:40}}>
-        <div style={{maxWidth:1000,margin:"0 auto"}}>
-          <div style={{textAlign:"center",marginBottom:36}}>
-            <div style={{fontSize:11,fontWeight:700,letterSpacing:"2px",color:T.gold,marginBottom:8,textTransform:"uppercase"}}>
-              لماذا المنصة؟
-            </div>
-            <h2 style={{fontSize:"clamp(20px,3vw,26px)",fontWeight:900,color:T.ink,margin:0,letterSpacing:"-.3px"}}>
-              ثلاثة التزامات نقدّمها لك
+      {/* ── Three Pillars — Bauhaus geometry ── */}
+      <div style={{padding:"72px 24px",background:T.cream}}>
+        <div style={{maxWidth:1100,margin:"0 auto"}}>
+          <div style={{textAlign:"center",marginBottom:50}}>
+            <Eyebrow text="ثلاثة التزامات" color={T.copper}/>
+            <h2 style={{
+              fontFamily:T.fontDisp,
+              fontSize:"clamp(24px,3.5vw,36px)",fontWeight:600,color:T.ink,
+              margin:0,letterSpacing:"-.4px",lineHeight:1.3
+            }}>
+              لماذا تختار هذه المنصّة؟
             </h2>
           </div>
-          <div style={{display:"grid",gridTemplateColumns:"repeat(auto-fit,minmax(240px,1fr))",gap:18}}>
+          <div style={{display:"grid",gridTemplateColumns:"repeat(auto-fit,minmax(260px,1fr))",gap:18}}>
             {[
-              {icon:P.shieldCheck, title:"بياناتك في أمان",  text:"تُخزَّن المعلومات على خوادم مشفّرة بمعايير دولية. رقم هاتفك لا يظهر للعموم أبداً.",color:T.green},
-              {icon:P.voice,       title:"صوت موحّد",       text:"كلما زاد عدد المسجّلين، زادت قوّة المطالبة بحقوق المهندسين أمام صنّاع القرار.",color:T.gold},
-              {icon:P.flag,        title:"مستقلّة 100%",     text:"المنصة غير حكومية وغير حزبية — تخدم المهندس العراقي حصراً بلا أي ارتباطات.",color:T.blue},
+              {icon:P.shieldCheck, num:"I",   title:"بياناتك في أمان",  text:"تُخزَّن المعلومات على خوادم مشفّرة بمعايير دوليّة. رقم هاتفك لا يظهر للعموم أبداً.",color:T.sage},
+              {icon:P.voice,       num:"II",  title:"صوت موحّد",       text:"كلّما زاد عدد المسجّلين، زادت قوّة المطالبة بحقوق المهندسين أمام صنّاع القرار.",color:T.copper},
+              {icon:P.flag,        num:"III", title:"مستقلّة 100٪",    text:"المنصّة غير حكوميّة وغير حزبيّة — تخدم المهندس العراقيّ حصراً بلا أيّ ارتباطات.",color:T.crimson},
             ].map(function(item){return(
               <div key={item.title} style={{
-                background:T.surface,borderRadius:T.radiusLg,padding:"24px 20px",
-                border:"1px solid "+T.border,boxShadow:T.shadow,
-                borderTop:"3px solid "+item.color
+                background:T.paper,borderRadius:10,padding:"28px 24px",
+                border:"1px solid "+T.border,
+                position:"relative",overflow:"hidden"
               }}>
+                {/* Roman numeral in corner */}
                 <div style={{
-                  width:46,height:46,borderRadius:10,
-                  background:item.color+"15",
-                  display:"flex",alignItems:"center",justifyContent:"center",marginBottom:14
-                }}>
-                  <SvgIcon d={item.icon} size={22} color={item.color}/>
+                  position:"absolute",top:14,left:18,
+                  fontFamily:T.fontDisp,fontSize:46,fontWeight:700,
+                  color:item.color,opacity:.10,lineHeight:1,letterSpacing:"-2px"
+                }}>{item.num}</div>
+                <div style={{position:"relative"}}>
+                  <div style={{
+                    width:46,height:46,borderRadius:8,
+                    background:item.color+"12",
+                    border:"1px solid "+item.color+"30",
+                    display:"flex",alignItems:"center",justifyContent:"center",marginBottom:18
+                  }}>
+                    <SvgIcon d={item.icon} size={22} color={item.color}/>
+                  </div>
+                  <h4 style={{
+                    fontFamily:T.fontDisp,
+                    fontSize:18,fontWeight:600,marginBottom:10,color:T.ink,
+                    letterSpacing:"-.2px"
+                  }}>{item.title}</h4>
+                  <p style={{color:T.text2,fontSize:13.5,lineHeight:1.95,margin:0}}>{item.text}</p>
                 </div>
-                <h4 style={{fontSize:15,fontWeight:800,marginBottom:10,color:T.ink,letterSpacing:".1px"}}>{item.title}</h4>
-                <p style={{color:T.text3,fontSize:13.5,lineHeight:1.9,margin:0}}>{item.text}</p>
               </div>
             );})}
           </div>
         </div>
       </div>
 
-      {/* ── Final CTA ── */}
+      {/* ── Final CTA — Architectural plate ── */}
       <div style={{
-        background:"linear-gradient(135deg,"+T.ink+","+T.ink2+" 60%,"+T.ink3+")",
-        padding:"56px 20px",textAlign:"center",position:"relative",overflow:"hidden"
+        background:"linear-gradient(135deg,"+T.ink+" 0%,"+T.ink2+" 100%)",
+        padding:"72px 24px",textAlign:"center",position:"relative",overflow:"hidden"
       }}>
         <div style={{
           position:"absolute",inset:0,
-          backgroundImage:BLUEPRINT_BG,backgroundSize:BLUEPRINT_SIZE,opacity:.4,pointerEvents:"none"
+          backgroundImage:BLUEPRINT_BG,backgroundSize:BLUEPRINT_SIZE,opacity:.5,pointerEvents:"none"
         }}/>
-        <div style={{maxWidth:720,margin:"0 auto",position:"relative"}}>
-          <h2 style={{color:"#fff",fontSize:"clamp(22px,3.5vw,30px)",fontWeight:900,marginBottom:14,letterSpacing:"-.3px"}}>
-            اجعل صوتك مسموعاً
+        {/* Copper accent corners */}
+        <div style={{position:"absolute",top:24,right:24,width:28,height:28,borderTop:"2px solid "+T.copper,borderRight:"2px solid "+T.copper,opacity:.6}}/>
+        <div style={{position:"absolute",bottom:24,left:24,width:28,height:28,borderBottom:"2px solid "+T.copper,borderLeft:"2px solid "+T.copper,opacity:.6}}/>
+
+        <div style={{maxWidth:780,margin:"0 auto",position:"relative"}}>
+          <div style={{
+            display:"inline-flex",alignItems:"center",gap:10,
+            fontFamily:T.fontMono,fontSize:11,color:T.copperLt,
+            letterSpacing:"2px",marginBottom:18,fontWeight:600
+          }}>
+            <span style={{width:30,height:1,background:T.copper}}/>
+            انضمّ إلى الميثاق
+            <span style={{width:30,height:1,background:T.copper}}/>
+          </div>
+          <h2 style={{
+            fontFamily:T.fontDisp,
+            color:"#fff",fontSize:"clamp(28px,4.5vw,46px)",fontWeight:600,
+            marginBottom:18,letterSpacing:"-.5px",lineHeight:1.2
+          }}>
+            اجعل صوتك مسموعاً.
           </h2>
-          <p style={{color:"#cbd5e1",fontSize:15,lineHeight:1.9,marginBottom:28,maxWidth:560,margin:"0 auto 28px"}}>
-            انضم إلى آلاف المهندسين العراقيين الذين سجّلوا أسماءهم في القائمة الوطنية وكن جزءاً من الصوت الجماعي.
+          <p style={{
+            color:"#cbd5e1",fontSize:16,lineHeight:1.95,marginBottom:32,
+            maxWidth:560,margin:"0 auto 32px"
+          }}>
+            انضمّ إلى المهندسين العراقيين الذين سجّلوا أسماءهم في القائمة الوطنيّة،
+            وكن جزءاً من الصوت الجماعيّ الذي يطالب بحقوق التعيين.
           </p>
           <button onClick={function(){setPage("register");}}
+            onMouseEnter={function(e){e.currentTarget.style.transform="translateY(-2px)";}}
+            onMouseLeave={function(e){e.currentTarget.style.transform="none";}}
             style={{
-              background:"linear-gradient(135deg,#d4b169,#c9a14a)",
-              color:T.ink,border:"none",padding:"15px 38px",borderRadius:T.radius,
-              fontSize:15,fontWeight:800,cursor:"pointer",
-              boxShadow:"0 8px 28px rgba(201,161,74,.45)",
-              display:"inline-flex",alignItems:"center",gap:10,letterSpacing:".3px"
+              background:"linear-gradient(135deg,"+T.copper+","+T.copperDk+")",
+              color:"#fff",border:"none",padding:"16px 40px",borderRadius:8,
+              fontSize:15,fontWeight:700,cursor:"pointer",
+              boxShadow:"0 12px 32px rgba(184,115,51,.40)",
+              display:"inline-flex",alignItems:"center",gap:12,
+              letterSpacing:".3px",fontFamily:T.font,transition:"transform .2s"
             }}>
-            <SvgIcon d={P.edit} size={18} color={T.ink}/>
-            سجّل اسمك الآن — مجاناً
+            <SvgIcon d={P.edit} size={18} color="#fff"/>
+            سجّل اسمك الآن — مجّاناً
+            <SvgIcon d={P.arrow} size={15} color="#fff"/>
           </button>
         </div>
       </div>
@@ -2327,55 +2648,67 @@ export default function App() {
   return (
     <div style={{fontFamily:T.font,minHeight:"100vh",background:T.bg,color:T.text,direction:"rtl"}}>
       <nav style={{
-        background:"linear-gradient(135deg,"+T.ink+","+T.ink2+")",
-        padding:"10px 22px",
+        background:T.ink,
+        padding:"11px 24px",
         display:"flex",alignItems:"center",justifyContent:"space-between",
-        boxShadow:"0 2px 16px rgba(0,0,0,.35)",flexWrap:"wrap",gap:4,
-        borderBottom:"1px solid rgba(201,161,74,.15)"
+        boxShadow:"0 1px 0 rgba(184,115,51,.18), 0 4px 20px rgba(0,0,0,.20)",
+        flexWrap:"wrap",gap:4,
+        borderBottom:"1px solid rgba(184,115,51,.20)",
+        position:"relative"
       }}>
         {/* Logo — click to go home */}
         <div onClick={function(){setPage("home");}} style={{
           color:"#fff",fontSize:15,fontWeight:700,padding:"4px 0",
-          display:"flex",alignItems:"center",gap:11,cursor:"pointer",userSelect:"none"
+          display:"flex",alignItems:"center",gap:12,cursor:"pointer",userSelect:"none"
         }}>
           <div style={{
-            width:40,height:40,borderRadius:10,
-            background:"linear-gradient(135deg,rgba(201,161,74,.3),rgba(201,161,74,.08))",
-            border:"1px solid rgba(201,161,74,.4)",
+            width:42,height:42,borderRadius:8,
+            background:"linear-gradient(135deg,rgba(184,115,51,.28),rgba(184,115,51,.08))",
+            border:"1px solid rgba(184,115,51,.45)",
             display:"flex",alignItems:"center",justifyContent:"center",
-            boxShadow:"inset 0 1px 0 rgba(255,255,255,.1)"
+            boxShadow:"inset 0 1px 0 rgba(255,255,255,.08)"
           }}>
-            <SvgIcon d={P.compass} size={22} color="#fbbf24" sw={1.7}/>
+            <SvgIcon d={P.compass} size={22} color={T.copperLt} sw={1.7}/>
           </div>
-          <span style={{display:"flex",flexDirection:"column",lineHeight:1.2}}>
-            <span style={{fontSize:13.5,fontWeight:800,letterSpacing:".2px"}}>منصة مهندسي العراق</span>
-            <span style={{fontSize:9.5,color:"rgba(253,230,138,.65)",fontWeight:500,letterSpacing:".5px"}}>
-              الخريجون غير المعينين — منصّة وطنية
+          <span style={{display:"flex",flexDirection:"column",lineHeight:1.25}}>
+            <span style={{
+              fontFamily:T.fontDisp,
+              fontSize:14.5,fontWeight:600,letterSpacing:"0",color:"#fff"
+            }}>منصّة مهندسي العراق</span>
+            <span style={{
+              fontFamily:T.fontMono,
+              fontSize:9.5,color:T.copperLt,fontWeight:500,letterSpacing:"1.5px"
+            }}>
+              IRAQI · ENG · PLATFORM
             </span>
           </span>
           <span style={{
-            fontSize:9,background:"rgba(34,197,94,.18)",color:"#4ade80",
-            padding:"2px 8px",borderRadius:20,fontWeight:800,letterSpacing:"1.2px",
-            border:"1px solid rgba(34,197,94,.3)"
-          }}>LIVE</span>
+            fontSize:9,background:"rgba(74,124,116,.20)",color:"#86c8b9",
+            padding:"3px 9px",borderRadius:4,fontWeight:700,letterSpacing:"1.5px",
+            border:"1px solid rgba(74,124,116,.35)",fontFamily:T.fontMono
+          }}>● LIVE</span>
         </div>
 
-        <div style={{display:"flex",gap:3,flexWrap:"wrap",alignItems:"center"}}>
+        <div style={{display:"flex",gap:4,flexWrap:"wrap",alignItems:"center"}}>
           {navItems.map(function(n){
             return (
               <button key={n.k} style={{...navBtn(page===n.k),display:"flex",alignItems:"center",gap:6,fontSize:12}} onClick={function(){setPage(n.k);}}>
-                <SvgIcon d={n.icon} size={13} color={page===n.k?"#fde68a":"rgba(255,255,255,.65)"}/>{n.l}
+                <SvgIcon d={n.icon} size={13} color={page===n.k?T.copperLt:"rgba(255,255,255,.55)"}/>{n.l}
               </button>
             );
           })}
-          <button onClick={function(){setSearch(true);}} style={{
-            background:"linear-gradient(135deg,rgba(201,161,74,.18),rgba(201,161,74,.08))",
-            border:"1px solid rgba(201,161,74,.45)",color:"#fde68a",
-            padding:"8px 14px",borderRadius:8,cursor:"pointer",
-            fontSize:12,fontWeight:700,marginRight:6,
-            display:"flex",alignItems:"center",gap:6,fontFamily:T.font
-          }}>
-            <SvgIcon d={P.search} size={13} color="#fde68a"/>
+          <button onClick={function(){setSearch(true);}}
+            onMouseEnter={function(e){e.currentTarget.style.background="rgba(184,115,51,.25)";}}
+            onMouseLeave={function(e){e.currentTarget.style.background="linear-gradient(135deg,rgba(184,115,51,.2),rgba(184,115,51,.08))";}}
+            style={{
+              background:"linear-gradient(135deg,rgba(184,115,51,.2),rgba(184,115,51,.08))",
+              border:"1px solid rgba(184,115,51,.5)",color:T.copperLt,
+              padding:"8px 14px",borderRadius:6,cursor:"pointer",
+              fontSize:12,fontWeight:700,marginRight:6,
+              display:"flex",alignItems:"center",gap:6,fontFamily:T.font,
+              transition:"background .2s"
+            }}>
+            <SvgIcon d={P.search} size={13} color={T.copperLt}/>
             تحقّق من تسجيلك
           </button>
         </div>
@@ -2394,57 +2727,115 @@ export default function App() {
       {showSearch && <SearchModal onClose={function(){setSearch(false);}}/>}
 
       <footer style={{
-        background:"linear-gradient(135deg,"+T.ink+","+T.ink2+")",
-        color:"#cbd5e1",padding:"40px 20px 20px",marginTop:0
+        background:T.ink,
+        color:"#cbd5e1",padding:"56px 24px 24px",marginTop:0,
+        position:"relative",overflow:"hidden",
+        borderTop:"1px solid rgba(184,115,51,.2)"
       }}>
-        <div style={{maxWidth:1080,margin:"0 auto"}}>
+        {/* subtle iso grid */}
+        <div style={{
+          position:"absolute",inset:0,
+          backgroundImage:BLUEPRINT_BG,backgroundSize:BLUEPRINT_SIZE,
+          opacity:.35,pointerEvents:"none"
+        }}/>
+        <div style={{maxWidth:1200,margin:"0 auto",position:"relative"}}>
+          {/* Top: caliper divider */}
+          <div style={{marginBottom:36,opacity:.5}}>
+            <CaliperDivider color={T.copperLt}/>
+          </div>
+
           <div style={{
-            display:"grid",gridTemplateColumns:"repeat(auto-fit,minmax(220px,1fr))",
-            gap:32,marginBottom:28,paddingBottom:26,borderBottom:"1px solid rgba(255,255,255,.08)"
+            display:"grid",gridTemplateColumns:"2fr 1fr 1.5fr",
+            gap:48,marginBottom:36,paddingBottom:32,
+            borderBottom:"1px solid rgba(255,255,255,.08)"
           }}>
             {/* Brand */}
-            <div>
-              <div style={{display:"flex",alignItems:"center",gap:10,marginBottom:14}}>
+            <div style={{minWidth:0}}>
+              <div style={{display:"flex",alignItems:"center",gap:12,marginBottom:16}}>
                 <div style={{
-                  width:38,height:38,borderRadius:10,
-                  background:"rgba(201,161,74,.18)",border:"1px solid rgba(201,161,74,.4)",
+                  width:44,height:44,borderRadius:8,
+                  background:"rgba(184,115,51,.18)",
+                  border:"1px solid rgba(184,115,51,.4)",
                   display:"flex",alignItems:"center",justifyContent:"center"
                 }}>
-                  <SvgIcon d={P.compass} size={20} color="#fbbf24"/>
+                  <SvgIcon d={P.compass} size={22} color={T.copperLt}/>
                 </div>
                 <div>
-                  <div style={{color:"#fff",fontWeight:800,fontSize:14}}>منصة مهندسي العراق</div>
-                  <div style={{color:"#94a3b8",fontSize:10,letterSpacing:".5px"}}>منصّة وطنية مستقلة</div>
+                  <div style={{
+                    color:"#fff",fontFamily:T.fontDisp,
+                    fontWeight:600,fontSize:16,letterSpacing:"-.2px"
+                  }}>منصّة مهندسي العراق</div>
+                  <div style={{
+                    color:T.copperLt,fontSize:10,fontFamily:T.fontMono,
+                    letterSpacing:"1.5px",marginTop:2
+                  }}>IRAQI · ENG · PLATFORM</div>
                 </div>
               </div>
-              <p style={{fontSize:12,lineHeight:1.9,color:"#94a3b8",margin:0}}>
-                صوت موحّد للكفاءات الهندسية العراقية الباحثة عن فرص التعيين والمشاركة في بناء الوطن.
+              <p style={{fontSize:13,lineHeight:2,color:"#94a3b8",margin:"0 0 14px",maxWidth:380}}>
+                صوت موحّد للكفاءات الهندسيّة العراقيّة الباحثة عن فرص التعيين
+                والمشاركة في بناء الوطن.
               </p>
+              <div style={{
+                display:"inline-flex",alignItems:"center",gap:8,
+                fontFamily:T.fontMono,fontSize:10,color:T.copperLt,
+                letterSpacing:"1.5px",padding:"5px 10px",
+                background:"rgba(184,115,51,.1)",border:"1px solid rgba(184,115,51,.3)",
+                borderRadius:4
+              }}>
+                ● EST. 2026 · IRAQ
+              </div>
             </div>
             {/* Links */}
             <div>
-              <h5 style={{color:"#fde68a",fontSize:12,fontWeight:700,letterSpacing:"1.5px",marginBottom:12,textTransform:"uppercase"}}>روابط سريعة</h5>
-              <div style={{display:"flex",flexDirection:"column",gap:8}}>
-                <span style={{cursor:"pointer",fontSize:13,color:"#cbd5e1"}} onClick={function(){setPage("about");}}>عن المنصة</span>
-                <span style={{cursor:"pointer",fontSize:13,color:"#cbd5e1"}} onClick={function(){setPage("privacy");}}>سياسة الخصوصية</span>
-                <span style={{cursor:"pointer",fontSize:13,color:"#cbd5e1"}} onClick={function(){setPage("coordinators");}}>المنسقون</span>
-                <span style={{cursor:"pointer",fontSize:13,color:"#cbd5e1"}} onClick={function(){setPage("dashboard");}}>الإحصائيات</span>
+              <h5 style={{
+                color:T.copperLt,fontSize:11,fontWeight:700,letterSpacing:"2px",
+                marginBottom:16,textTransform:"uppercase",fontFamily:T.fontMono
+              }}>الأقسام</h5>
+              <div style={{display:"flex",flexDirection:"column",gap:10}}>
+                <span style={{cursor:"pointer",fontSize:13,color:"#cbd5e1",transition:"color .2s"}}
+                  onClick={function(){setPage("about");}}
+                  onMouseEnter={function(e){e.currentTarget.style.color="#fff";}}
+                  onMouseLeave={function(e){e.currentTarget.style.color="#cbd5e1";}}>→ عن المنصّة</span>
+                <span style={{cursor:"pointer",fontSize:13,color:"#cbd5e1",transition:"color .2s"}}
+                  onClick={function(){setPage("privacy");}}
+                  onMouseEnter={function(e){e.currentTarget.style.color="#fff";}}
+                  onMouseLeave={function(e){e.currentTarget.style.color="#cbd5e1";}}>→ سياسة الخصوصيّة</span>
+                <span style={{cursor:"pointer",fontSize:13,color:"#cbd5e1",transition:"color .2s"}}
+                  onClick={function(){setPage("coordinators");}}
+                  onMouseEnter={function(e){e.currentTarget.style.color="#fff";}}
+                  onMouseLeave={function(e){e.currentTarget.style.color="#cbd5e1";}}>→ المنسّقون</span>
+                <span style={{cursor:"pointer",fontSize:13,color:"#cbd5e1",transition:"color .2s"}}
+                  onClick={function(){setPage("dashboard");}}
+                  onMouseEnter={function(e){e.currentTarget.style.color="#fff";}}
+                  onMouseLeave={function(e){e.currentTarget.style.color="#cbd5e1";}}>→ الإحصائيّات</span>
               </div>
             </div>
             {/* Mission */}
             <div>
-              <h5 style={{color:"#fde68a",fontSize:12,fontWeight:700,letterSpacing:"1.5px",marginBottom:12,textTransform:"uppercase"}}>هدفنا</h5>
-              <p style={{fontSize:12,lineHeight:1.9,color:"#94a3b8",margin:0}}>
-                أرشفة وإحصاء كفاءات الهندسة العراقية رسمياً، لتسهيل المطالبة بحقوقهم في التعيينات المركزية والمشاريع التنموية.
+              <h5 style={{
+                color:T.copperLt,fontSize:11,fontWeight:700,letterSpacing:"2px",
+                marginBottom:16,textTransform:"uppercase",fontFamily:T.fontMono
+              }}>هدفنا</h5>
+              <p style={{fontSize:13,lineHeight:2,color:"#94a3b8",margin:0}}>
+                أرشفة وإحصاء كفاءات الهندسة العراقيّة رسميّاً، لتسهيل المطالبة
+                بحقوقهم في التعيينات المركزيّة والمشاريع التنمويّة.
               </p>
             </div>
           </div>
           <div style={{
             display:"flex",justifyContent:"space-between",alignItems:"center",
-            flexWrap:"wrap",gap:10,fontSize:11,color:"#64748b"
+            flexWrap:"wrap",gap:14,fontSize:11,color:"#64748b"
           }}>
-            <span>المنصة الوطنية لمهندسي العراق غير المعينين &copy; {CUR_YEAR} — جميع الحقوق محفوظة</span>
-            <span style={{fontFamily:T.fontMono,letterSpacing:".5px"}}>v2.0 · Engineering Edition</span>
+            <span style={{fontFamily:T.font}}>
+              المنصّة الوطنيّة لمهندسي العراق غير المعيّنين &copy; {CUR_YEAR}
+              <span style={{margin:"0 10px",opacity:.5}}>·</span>
+              جميع الحقوق محفوظة
+            </span>
+            <span style={{
+              fontFamily:T.fontMono,letterSpacing:"1.5px",
+              padding:"3px 8px",border:"1px solid rgba(184,115,51,.3)",
+              borderRadius:4,color:T.copperLt
+            }}>v3.0 · CIVIC ENGINEERING</span>
           </div>
         </div>
       </footer>
