@@ -8,42 +8,46 @@ var ADMIN_PASS        = process.env.REACT_APP_ADMIN_PASS || "";
 var READONLY_PASS     = process.env.REACT_APP_READONLY_PASS || "";
 var READY = Boolean(SUPABASE_URL && SUPABASE_KEY);
 
-// ── Design Tokens — Modern Dark Engineering ───────────────────────────
+// ── Design Tokens — Engineering Blueprint Modern ──────────────────────
+// Light blueprint-paper aesthetic. Deep ocean navy for text/structure (ink),
+// bright azure for accents (highlight lines), pale sky for surfaces.
+// Token name "cyan" kept for code stability — VALUE is now bright azure.
+// Palette: #093C5D · #2C5EAD · #1591DC · #4BB8FA · #C4E2F5
 var T = {
-  // Surfaces (dark navy theme)
-  bg0:       "#0a1220",   // deepest page background
-  bg1:       "#0f1827",   // primary section bg
-  bg2:       "#131e36",   // elevated cards
-  bg3:       "#1a2540",   // hover / popover
-  bg4:       "#1f2c47",   // borders
-  border:    "#1f2c47",   // subtle borders
-  border2:   "#2a3956",   // stronger borders
-  // Text on dark
-  text:      "#ffffff",   // primary text
-  text2:     "#c9d1e1",   // secondary text
-  text3:     "#8b96ad",   // muted
-  text4:     "#5a657a",   // very muted
-  // Accent — bright cyan (engineering/tech feel)
-  cyan:      "#3ec1d3",   // primary accent
-  cyanLt:    "#5fd4e3",   // lighter for hover
-  cyanDk:    "#2a96a8",   // darker pressed
-  cyanGlow:  "rgba(62,193,211,.30)",
-  // Supporting colors
-  ink:       "#0e1a3a",   // deep navy for legacy gradients
-  ink2:      "#16213f",
-  ink3:      "#1e2c4d",
-  // Status (harmonized with dark theme)
-  success:   "#4ade80",
-  warning:   "#fbbf24",
-  danger:    "#f87171",
-  info:      "#60a5fa",
-  // Effects — luminous shadows
-  shadow:    "0 1px 2px rgba(0,0,0,.4),0 4px 16px rgba(0,0,0,.20)",
-  shadowLg:  "0 8px 32px rgba(0,0,0,.40),0 24px 64px rgba(0,0,0,.30)",
-  shadowCyan:"0 8px 28px rgba(62,193,211,.30)",
+  // Surfaces — clean blueprint paper
+  bg0:       "#f8fbfd",   // page background (off-white with sky hint)
+  bg1:       "#f0f7fc",   // primary section bg (faint sky)
+  bg2:       "#ffffff",   // elevated cards (white paper)
+  bg3:       "#e8f3fb",   // hover / popover (lighter sky)
+  bg4:       "#C4E2F5",   // pale sky tinted band
+  border:    "#d8e8f3",   // subtle border (very pale sky)
+  border2:   "#C4E2F5",   // stronger border (pale sky)
+  // Text — deep ocean navy ink
+  text:      "#093C5D",   // primary text (deep ocean navy)
+  text2:     "#2C5EAD",   // secondary text (royal blue)
+  text3:     "#5a7a96",   // muted (slate-blue)
+  text4:     "#8ba8be",   // very muted
+  // Accent — bright azure (blueprint highlight line)
+  cyan:      "#1591DC",   // primary accent — bright azure
+  cyanLt:    "#4BB8FA",   // lighter for hover (sky blue)
+  cyanDk:    "#0f6fa8",   // darker pressed (deep azure)
+  cyanGlow:  "rgba(21,145,220,.32)",
+  // Supporting — deep navy for hero/navbar/footer gradients
+  ink:       "#093C5D",   // deep ocean navy
+  ink2:      "#062A45",   // deepest navy
+  ink3:      "#2C5EAD",   // royal blue (3rd stop)
+  // Status — classic vibrant for clarity
+  success:   "#22c55e",
+  warning:   "#f59e0b",
+  danger:    "#ef4444",
+  info:      "#1591DC",
+  // Effects — soft navy-tinted shadows for light theme
+  shadow:    "0 1px 2px rgba(9,60,93,.06),0 4px 14px rgba(9,60,93,.08)",
+  shadowLg:  "0 4px 18px rgba(9,60,93,.10),0 24px 56px rgba(9,60,93,.14)",
+  shadowCyan:"0 8px 24px rgba(21,145,220,.38)",
   radius:    8,
   radiusLg:  14,
-  // Font — Tajawal only (modern, formal Arabic)
+  // Font — Tajawal kept for Arabic readability
   font:      "'Tajawal','Segoe UI',Tahoma,Arial,sans-serif",
   fontDisp:  "'Tajawal','Segoe UI',Tahoma,Arial,sans-serif",
   fontMono:  "'JetBrains Mono','Cascadia Code','Consolas',monospace",
@@ -75,11 +79,11 @@ T.shadowGold   = T.shadowCyan;
 T.shadowCopper = T.shadowCyan;
 
 // Engineering grid patterns — bright cyan on dark
-var ISO_GRID = "linear-gradient(30deg,rgba(62,193,211,.05) 1px,transparent 1px),linear-gradient(150deg,rgba(62,193,211,.05) 1px,transparent 1px)";
+var ISO_GRID = "linear-gradient(30deg,rgba(21,145,220,.05) 1px,transparent 1px),linear-gradient(150deg,rgba(21,145,220,.05) 1px,transparent 1px)";
 var ISO_GRID_SIZE = "48px 28px";
-var BLUEPRINT_BG = "linear-gradient(rgba(62,193,211,.06) 1px,transparent 1px),linear-gradient(90deg,rgba(62,193,211,.06) 1px,transparent 1px)";
+var BLUEPRINT_BG = "linear-gradient(rgba(21,145,220,.06) 1px,transparent 1px),linear-gradient(90deg,rgba(21,145,220,.06) 1px,transparent 1px)";
 var BLUEPRINT_SIZE = "48px 48px";
-var DOT_GRID = "radial-gradient(rgba(62,193,211,.10) 1px,transparent 1px)";
+var DOT_GRID = "radial-gradient(rgba(21,145,220,.10) 1px,transparent 1px)";
 var DOT_GRID_SIZE = "22px 22px";
 
 // ── Constants ─────────────────────────────────────────────────────────
@@ -157,8 +161,8 @@ function SvgIcon({d, size, color, sw}) {
 // Architectural Compass Rose — main hero emblem
 function CompassRose({size, color, accent}) {
   var s = size||140;
-  var c = color||"#c9d1e1";
-  var a = accent||"#3ec1d3";
+  var c = color||"#093C5D";
+  var a = accent||"#1591DC";
   return (
     <svg width={s} height={s} viewBox="0 0 200 200" fill="none" xmlns="http://www.w3.org/2000/svg">
       {/* outer ring */}
@@ -201,7 +205,7 @@ function CompassRose({size, color, accent}) {
 // Isometric structural cube — secondary motif
 function IsoCube({size, color}) {
   var s = size||60;
-  var c = color||"#3ec1d3";
+  var c = color||"#1591DC";
   return (
     <svg width={s} height={s} viewBox="0 0 60 60" fill="none">
       <path d="M30 5 L55 19 L55 41 L30 55 L5 41 L5 19 Z" stroke={c} strokeWidth="1.4" opacity=".5"/>
@@ -215,8 +219,8 @@ function IsoCube({size, color}) {
 // T-square + Triangle drafting tools (decorative)
 function DraftingTools({size, color, accent}) {
   var s = size||120;
-  var c = color||"#c9d1e1";
-  var a = accent||"#3ec1d3";
+  var c = color||"#093C5D";
+  var a = accent||"#1591DC";
   return (
     <svg width={s} height={s} viewBox="0 0 120 120" fill="none">
       {/* T-square horizontal arm */}
@@ -239,7 +243,7 @@ function DraftingTools({size, color, accent}) {
 
 // Caliper-style horizontal divider
 function CaliperDivider({color, width}) {
-  var c = color||"#3ec1d3";
+  var c = color||"#1591DC";
   return (
     <svg width="100%" height="20" viewBox="0 0 400 20" preserveAspectRatio="none" style={{width:width||"100%",display:"block"}}>
       <line x1="0" y1="10" x2="400" y2="10" stroke={c} strokeWidth="1" opacity=".6"/>
@@ -257,7 +261,7 @@ function CaliperDivider({color, width}) {
 
 // Section eyebrow with tick marks (replaces simple uppercase label)
 function Eyebrow({text, color, align}) {
-  var c = color||"#3ec1d3";
+  var c = color||"#1591DC";
   return (
     <div style={{
       display:"inline-flex",alignItems:"center",gap:10,
@@ -388,8 +392,8 @@ var db = {
 // ── Style helpers ─────────────────────────────────────────────────────
 function navBtn(a) {
   return {
-    background:a?"rgba(62,193,211,.14)":"transparent",
-    border:"1px solid "+(a?"rgba(62,193,211,.45)":"transparent"),
+    background:a?"rgba(21,145,220,.14)":"transparent",
+    border:"1px solid "+(a?"rgba(21,145,220,.45)":"transparent"),
     color:a?T.cyan:T.text2,
     padding:"8px 14px",borderRadius:6,cursor:"pointer",
     fontSize:12.5,fontWeight:a?700:500,transition:"all .2s",fontFamily:T.font,
@@ -410,7 +414,7 @@ function btn(bg1,bg2) {
     background:"linear-gradient(135deg,"+(bg1||T.bg3)+","+(bg2||T.bg2)+")",
     color:T.text,border:"1px solid "+T.border2,padding:"11px 22px",borderRadius:T.radius,
     fontSize:13,fontWeight:700,cursor:"pointer",
-    boxShadow:"0 4px 14px rgba(0,0,0,.30)",
+    boxShadow:"0 4px 14px rgba(9,60,93,.10)",
     transition:"transform .15s, box-shadow .2s",fontFamily:T.font,
     letterSpacing:".3px"
   };
@@ -556,10 +560,10 @@ function SearchModal({onClose}) {
   }
 
   return (
-    <div style={{position:"fixed",inset:0,background:"rgba(0,0,0,.75)",backdropFilter:"blur(4px)",zIndex:1000,display:"flex",alignItems:"center",justifyContent:"center",padding:16,direction:"rtl"}} onClick={function(e){if(e.target===e.currentTarget)onClose();}}>
+    <div style={{position:"fixed",inset:0,background:"rgba(9,60,93,.55)",backdropFilter:"blur(6px)",zIndex:1000,display:"flex",alignItems:"center",justifyContent:"center",padding:16,direction:"rtl"}} onClick={function(e){if(e.target===e.currentTarget)onClose();}}>
       <div style={{
         background:T.bg2,borderRadius:T.radiusLg,width:"100%",maxWidth:520,
-        boxShadow:"0 24px 80px rgba(0,0,0,.6)",overflow:"hidden",
+        boxShadow:"0 24px 80px rgba(9,60,93,.30)",overflow:"hidden",
         maxHeight:"90vh",display:"flex",flexDirection:"column",
         border:"1px solid "+T.border2
       }}>
@@ -579,9 +583,9 @@ function SearchModal({onClose}) {
           </button>
           <div style={{display:"flex",alignItems:"center",gap:14,position:"relative"}}>
             <div style={{
-              background:"rgba(62,193,211,.20)",border:"1px solid rgba(62,193,211,.45)",
+              background:"rgba(21,145,220,.20)",border:"1px solid rgba(21,145,220,.45)",
               borderRadius:12,padding:"11px",display:"flex",
-              boxShadow:"0 0 24px rgba(62,193,211,.25)"
+              boxShadow:"0 0 24px rgba(21,145,220,.25)"
             }}>
               <SvgIcon d={P.search} size={24} color={T.cyan}/>
             </div>
@@ -630,8 +634,8 @@ function SearchModal({onClose}) {
           )}
 
           {status==="no_name" && (
-            <div style={{background:"rgba(251,191,36,.10)",border:"1px solid rgba(251,191,36,.35)",borderRadius:14,padding:"22px",textAlign:"center"}}>
-              <div style={{width:56,height:56,borderRadius:"50%",background:"rgba(251,191,36,.18)",margin:"0 auto 12px",display:"flex",alignItems:"center",justifyContent:"center"}}>
+            <div style={{background:"rgba(21,145,220,.10)",border:"1px solid rgba(21,145,220,.35)",borderRadius:14,padding:"22px",textAlign:"center"}}>
+              <div style={{width:56,height:56,borderRadius:"50%",background:"rgba(21,145,220,.18)",margin:"0 auto 12px",display:"flex",alignItems:"center",justifyContent:"center"}}>
                 <SvgIcon d="M12 9v2m0 4h.01M10.29 3.86L1.82 18a2 2 0 001.71 3h16.94a2 2 0 001.71-3L13.71 3.86a2 2 0 00-3.42 0z" size={26} color={T.warning}/>
               </div>
               <h4 style={{color:T.warning,margin:"0 0 8px",fontSize:16}}>الاسم لا يطابق السجل</h4>
@@ -670,7 +674,7 @@ function SearchModal({onClose}) {
                   {l:"سنة التخرج",      v:result.graduation_year},
                   {l:"تاريخ التسجيل",   v:new Date(result.created_at).toLocaleDateString("en-GB")},
                 ].map(function(item){return(
-                  <div key={item.l} style={{background:"rgba(0,0,0,.20)",border:"1px solid "+T.border,borderRadius:10,padding:"10px 14px"}}>
+                  <div key={item.l} style={{background:T.bg1,border:"1px solid "+T.border,borderRadius:10,padding:"10px 14px"}}>
                     <div style={{fontSize:11,color:T.text3,marginBottom:3,fontWeight:600}}>{item.l}</div>
                     <div style={{fontWeight:700,fontSize:13,color:T.text}}>{item.v}</div>
                   </div>
@@ -818,10 +822,10 @@ function RegisterPage() {
         }}>
           <div style={{
             width:48,height:48,borderRadius:12,
-            background:"linear-gradient(135deg,rgba(62,193,211,.20),rgba(62,193,211,.06))",
-            border:"1px solid rgba(62,193,211,.45)",
+            background:"linear-gradient(135deg,rgba(21,145,220,.20),rgba(21,145,220,.06))",
+            border:"1px solid rgba(21,145,220,.45)",
             display:"flex",alignItems:"center",justifyContent:"center",flexShrink:0,
-            boxShadow:"0 0 24px rgba(62,193,211,.18)"
+            boxShadow:"0 0 24px rgba(21,145,220,.18)"
           }}>
             <SvgIcon d={P.edit} size={22} color={T.cyan}/>
           </div>
@@ -894,7 +898,7 @@ function RegisterPage() {
               <div style={{display:"flex",gap:10}}>
                 {[{v:"ذكر",l:"ذكر"},{v:"أنثى",l:"أنثى"}].map(({v,l})=>{
                   var a=f.gender===v;
-                  return <div key={v} onClick={()=>up("gender",v)} style={{flex:1,textAlign:"center",padding:"10px",borderRadius:10,cursor:"pointer",fontWeight:600,fontSize:14,border:"2px solid "+(a?T.cyan:T.border2),background:a?"rgba(62,193,211,.14)":T.bg2,color:a?T.cyan:T.text3,transition:"all .15s"}}>{l}</div>;
+                  return <div key={v} onClick={()=>up("gender",v)} style={{flex:1,textAlign:"center",padding:"10px",borderRadius:10,cursor:"pointer",fontWeight:600,fontSize:14,border:"2px solid "+(a?T.cyan:T.border2),background:a?"rgba(21,145,220,.14)":T.bg2,color:a?T.cyan:T.text3,transition:"all .15s"}}>{l}</div>;
                 })}
               </div>
             </Field>
@@ -979,13 +983,13 @@ function DashboardPage() {
   var pct = function(n){ return total>0 ? (n/total)*100 : 0; };
 
   var cards = [
-    {iconPath:P.users,    label:"إجمالي المهندسين",    val:total,      pct:100,             barPct:100,                  color:T.cyan},
-    {iconPath:P.male,     label:"الذكور",                val:male,       pct:pct(male),       barPct:pct(male),            color:"#22d3ee"},
-    {iconPath:P.female,   label:"الإناث",                val:female,     pct:pct(female),     barPct:pct(female),          color:"#f472b6"},
-    {iconPath:P.map,      label:"المحافظات",             val:provinces,  pct:0,               barPct:(provinces/18)*100,   color:"#fbbf24"},
-    {iconPath:P.grad,     label:"التخصصات الهندسية",     val:specs,      pct:0,               barPct:Math.min(specs*5,100),color:"#a78bfa"},
-    {iconPath:P.heart,    label:"متزوجون",                val:married,    pct:pct(married),    barPct:pct(married),         color:"#fb923c"},
-    {iconPath:P.person,   label:"غير متزوجين",           val:notMarried, pct:pct(notMarried), barPct:pct(notMarried),      color:"#818cf8"},
+    {iconPath:P.users,    label:"إجمالي المهندسين",    val:total,      pct:100,             barPct:100,                  color:"#1591DC"},
+    {iconPath:P.male,     label:"الذكور",                val:male,       pct:pct(male),       barPct:pct(male),            color:"#2C5EAD"},
+    {iconPath:P.female,   label:"الإناث",                val:female,     pct:pct(female),     barPct:pct(female),          color:"#e11d8c"},
+    {iconPath:P.map,      label:"المحافظات",             val:provinces,  pct:0,               barPct:(provinces/18)*100,   color:"#4BB8FA"},
+    {iconPath:P.grad,     label:"التخصصات الهندسية",     val:specs,      pct:0,               barPct:Math.min(specs*5,100),color:"#093C5D"},
+    {iconPath:P.heart,    label:"متزوجون",                val:married,    pct:pct(married),    barPct:pct(married),         color:"#22c55e"},
+    {iconPath:P.person,   label:"غير متزوجين",           val:notMarried, pct:pct(notMarried), barPct:pct(notMarried),      color:"#5a7a96"},
   ];
 
   return (
@@ -1121,10 +1125,10 @@ function AdminPage() {
       <div style={{...card,textAlign:"center",padding:"36px 28px",borderTop:"3px solid "+T.cyan}}>
         <div style={{
           width:72,height:72,borderRadius:16,
-          background:"linear-gradient(135deg,rgba(62,193,211,.20),rgba(62,193,211,.06))",
-          border:"1px solid rgba(62,193,211,.45)",
+          background:"linear-gradient(135deg,rgba(21,145,220,.20),rgba(21,145,220,.06))",
+          border:"1px solid rgba(21,145,220,.45)",
           margin:"0 auto 18px",display:"flex",alignItems:"center",justifyContent:"center",
-          boxShadow:"0 8px 24px rgba(0,0,0,.4),0 0 32px rgba(62,193,211,.25)"
+          boxShadow:"0 8px 24px rgba(9,60,93,.12),0 0 32px rgba(21,145,220,.25)"
         }}>
           <SvgIcon d={P.lock} size={32} color={T.cyan}/>
         </div>
@@ -1287,7 +1291,7 @@ function AdminPage() {
                     var isDup=dupIds.has(r.id);
                     var ec=EMPLOY_COLORS[r.employment_status]||T.text3;
                     return (
-                      <tr key={r.id} style={{borderBottom:"1px solid "+T.border,background:isDup?"rgba(251,191,36,.08)":i%2?T.bg1:T.bg2}}>
+                      <tr key={r.id} style={{borderBottom:"1px solid "+T.border,background:isDup?"rgba(21,145,220,.08)":i%2?T.bg1:T.bg2}}>
                         <td style={{padding:"8px 9px",color:T.text4,fontFamily:T.fontMono}}>{i+1}{isDup&&<span style={{color:T.warning,marginRight:3}} title="مكرر">!</span>}</td>
                         <td style={{padding:"8px 9px",fontWeight:600,whiteSpace:"nowrap",color:T.text}}>{r.full_name}</td>
                         <td style={{padding:"8px 9px"}}><span style={{background:T.cyan+"18",color:T.cyan,padding:"2px 7px",borderRadius:20,fontSize:11,border:"1px solid "+T.cyan+"30"}}>{r.province}</span></td>
@@ -1330,7 +1334,7 @@ function AdminPage() {
             <div style={{overflowX:"auto"}}>
               <table style={{width:"100%",borderCollapse:"collapse",fontSize:12}}>
                 <thead>
-                  <tr style={{background:"rgba(251,191,36,.10)"}}>
+                  <tr style={{background:"rgba(21,145,220,.10)"}}>
                     {["الاسم","المحافظة","الجامعة","الهاتف","تاريخ التسجيل"].map(h=>(
                       <th key={h} style={{padding:"10px",textAlign:"right",borderBottom:"2px solid "+T.warning+"40",fontWeight:700,color:T.warning}}>{h}</th>
                     ))}
@@ -1338,7 +1342,7 @@ function AdminPage() {
                 </thead>
                 <tbody>
                   {members.filter(r=>dupIds.has(r.id)).map((r,i)=>(
-                    <tr key={r.id} style={{borderBottom:"1px solid "+T.border,background:i%2?"rgba(251,191,36,.06)":T.bg2,color:T.text2}}>
+                    <tr key={r.id} style={{borderBottom:"1px solid "+T.border,background:i%2?"rgba(21,145,220,.06)":T.bg2,color:T.text2}}>
                       <td style={{padding:"8px 10px",fontWeight:600,color:T.text}}>{r.full_name}</td>
                       <td style={{padding:"8px 10px"}}>{r.province}</td>
                       <td style={{padding:"8px 10px"}}>{r.university||"—"}</td>
@@ -1514,9 +1518,9 @@ function AboutPage() {
         <div style={{position:"relative",textAlign:"center"}}>
           <div style={{
             width:78,height:78,borderRadius:18,
-            background:"rgba(62,193,211,.18)",border:"1px solid rgba(62,193,211,.45)",
+            background:"rgba(21,145,220,.18)",border:"1px solid rgba(21,145,220,.45)",
             margin:"0 auto 18px",display:"flex",alignItems:"center",justifyContent:"center",
-            boxShadow:"0 8px 28px rgba(0,0,0,.4),0 0 36px rgba(62,193,211,.22)"
+            boxShadow:"0 8px 28px rgba(9,60,93,.12),0 0 36px rgba(21,145,220,.22)"
           }}>
             <SvgIcon d={P.compass} size={38} color={T.cyan} sw={1.7}/>
           </div>
@@ -1591,7 +1595,7 @@ function AboutPage() {
       }}>
         <div style={{
           position:"absolute",top:-40,left:-40,width:240,height:240,borderRadius:"50%",
-          background:"radial-gradient(circle,rgba(62,193,211,.18),transparent 70%)",pointerEvents:"none"
+          background:"radial-gradient(circle,rgba(21,145,220,.18),transparent 70%)",pointerEvents:"none"
         }}/>
         <div style={{position:"relative"}}>
           <div style={{fontSize:11,color:T.cyan,fontWeight:700,letterSpacing:"2px",marginBottom:8,textTransform:"uppercase",fontFamily:T.fontMono}}>الهدف الأساسي</div>
@@ -1646,9 +1650,9 @@ function PrivacyPage() {
         <div style={{position:"relative"}}>
           <div style={{
             width:64,height:64,borderRadius:16,
-            background:"rgba(62,193,211,.18)",border:"1px solid rgba(62,193,211,.45)",
+            background:"rgba(21,145,220,.18)",border:"1px solid rgba(21,145,220,.45)",
             margin:"0 auto 14px",display:"flex",alignItems:"center",justifyContent:"center",
-            boxShadow:"0 0 28px rgba(62,193,211,.22)"
+            boxShadow:"0 0 28px rgba(21,145,220,.22)"
           }}>
             <SvgIcon d={P.shieldCheck} size={30} color={T.cyan}/>
           </div>
@@ -1749,9 +1753,9 @@ function CoordinatorsPage() {
         <div style={{position:"relative"}}>
           <div style={{
             width:72,height:72,borderRadius:18,
-            background:"rgba(62,193,211,.18)",border:"1px solid rgba(62,193,211,.45)",
+            background:"rgba(21,145,220,.18)",border:"1px solid rgba(21,145,220,.45)",
             margin:"0 auto 16px",display:"flex",alignItems:"center",justifyContent:"center",
-            boxShadow:"0 8px 24px rgba(0,0,0,.4),0 0 32px rgba(62,193,211,.20)"
+            boxShadow:"0 8px 24px rgba(9,60,93,.12),0 0 32px rgba(21,145,220,.20)"
           }}>
             <SvgIcon d={P.coord} size={34} color={T.cyan}/>
           </div>
@@ -1762,7 +1766,7 @@ function CoordinatorsPage() {
           </p>
           <div style={{display:"flex",gap:10,justifyContent:"center",flexWrap:"wrap"}}>
             <span style={{
-              background:"rgba(62,193,211,.18)",border:"1px solid rgba(62,193,211,.40)",
+              background:"rgba(21,145,220,.18)",border:"1px solid rgba(21,145,220,.40)",
               color:T.cyan,borderRadius:20,padding:"5px 16px",fontSize:12.5,fontWeight:700,
               fontFamily:T.fontMono,letterSpacing:".3px"
             }}>
@@ -2078,13 +2082,13 @@ function DownloadButtons({data}) {
     <div style={{display:"flex",gap:12,justifyContent:"center",flexWrap:"wrap",marginTop:20}}>
       <button
         onClick={function(){openRegistrationPrint(data);}}
-        style={{background:"linear-gradient(135deg,#1d4ed8,#1e40af)",color:"#fff",border:"none",padding:"12px 24px",borderRadius:12,fontSize:14,fontWeight:700,cursor:"pointer",display:"flex",alignItems:"center",gap:8,boxShadow:"0 4px 16px rgba(29,78,216,.3)"}}>
+        style={{background:"linear-gradient(135deg,#1591DC,#2C5EAD)",color:"#fff",border:"none",padding:"12px 24px",borderRadius:12,fontSize:14,fontWeight:700,cursor:"pointer",display:"flex",alignItems:"center",gap:8,boxShadow:"0 4px 16px rgba(21,145,220,.40)"}}>
         <SvgIcon d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" size={18} color="#fff"/>
         استمارة التسجيل
       </button>
       <button
         onClick={function(){openAuthorizationPrint(data);}}
-        style={{background:"linear-gradient(135deg,#7c3aed,#6d28d9)",color:"#fff",border:"none",padding:"12px 24px",borderRadius:12,fontSize:14,fontWeight:700,cursor:"pointer",display:"flex",alignItems:"center",gap:8,boxShadow:"0 4px 16px rgba(124,58,237,.3)"}}>
+        style={{background:"linear-gradient(135deg,#093C5D,#2C5EAD)",color:"#fff",border:"none",padding:"12px 24px",borderRadius:12,fontSize:14,fontWeight:700,cursor:"pointer",display:"flex",alignItems:"center",gap:8,boxShadow:"0 4px 16px rgba(9,60,93,.40)"}}>
         <SvgIcon d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" size={18} color="#fff"/>
         استمارة التخويل
       </button>
@@ -2092,7 +2096,7 @@ function DownloadButtons({data}) {
   );
 }
 
-// ── Home Page — Modern Dark Engineering ───────────────────────────────
+// ── Home Page — Engineering Blueprint ─────────────────────────────────
 function HomePage({setPage, openSearch}) {
   var [stats, setStats]   = useState(null);
   var [hover,  setHover]  = useState("");
@@ -2141,10 +2145,11 @@ function HomePage({setPage, openSearch}) {
   return (
     <div style={{direction:"rtl",fontFamily:T.font,background:T.bg0,color:T.text}}>
 
-      {/* ── HERO — Dark with cyan accent ── */}
+      {/* ── HERO — Blueprint paper with sky accent ── */}
       <div style={{
         position:"relative",overflow:"hidden",
-        background:"radial-gradient(ellipse at top right,#152340 0%,"+T.bg0+" 50%)"
+        background:"radial-gradient(ellipse at top right,"+T.bg4+" 0%,"+T.bg0+" 55%)",
+        borderBottom:"1px solid "+T.border
       }}>
         {/* Subtle iso grid */}
         <div style={{
@@ -2155,7 +2160,7 @@ function HomePage({setPage, openSearch}) {
         {/* Cyan glow top-right */}
         <div style={{
           position:"absolute",top:"-200px",left:"-100px",width:600,height:600,
-          background:"radial-gradient(circle,rgba(62,193,211,.10) 0%,transparent 65%)",
+          background:"radial-gradient(circle,rgba(21,145,220,.10) 0%,transparent 65%)",
           pointerEvents:"none"
         }}/>
         {/* Diagonal cyan accent stripe */}
@@ -2244,17 +2249,17 @@ function HomePage({setPage, openSearch}) {
               <button onClick={function(){setPage("register");}}
                 onMouseEnter={function(e){
                   e.currentTarget.style.transform="translateY(-2px)";
-                  e.currentTarget.style.boxShadow="0 14px 36px rgba(62,193,211,.45)";
+                  e.currentTarget.style.boxShadow="0 14px 36px rgba(21,145,220,.45)";
                 }}
                 onMouseLeave={function(e){
                   e.currentTarget.style.transform="none";
-                  e.currentTarget.style.boxShadow="0 8px 24px rgba(62,193,211,.35)";
+                  e.currentTarget.style.boxShadow="0 8px 24px rgba(21,145,220,.35)";
                 }}
                 style={{
                   background:"linear-gradient(135deg,"+T.cyanLt+","+T.cyan+")",
                   color:T.bg0,border:"none",padding:"15px 30px",borderRadius:30,
                   fontSize:14.5,fontWeight:800,cursor:"pointer",
-                  boxShadow:"0 8px 24px rgba(62,193,211,.35)",
+                  boxShadow:"0 8px 24px rgba(21,145,220,.35)",
                   display:"inline-flex",alignItems:"center",gap:10,
                   letterSpacing:".2px",fontFamily:T.font,
                   transition:"transform .2s, box-shadow .2s"
@@ -2267,7 +2272,7 @@ function HomePage({setPage, openSearch}) {
                 onMouseEnter={function(e){
                   e.currentTarget.style.borderColor=T.cyan;
                   e.currentTarget.style.color=T.cyan;
-                  e.currentTarget.style.background="rgba(62,193,211,.06)";
+                  e.currentTarget.style.background="rgba(21,145,220,.06)";
                 }}
                 onMouseLeave={function(e){
                   e.currentTarget.style.borderColor=T.border2;
@@ -2328,7 +2333,7 @@ function HomePage({setPage, openSearch}) {
               @media (max-width: 900px) { .hero-compass { display: none !important; } }
               .compass-spin { animation: spin-slow 80s linear infinite; }
               .cyan-glow {
-                filter: drop-shadow(0 0 20px rgba(62,193,211,.25)) drop-shadow(0 0 40px rgba(62,193,211,.15));
+                filter: drop-shadow(0 0 20px rgba(21,145,220,.25)) drop-shadow(0 0 40px rgba(21,145,220,.15));
               }
             `}</style>
             <div style={{
@@ -2350,17 +2355,17 @@ function HomePage({setPage, openSearch}) {
               {/* Cyan ambient glow behind compass */}
               <div style={{
                 position:"absolute",inset:0,borderRadius:"50%",
-                background:"radial-gradient(circle,rgba(62,193,211,.15),transparent 70%)",
+                background:"radial-gradient(circle,rgba(21,145,220,.15),transparent 70%)",
                 pointerEvents:"none"
               }}/>
               <div className="compass-spin cyan-glow">
-                <CompassRose size={300} color="#c9d1e1" accent={T.cyan}/>
+                <CompassRose size={300} color="#2C5EAD" accent={T.cyan}/>
               </div>
               <div style={{position:"absolute",top:-14,right:-30,opacity:.8}}>
                 <IsoCube size={54} color={T.cyan}/>
               </div>
               <div style={{position:"absolute",bottom:-10,left:-40,opacity:.65}}>
-                <DraftingTools size={92} color="#c9d1e1" accent={T.cyan}/>
+                <DraftingTools size={92} color="#2C5EAD" accent={T.cyan}/>
               </div>
             </div>
             <div style={{
@@ -2422,7 +2427,7 @@ function HomePage({setPage, openSearch}) {
                 style={{
                   background:isHov ? T.bg3 : T.bg2,
                   borderRadius:12,padding:"28px 24px 22px",
-                  boxShadow:isHov?"0 16px 48px rgba(0,0,0,.5),0 0 0 1px rgba(62,193,211,.4)":T.shadow,
+                  boxShadow:isHov?"0 16px 48px rgba(9,60,93,.18),0 0 0 1px rgba(21,145,220,.4)":T.shadow,
                   border:"1px solid "+(isHov?T.cyan+"66":T.border2),
                   cursor:"pointer",transition:"all .3s cubic-bezier(.4,0,.2,1)",
                   transform:isHov?"translateY(-6px)":"none",
@@ -2433,7 +2438,7 @@ function HomePage({setPage, openSearch}) {
                 {/* hover-only gradient sweep */}
                 {isHov && <div style={{
                   position:"absolute",inset:0,
-                  background:"linear-gradient(135deg,rgba(62,193,211,.06),transparent 60%)",
+                  background:"linear-gradient(135deg,rgba(21,145,220,.06),transparent 60%)",
                   pointerEvents:"none"
                 }}/>}
 
@@ -2450,12 +2455,12 @@ function HomePage({setPage, openSearch}) {
                   </div>
                   <div style={{
                     width:48,height:48,borderRadius:10,
-                    background:"linear-gradient(135deg,rgba(62,193,211,.18),rgba(62,193,211,.06))",
+                    background:"linear-gradient(135deg,rgba(21,145,220,.18),rgba(21,145,220,.06))",
                     border:"1px solid "+T.cyan+"40",
                     display:"flex",alignItems:"center",justifyContent:"center",
                     transition:"all .3s",
                     transform:isHov?"rotate(-6deg) scale(1.05)":"none",
-                    boxShadow:isHov?"0 4px 16px rgba(62,193,211,.25)":"none"
+                    boxShadow:isHov?"0 4px 16px rgba(21,145,220,.25)":"none"
                   }}>
                     <SvgIcon d={fc.icon} size={22} color={T.cyan}/>
                   </div>
@@ -2524,7 +2529,7 @@ function HomePage({setPage, openSearch}) {
         <div style={{
           position:"absolute",right:"-100px",top:"50%",transform:"translateY(-50%)",
           width:400,height:400,
-          background:"radial-gradient(circle,rgba(62,193,211,.12),transparent 70%)",
+          background:"radial-gradient(circle,rgba(21,145,220,.12),transparent 70%)",
           pointerEvents:"none"
         }}/>
         <div style={{maxWidth:1100,margin:"0 auto",position:"relative"}}>
@@ -2564,7 +2569,7 @@ function HomePage({setPage, openSearch}) {
                   WebkitBackgroundClip:"text",
                   WebkitTextFillColor:"transparent",
                   backgroundClip:"text",
-                  textShadow:"0 0 60px rgba(62,193,211,.25)"
+                  textShadow:"0 0 60px rgba(21,145,220,.25)"
                 }}>
                   {total===null ? "—" : total.toLocaleString("en-US")}
                 </div>
@@ -2619,7 +2624,7 @@ function HomePage({setPage, openSearch}) {
                 <div style={{position:"relative"}}>
                   <div style={{
                     width:50,height:50,borderRadius:10,
-                    background:"linear-gradient(135deg,rgba(62,193,211,.18),rgba(62,193,211,.06))",
+                    background:"linear-gradient(135deg,rgba(21,145,220,.18),rgba(21,145,220,.06))",
                     border:"1px solid "+T.cyan+"40",
                     display:"flex",alignItems:"center",justifyContent:"center",marginBottom:20
                   }}>
@@ -2651,7 +2656,7 @@ function HomePage({setPage, openSearch}) {
         {/* Cyan ambient glow */}
         <div style={{
           position:"absolute",inset:0,
-          background:"radial-gradient(ellipse at center,rgba(62,193,211,.10),transparent 60%)",
+          background:"radial-gradient(ellipse at center,rgba(21,145,220,.10),transparent 60%)",
           pointerEvents:"none"
         }}/>
         {/* Corner ticks */}
@@ -2685,17 +2690,17 @@ function HomePage({setPage, openSearch}) {
           <button onClick={function(){setPage("register");}}
             onMouseEnter={function(e){
               e.currentTarget.style.transform="translateY(-2px)";
-              e.currentTarget.style.boxShadow="0 18px 48px rgba(62,193,211,.55)";
+              e.currentTarget.style.boxShadow="0 18px 48px rgba(21,145,220,.55)";
             }}
             onMouseLeave={function(e){
               e.currentTarget.style.transform="none";
-              e.currentTarget.style.boxShadow="0 12px 36px rgba(62,193,211,.40)";
+              e.currentTarget.style.boxShadow="0 12px 36px rgba(21,145,220,.40)";
             }}
             style={{
               background:"linear-gradient(135deg,"+T.cyanLt+","+T.cyan+")",
               color:T.bg0,border:"none",padding:"17px 42px",borderRadius:32,
               fontSize:16,fontWeight:800,cursor:"pointer",
-              boxShadow:"0 12px 36px rgba(62,193,211,.40)",
+              boxShadow:"0 12px 36px rgba(21,145,220,.40)",
               display:"inline-flex",alignItems:"center",gap:12,
               letterSpacing:".2px",fontFamily:T.font,transition:"all .25s"
             }}>
@@ -2731,7 +2736,7 @@ export default function App() {
         background:T.bg1,
         padding:"11px 24px",
         display:"flex",alignItems:"center",justifyContent:"space-between",
-        boxShadow:"0 1px 0 rgba(62,193,211,.18), 0 4px 20px rgba(0,0,0,.40)",
+        boxShadow:"0 1px 0 rgba(21,145,220,.18), 0 4px 20px rgba(9,60,93,.12)",
         flexWrap:"wrap",gap:4,
         borderBottom:"1px solid "+T.border2,
         position:"relative"
@@ -2743,8 +2748,8 @@ export default function App() {
         }}>
           <div style={{
             width:42,height:42,borderRadius:8,
-            background:"linear-gradient(135deg,rgba(62,193,211,.22),rgba(62,193,211,.06))",
-            border:"1px solid rgba(62,193,211,.45)",
+            background:"linear-gradient(135deg,rgba(21,145,220,.22),rgba(21,145,220,.06))",
+            border:"1px solid rgba(21,145,220,.45)",
             display:"flex",alignItems:"center",justifyContent:"center",
             boxShadow:"inset 0 1px 0 rgba(255,255,255,.06)"
           }}>
@@ -2778,11 +2783,11 @@ export default function App() {
             );
           })}
           <button onClick={function(){setSearch(true);}}
-            onMouseEnter={function(e){e.currentTarget.style.background="rgba(62,193,211,.25)";}}
-            onMouseLeave={function(e){e.currentTarget.style.background="linear-gradient(135deg,rgba(62,193,211,.20),rgba(62,193,211,.06))";}}
+            onMouseEnter={function(e){e.currentTarget.style.background="rgba(21,145,220,.25)";}}
+            onMouseLeave={function(e){e.currentTarget.style.background="linear-gradient(135deg,rgba(21,145,220,.20),rgba(21,145,220,.06))";}}
             style={{
-              background:"linear-gradient(135deg,rgba(62,193,211,.20),rgba(62,193,211,.06))",
-              border:"1px solid rgba(62,193,211,.50)",color:T.cyan,
+              background:"linear-gradient(135deg,rgba(21,145,220,.20),rgba(21,145,220,.06))",
+              border:"1px solid rgba(21,145,220,.50)",color:T.cyan,
               padding:"8px 14px",borderRadius:6,cursor:"pointer",
               fontSize:12,fontWeight:700,marginRight:6,
               display:"flex",alignItems:"center",gap:6,fontFamily:T.font,
@@ -2834,8 +2839,8 @@ export default function App() {
               <div style={{display:"flex",alignItems:"center",gap:12,marginBottom:16}}>
                 <div style={{
                   width:44,height:44,borderRadius:8,
-                  background:"rgba(62,193,211,.18)",
-                  border:"1px solid rgba(62,193,211,.45)",
+                  background:"rgba(21,145,220,.18)",
+                  border:"1px solid rgba(21,145,220,.45)",
                   display:"flex",alignItems:"center",justifyContent:"center"
                 }}>
                   <SvgIcon d={P.compass} size={22} color={T.cyan}/>
@@ -2859,7 +2864,7 @@ export default function App() {
                 display:"inline-flex",alignItems:"center",gap:8,
                 fontFamily:T.fontMono,fontSize:10,color:T.cyan,
                 letterSpacing:"1.5px",padding:"5px 10px",
-                background:"rgba(62,193,211,.10)",border:"1px solid rgba(62,193,211,.30)",
+                background:"rgba(21,145,220,.10)",border:"1px solid rgba(21,145,220,.30)",
                 borderRadius:4
               }}>
                 ● EST. 2026 · IRAQ
@@ -2913,7 +2918,7 @@ export default function App() {
             </span>
             <span style={{
               fontFamily:T.fontMono,letterSpacing:"1.5px",
-              padding:"3px 8px",border:"1px solid rgba(62,193,211,.30)",
+              padding:"3px 8px",border:"1px solid rgba(21,145,220,.30)",
               borderRadius:4,color:T.cyan
             }}>v4.0 · DARK ENGINEERING</span>
           </div>
