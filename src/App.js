@@ -8,69 +8,79 @@ var ADMIN_PASS        = process.env.REACT_APP_ADMIN_PASS || "";
 var READONLY_PASS     = process.env.REACT_APP_READONLY_PASS || "";
 var READY = Boolean(SUPABASE_URL && SUPABASE_KEY);
 
-// ── Design Tokens — Bauhaus Civic Engineering ─────────────────────────
+// ── Design Tokens — Modern Dark Engineering ───────────────────────────
 var T = {
-  // Palette — Modern, harmonious, engineering
-  ink:       "#0e1a3a",   // deep midnight indigo (primary)
-  ink2:      "#1a2752",   // secondary deep
-  ink3:      "#2a3a6b",   // tertiary
-  copper:    "#b87333",   // burnished copper accent (engineering brass)
-  copperLt:  "#d49154",   // light copper
-  copperDk:  "#8a5424",   // dark copper
-  sage:      "#4a7c74",   // calm sage teal (secondary accent)
-  sageLt:    "#6ba095",
-  crimson:   "#9b2c3a",   // muted Iraqi crimson (cultural highlight)
-  stone:     "#6b6660",   // warm grey neutral
-  cream:     "#f6f1e8",   // warm cream background
-  cream2:    "#ece5d6",   // deeper cream
-  paper:     "#fbf8f1",   // surface (warmer than white)
-  ivory:     "#ffffff",   // pure white when needed
-  border:    "#e0d8c8",   // warm border
-  border2:   "#c8bfaa",   // stronger border
-  text:      "#0a0a0a",   // near-black
-  text2:     "#332f29",   // body text
-  text3:     "#6b6660",   // muted (= stone)
-  text4:     "#a39c91",   // very muted
-  // Status colors (harmonized with palette)
-  success:   "#3d6b4a",
-  warning:   "#a06b2a",
-  danger:    "#9b2c3a",
-  info:      "#2a5680",
-  // Effects
-  shadow:    "0 1px 2px rgba(14,26,58,.04),0 4px 14px rgba(14,26,58,.06)",
-  shadowLg:  "0 4px 18px rgba(14,26,58,.07),0 24px 56px rgba(14,26,58,.10)",
-  shadowCopper:"0 8px 24px rgba(184,115,51,.28)",
+  // Surfaces (dark navy theme)
+  bg0:       "#0a1220",   // deepest page background
+  bg1:       "#0f1827",   // primary section bg
+  bg2:       "#131e36",   // elevated cards
+  bg3:       "#1a2540",   // hover / popover
+  bg4:       "#1f2c47",   // borders
+  border:    "#1f2c47",   // subtle borders
+  border2:   "#2a3956",   // stronger borders
+  // Text on dark
+  text:      "#ffffff",   // primary text
+  text2:     "#c9d1e1",   // secondary text
+  text3:     "#8b96ad",   // muted
+  text4:     "#5a657a",   // very muted
+  // Accent — bright cyan (engineering/tech feel)
+  cyan:      "#3ec1d3",   // primary accent
+  cyanLt:    "#5fd4e3",   // lighter for hover
+  cyanDk:    "#2a96a8",   // darker pressed
+  cyanGlow:  "rgba(62,193,211,.30)",
+  // Supporting colors
+  ink:       "#0e1a3a",   // deep navy for legacy gradients
+  ink2:      "#16213f",
+  ink3:      "#1e2c4d",
+  // Status (harmonized with dark theme)
+  success:   "#4ade80",
+  warning:   "#fbbf24",
+  danger:    "#f87171",
+  info:      "#60a5fa",
+  // Effects — luminous shadows
+  shadow:    "0 1px 2px rgba(0,0,0,.4),0 4px 16px rgba(0,0,0,.20)",
+  shadowLg:  "0 8px 32px rgba(0,0,0,.40),0 24px 64px rgba(0,0,0,.30)",
+  shadowCyan:"0 8px 28px rgba(62,193,211,.30)",
   radius:    8,
   radiusLg:  14,
-  // Font stack — Reem Kufi (display) + Tajawal (body) + JetBrains Mono (numbers)
+  // Font — Tajawal only (modern, formal Arabic)
   font:      "'Tajawal','Segoe UI',Tahoma,Arial,sans-serif",
-  fontDisp:  "'Reem Kufi Fun','Tajawal','Segoe UI',sans-serif",
+  fontDisp:  "'Tajawal','Segoe UI',Tahoma,Arial,sans-serif",
   fontMono:  "'JetBrains Mono','Cascadia Code','Consolas',monospace",
 };
 
 // Backward-compat aliases for legacy color names used throughout the file
-T.gold     = T.copper;
-T.gold2    = T.copperLt;
-T.goldDark = T.copperDk;
-T.green    = T.success;
-T.blue     = T.info;
-T.teal     = T.sage;
-T.red      = T.danger;
-T.amber    = T.warning;
-T.surface  = T.paper;
-T.bg       = T.cream;
-T.bg2      = T.cream2;
-T.shadowGold = T.shadowCopper;
+T.copper     = T.cyan;
+T.copperLt   = T.cyanLt;
+T.copperDk   = T.cyanDk;
+T.gold       = T.cyan;
+T.gold2      = T.cyanLt;
+T.goldDark   = T.cyanDk;
+T.green      = T.success;
+T.blue       = T.info;
+T.teal       = T.cyan;
+T.red        = T.danger;
+T.amber      = T.warning;
+T.sage       = T.cyan;
+T.sageLt     = T.cyanLt;
+T.crimson    = T.danger;
+T.stone      = T.text3;
+T.cream      = T.bg0;
+T.cream2     = T.bg1;
+T.paper      = T.bg2;
+T.surface    = T.bg2;
+T.ivory      = T.text;
+T.bg         = T.bg0;
+T.shadowGold   = T.shadowCyan;
+T.shadowCopper = T.shadowCyan;
 
-// Isometric grid pattern (more refined than flat blueprint)
-var ISO_GRID = "linear-gradient(30deg,rgba(14,26,58,.04) 1px,transparent 1px),linear-gradient(150deg,rgba(14,26,58,.04) 1px,transparent 1px)";
+// Engineering grid patterns — bright cyan on dark
+var ISO_GRID = "linear-gradient(30deg,rgba(62,193,211,.05) 1px,transparent 1px),linear-gradient(150deg,rgba(62,193,211,.05) 1px,transparent 1px)";
 var ISO_GRID_SIZE = "48px 28px";
-// Blueprint grid for dark sections
-var BLUEPRINT_BG = "linear-gradient(rgba(184,115,51,.07) 1px,transparent 1px),linear-gradient(90deg,rgba(184,115,51,.07) 1px,transparent 1px)";
+var BLUEPRINT_BG = "linear-gradient(rgba(62,193,211,.06) 1px,transparent 1px),linear-gradient(90deg,rgba(62,193,211,.06) 1px,transparent 1px)";
 var BLUEPRINT_SIZE = "48px 48px";
-// Fine dotted grid
-var DOT_GRID = "radial-gradient(rgba(14,26,58,.10) 1px,transparent 1px)";
-var DOT_GRID_SIZE = "20px 20px";
+var DOT_GRID = "radial-gradient(rgba(62,193,211,.10) 1px,transparent 1px)";
+var DOT_GRID_SIZE = "22px 22px";
 
 // ── Constants ─────────────────────────────────────────────────────────
 var PROVINCES = ["بغداد","البصرة","نينوى","أربيل","السليمانية","كركوك","الأنبار","ديالى","بابل","كربلاء","النجف","واسط","ذي قار","ميسان","المثنى","القادسية","صلاح الدين","دهوك"];
@@ -147,8 +157,8 @@ function SvgIcon({d, size, color, sw}) {
 // Architectural Compass Rose — main hero emblem
 function CompassRose({size, color, accent}) {
   var s = size||140;
-  var c = color||"#0e1a3a";
-  var a = accent||"#b87333";
+  var c = color||"#c9d1e1";
+  var a = accent||"#3ec1d3";
   return (
     <svg width={s} height={s} viewBox="0 0 200 200" fill="none" xmlns="http://www.w3.org/2000/svg">
       {/* outer ring */}
@@ -191,7 +201,7 @@ function CompassRose({size, color, accent}) {
 // Isometric structural cube — secondary motif
 function IsoCube({size, color}) {
   var s = size||60;
-  var c = color||"#b87333";
+  var c = color||"#3ec1d3";
   return (
     <svg width={s} height={s} viewBox="0 0 60 60" fill="none">
       <path d="M30 5 L55 19 L55 41 L30 55 L5 41 L5 19 Z" stroke={c} strokeWidth="1.4" opacity=".5"/>
@@ -205,8 +215,8 @@ function IsoCube({size, color}) {
 // T-square + Triangle drafting tools (decorative)
 function DraftingTools({size, color, accent}) {
   var s = size||120;
-  var c = color||"#0e1a3a";
-  var a = accent||"#b87333";
+  var c = color||"#c9d1e1";
+  var a = accent||"#3ec1d3";
   return (
     <svg width={s} height={s} viewBox="0 0 120 120" fill="none">
       {/* T-square horizontal arm */}
@@ -229,7 +239,7 @@ function DraftingTools({size, color, accent}) {
 
 // Caliper-style horizontal divider
 function CaliperDivider({color, width}) {
-  var c = color||"#b87333";
+  var c = color||"#3ec1d3";
   return (
     <svg width="100%" height="20" viewBox="0 0 400 20" preserveAspectRatio="none" style={{width:width||"100%",display:"block"}}>
       <line x1="0" y1="10" x2="400" y2="10" stroke={c} strokeWidth="1" opacity=".6"/>
@@ -247,7 +257,7 @@ function CaliperDivider({color, width}) {
 
 // Section eyebrow with tick marks (replaces simple uppercase label)
 function Eyebrow({text, color, align}) {
-  var c = color||"#b87333";
+  var c = color||"#3ec1d3";
   return (
     <div style={{
       display:"inline-flex",alignItems:"center",gap:10,
@@ -378,9 +388,9 @@ var db = {
 // ── Style helpers ─────────────────────────────────────────────────────
 function navBtn(a) {
   return {
-    background:a?"rgba(184,115,51,.18)":"transparent",
-    border:"1px solid "+(a?"rgba(184,115,51,.40)":"transparent"),
-    color:a?T.copperLt:"rgba(255,255,255,.72)",
+    background:a?"rgba(62,193,211,.14)":"transparent",
+    border:"1px solid "+(a?"rgba(62,193,211,.45)":"transparent"),
+    color:a?T.cyan:T.text2,
     padding:"8px 14px",borderRadius:6,cursor:"pointer",
     fontSize:12.5,fontWeight:a?700:500,transition:"all .2s",fontFamily:T.font,
     letterSpacing:".2px"
@@ -390,27 +400,27 @@ function inp(err) {
   return {
     width:"100%",padding:"12px 14px",borderRadius:T.radius,
     border:"1.5px solid "+(err?T.danger:T.border2),
-    fontSize:14,outline:"none",background:T.paper,boxSizing:"border-box",
+    fontSize:14,outline:"none",background:T.bg1,boxSizing:"border-box",
     color:T.text,fontFamily:T.font,transition:"border-color .15s, box-shadow .15s",
-    boxShadow:err?"0 0 0 3px rgba(155,44,58,.12)":"none"
+    boxShadow:err?"0 0 0 3px rgba(248,113,113,.20)":"none"
   };
 }
 function btn(bg1,bg2) {
   return {
-    background:"linear-gradient(135deg,"+(bg1||T.ink2)+","+(bg2||T.ink)+")",
-    color:"#fff",border:"none",padding:"11px 22px",borderRadius:T.radius,
+    background:"linear-gradient(135deg,"+(bg1||T.bg3)+","+(bg2||T.bg2)+")",
+    color:T.text,border:"1px solid "+T.border2,padding:"11px 22px",borderRadius:T.radius,
     fontSize:13,fontWeight:700,cursor:"pointer",
-    boxShadow:"0 4px 14px rgba(14,26,58,.12)",
+    boxShadow:"0 4px 14px rgba(0,0,0,.30)",
     transition:"transform .15s, box-shadow .2s",fontFamily:T.font,
     letterSpacing:".3px"
   };
 }
 function btnGold() {
   return {
-    background:"linear-gradient(135deg,"+T.copperLt+","+T.copper+")",
-    color:"#fff",border:"none",padding:"12px 24px",borderRadius:T.radius,
-    fontSize:14,fontWeight:700,cursor:"pointer",
-    boxShadow:T.shadowCopper,fontFamily:T.font,letterSpacing:".3px",
+    background:"linear-gradient(135deg,"+T.cyanLt+","+T.cyan+")",
+    color:T.bg0,border:"none",padding:"12px 24px",borderRadius:T.radius,
+    fontSize:14,fontWeight:800,cursor:"pointer",
+    boxShadow:T.shadowCyan,fontFamily:T.font,letterSpacing:".2px",
     transition:"transform .15s, box-shadow .2s"
   };
 }
@@ -422,12 +432,12 @@ var grid2    = {display:"grid",gridTemplateColumns:"1fr 1fr",gap:16};
 function Field({label,error,children,optional}) {
   return (
     <div style={{marginBottom:16}}>
-      <label style={{display:"flex",alignItems:"center",gap:6,fontWeight:600,marginBottom:7,fontSize:13,color:"#374151"}}>
+      <label style={{display:"flex",alignItems:"center",gap:6,fontWeight:600,marginBottom:7,fontSize:13,color:T.text2}}>
         {label}
-        {optional && <span style={{fontSize:11,color:"#94a3b8",fontWeight:400}}>(اختياري)</span>}
+        {optional && <span style={{fontSize:11,color:T.text3,fontWeight:400}}>(اختياري)</span>}
       </label>
       {children}
-      {error && <div style={{color:"#ef4444",fontSize:12,marginTop:4}}>{error}</div>}
+      {error && <div style={{color:T.danger,fontSize:12,marginTop:4}}>{error}</div>}
     </div>
   );
 }
@@ -435,10 +445,10 @@ function Field({label,error,children,optional}) {
 function Check({value,label,color,onChange}) {
   return (
     <div style={{display:"flex",alignItems:"center",gap:10,cursor:"pointer",userSelect:"none"}} onClick={()=>onChange(!value)}>
-      <div style={{width:20,height:20,borderRadius:5,border:"2px solid "+(value?(color||"#1d4ed8"):"#cbd5e1"),background:value?(color||"#1d4ed8"):"#fff",display:"flex",alignItems:"center",justifyContent:"center",flexShrink:0}}>
-        {value && <SvgIcon d="M5 13l4 4L19 7" size={12} color="#fff" sw={2.5}/>}
+      <div style={{width:20,height:20,borderRadius:5,border:"2px solid "+(value?(color||T.cyan):T.border2),background:value?(color||T.cyan):T.bg1,display:"flex",alignItems:"center",justifyContent:"center",flexShrink:0,transition:"all .15s"}}>
+        {value && <SvgIcon d="M5 13l4 4L19 7" size={12} color={T.bg0} sw={2.5}/>}
       </div>
-      <span style={{fontSize:14,color:"#374151",fontWeight:value?600:400}}>{label}</span>
+      <span style={{fontSize:14,color:T.text2,fontWeight:value?600:400}}>{label}</span>
     </div>
   );
 }
@@ -446,10 +456,10 @@ function Check({value,label,color,onChange}) {
 function SectionHeader({icon,title,color}) {
   return (
     <div style={{display:"flex",alignItems:"center",gap:10,marginBottom:18}}>
-      <div style={{width:34,height:34,borderRadius:10,background:color||"#1d4ed8",display:"flex",alignItems:"center",justifyContent:"center",flexShrink:0}}>
-        <SvgIcon d={icon} size={18} color="#fff"/>
+      <div style={{width:34,height:34,borderRadius:10,background:color||T.cyan,display:"flex",alignItems:"center",justifyContent:"center",flexShrink:0,boxShadow:"0 4px 14px "+(color||T.cyan)+"40"}}>
+        <SvgIcon d={icon} size={18} color={T.bg0}/>
       </div>
-      <span style={{fontWeight:700,fontSize:14,color:"#0f172a"}}>{title}</span>
+      <span style={{fontWeight:700,fontSize:14,color:T.text}}>{title}</span>
     </div>
   );
 }
@@ -457,18 +467,19 @@ function SectionHeader({icon,title,color}) {
 // ── Professional Stat Card ────────────────────────────────────────────
 function StatCardPro({iconPath, label, val, pct, color, barPct}) {
   var bar = Math.min(barPct||pct||0, 100);
+  var c = color || T.cyan;
   return (
-    <div style={{background:"#fff",borderRadius:16,padding:"20px 20px 14px",boxShadow:"0 2px 12px rgba(0,0,0,.07)",border:"1px solid #f1f5f9",borderRight:"4px solid "+color,flex:"1 1 190px",minWidth:180}}>
+    <div style={{background:T.bg2,borderRadius:16,padding:"20px 20px 14px",boxShadow:T.shadow,border:"1px solid "+T.border2,borderRight:"4px solid "+c,flex:"1 1 190px",minWidth:180}}>
       <div style={{display:"flex",justifyContent:"space-between",alignItems:"flex-start",marginBottom:14}}>
-        <span style={{fontSize:12,color:"#94a3b8",fontWeight:500,direction:"ltr"}}>{pct>0?pct.toFixed(1)+"%":""}</span>
-        <div style={{width:46,height:46,borderRadius:"50%",background:"linear-gradient(135deg,"+color+","+color+"cc)",display:"flex",alignItems:"center",justifyContent:"center",flexShrink:0,boxShadow:"0 4px 12px "+color+"44"}}>
-          <SvgIcon d={iconPath} size={22} color="#fff"/>
+        <span style={{fontSize:12,color:T.text3,fontWeight:500,direction:"ltr"}}>{pct>0?pct.toFixed(1)+"%":""}</span>
+        <div style={{width:46,height:46,borderRadius:"50%",background:"linear-gradient(135deg,"+c+","+c+"cc)",display:"flex",alignItems:"center",justifyContent:"center",flexShrink:0,boxShadow:"0 4px 14px "+c+"55"}}>
+          <SvgIcon d={iconPath} size={22} color={T.bg0}/>
         </div>
       </div>
-      <div style={{fontSize:13,color:"#64748b",marginBottom:6,fontWeight:500,textAlign:"right"}}>{label}</div>
-      <div style={{fontSize:32,fontWeight:800,color:"#0f172a",textAlign:"right",marginBottom:12,direction:"ltr",lineHeight:1}}>{val}</div>
-      <div style={{height:4,background:"#f1f5f9",borderRadius:2}}>
-        <div style={{height:"100%",width:Math.max(bar,2)+"%",background:"linear-gradient(90deg,"+color+"88,"+color+")",borderRadius:2}}/>
+      <div style={{fontSize:13,color:T.text3,marginBottom:6,fontWeight:500,textAlign:"right"}}>{label}</div>
+      <div style={{fontSize:32,fontWeight:800,color:T.text,textAlign:"right",marginBottom:12,direction:"ltr",lineHeight:1}}>{val}</div>
+      <div style={{height:4,background:T.bg3,borderRadius:2}}>
+        <div style={{height:"100%",width:Math.max(bar,2)+"%",background:"linear-gradient(90deg,"+c+"88,"+c+")",borderRadius:2}}/>
       </div>
     </div>
   );
@@ -492,22 +503,22 @@ function Ticker() {
 
   return (
     <div style={{
-      background:T.ink2,
-      borderBottom:"1px solid "+T.copper,
+      background:T.bg1,
+      borderBottom:"1px solid "+T.cyan+"40",
       overflow:"hidden",height:34,display:"flex",alignItems:"center"
     }}>
       <div style={{
-        background:"linear-gradient(135deg,"+T.copperLt+","+T.copper+")",
-        color:"#fff",padding:"0 16px",fontSize:10.5,fontWeight:700,
+        background:"linear-gradient(135deg,"+T.cyanLt+","+T.cyan+")",
+        color:T.bg0,padding:"0 16px",fontSize:10.5,fontWeight:800,
         whiteSpace:"nowrap",height:"100%",display:"flex",alignItems:"center",
         flexShrink:0,gap:6,letterSpacing:"1.5px",fontFamily:T.fontMono
       }}>
-        <SvgIcon d={P.news} size={12} color="#fff"/>
+        <SvgIcon d={P.news} size={12} color={T.bg0}/>
         NOTICE / إشعار
       </div>
       <div style={{overflow:"hidden",flex:1,height:"100%",display:"flex",alignItems:"center"}}>
         <span style={{
-          display:"inline-block",whiteSpace:"nowrap",color:"#e7d9c4",
+          display:"inline-block",whiteSpace:"nowrap",color:T.text2,
           fontSize:12,fontWeight:500,animation:"ticker-ltr 40s linear infinite",
           letterSpacing:".2px",fontFamily:T.font
         }}>
@@ -545,107 +556,108 @@ function SearchModal({onClose}) {
   }
 
   return (
-    <div style={{position:"fixed",inset:0,background:"rgba(0,0,0,.6)",zIndex:1000,display:"flex",alignItems:"center",justifyContent:"center",padding:16,direction:"rtl"}} onClick={function(e){if(e.target===e.currentTarget)onClose();}}>
+    <div style={{position:"fixed",inset:0,background:"rgba(0,0,0,.75)",backdropFilter:"blur(4px)",zIndex:1000,display:"flex",alignItems:"center",justifyContent:"center",padding:16,direction:"rtl"}} onClick={function(e){if(e.target===e.currentTarget)onClose();}}>
       <div style={{
-        background:T.surface,borderRadius:T.radiusLg,width:"100%",maxWidth:520,
-        boxShadow:"0 20px 60px rgba(0,0,0,.35)",overflow:"hidden",
+        background:T.bg2,borderRadius:T.radiusLg,width:"100%",maxWidth:520,
+        boxShadow:"0 24px 80px rgba(0,0,0,.6)",overflow:"hidden",
         maxHeight:"90vh",display:"flex",flexDirection:"column",
-        border:"1px solid "+T.border
+        border:"1px solid "+T.border2
       }}>
         <div style={{
-          background:"linear-gradient(135deg,"+T.ink+","+T.ink2+")",
+          background:"linear-gradient(135deg,"+T.bg1+","+T.bg3+")",
           padding:"24px 26px",position:"relative",overflow:"hidden",
-          borderBottom:"3px solid "+T.gold
+          borderBottom:"2px solid "+T.cyan+"60"
         }}>
-          <div style={{position:"absolute",inset:0,backgroundImage:BLUEPRINT_BG,backgroundSize:BLUEPRINT_SIZE,opacity:.35,pointerEvents:"none"}}/>
+          <div style={{position:"absolute",inset:0,backgroundImage:BLUEPRINT_BG,backgroundSize:BLUEPRINT_SIZE,opacity:.5,pointerEvents:"none"}}/>
           <button onClick={onClose} style={{
             position:"absolute",top:14,left:14,
-            background:"rgba(239,68,68,.85)",border:"none",color:"#fff",
+            background:"rgba(248,113,113,.20)",border:"1px solid rgba(248,113,113,.50)",color:T.danger,
             borderRadius:8,padding:"5px 14px",fontSize:12,cursor:"pointer",
             fontWeight:700,display:"flex",alignItems:"center",gap:6,zIndex:2
           }}>
-            <SvgIcon d="M6 18L18 6M6 6l12 12" size={13} color="#fff"/> إغلاق
+            <SvgIcon d="M6 18L18 6M6 6l12 12" size={13} color={T.danger}/> إغلاق
           </button>
           <div style={{display:"flex",alignItems:"center",gap:14,position:"relative"}}>
             <div style={{
-              background:"rgba(201,161,74,.18)",border:"1px solid rgba(201,161,74,.4)",
-              borderRadius:12,padding:"11px",display:"flex"
+              background:"rgba(62,193,211,.20)",border:"1px solid rgba(62,193,211,.45)",
+              borderRadius:12,padding:"11px",display:"flex",
+              boxShadow:"0 0 24px rgba(62,193,211,.25)"
             }}>
-              <SvgIcon d={P.search} size={24} color="#fbbf24"/>
+              <SvgIcon d={P.search} size={24} color={T.cyan}/>
             </div>
             <div>
-              <div style={{fontSize:10,color:"#fde68a",fontWeight:700,letterSpacing:"1.5px",marginBottom:3,textTransform:"uppercase"}}>التحقق</div>
-              <h3 style={{color:"#fff",margin:0,fontSize:18,fontWeight:800,letterSpacing:"-.2px"}}>تحقّق من تسجيلك</h3>
-              <p style={{color:"#cbd5e1",margin:"4px 0 0",fontSize:12.5}}>أدخل اسمك الرباعي ورقم هاتفك للتحقق</p>
+              <div style={{fontSize:10,color:T.cyan,fontWeight:700,letterSpacing:"1.5px",marginBottom:3,textTransform:"uppercase",fontFamily:T.fontMono}}>التحقق</div>
+              <h3 style={{color:T.text,margin:0,fontSize:18,fontWeight:800,letterSpacing:"-.2px"}}>تحقّق من تسجيلك</h3>
+              <p style={{color:T.text2,margin:"4px 0 0",fontSize:12.5}}>أدخل اسمك الرباعي ورقم هاتفك للتحقق</p>
             </div>
           </div>
         </div>
 
-        <div style={{padding:"24px",overflowY:"auto",flex:1}}>
+        <div style={{padding:"24px",overflowY:"auto",flex:1,background:T.bg2}}>
           <div style={{marginBottom:14}}>
-            <label style={{display:"block",fontSize:13,fontWeight:600,color:"#374151",marginBottom:6}}>الاسم الرباعي الكامل</label>
+            <label style={{display:"block",fontSize:13,fontWeight:600,color:T.text2,marginBottom:6}}>الاسم الرباعي الكامل</label>
             <input value={name} onChange={function(e){setName(e.target.value);reset();}}
               onKeyDown={function(e){if(e.key==="Enter")search();}}
               placeholder="أدخل الاسم الرباعي كما هو مسجل..."
               style={{...inp(status==="err_name"||status==="no_name"),marginBottom:0}}/>
           </div>
           <div style={{marginBottom:16}}>
-            <label style={{display:"block",fontSize:13,fontWeight:600,color:"#374151",marginBottom:6}}>رقم الهاتف المسجل</label>
+            <label style={{display:"block",fontSize:13,fontWeight:600,color:T.text2,marginBottom:6}}>رقم الهاتف المسجل</label>
             <div style={{display:"flex",gap:10}}>
               <input value={phone} onChange={function(e){setPhone(e.target.value);reset();}}
                 onKeyDown={function(e){if(e.key==="Enter")search();}}
                 placeholder="07XXXXXXXXX"
                 style={{...inp(status==="err_phone"||status==="no_phone"),flex:1,direction:"ltr",textAlign:"right",marginBottom:0}}/>
-              <button onClick={search} disabled={loading} style={{...btn("#1e40af","#1d4ed8"),padding:"11px 22px",opacity:loading?0.7:1,whiteSpace:"nowrap",display:"flex",alignItems:"center",gap:8}}>
-                <SvgIcon d={P.search} size={16} color="#fff"/>
+              <button onClick={search} disabled={loading} style={{...btnGold(),padding:"11px 22px",opacity:loading?0.7:1,whiteSpace:"nowrap",display:"flex",alignItems:"center",gap:8}}>
+                <SvgIcon d={P.search} size={16} color={T.bg0}/>
                 {loading?"جاري البحث...":"بحث"}
               </button>
             </div>
           </div>
 
-          {status==="err_name"  && <div style={{background:"#fef2f2",border:"1px solid #fecaca",color:"#dc2626",padding:"10px 14px",borderRadius:10,fontSize:13,marginBottom:12}}>يرجى إدخال الاسم الرباعي (4 أجزاء على الأقل)</div>}
-          {status==="err_phone" && <div style={{background:"#fef2f2",border:"1px solid #fecaca",color:"#dc2626",padding:"10px 14px",borderRadius:10,fontSize:13,marginBottom:12}}>رقم الهاتف غير صحيح — يجب أن يبدأ بـ 07</div>}
-          {status==="err_api"   && <div style={{background:"#fef2f2",border:"1px solid #fecaca",color:"#dc2626",padding:"10px 14px",borderRadius:10,fontSize:13,marginBottom:12}}>حدث خطأ في الاتصال، حاول مرة أخرى</div>}
+          {status==="err_name"  && <div style={{background:"rgba(248,113,113,.12)",border:"1px solid rgba(248,113,113,.40)",color:T.danger,padding:"10px 14px",borderRadius:10,fontSize:13,marginBottom:12}}>يرجى إدخال الاسم الرباعي (4 أجزاء على الأقل)</div>}
+          {status==="err_phone" && <div style={{background:"rgba(248,113,113,.12)",border:"1px solid rgba(248,113,113,.40)",color:T.danger,padding:"10px 14px",borderRadius:10,fontSize:13,marginBottom:12}}>رقم الهاتف غير صحيح — يجب أن يبدأ بـ 07</div>}
+          {status==="err_api"   && <div style={{background:"rgba(248,113,113,.12)",border:"1px solid rgba(248,113,113,.40)",color:T.danger,padding:"10px 14px",borderRadius:10,fontSize:13,marginBottom:12}}>حدث خطأ في الاتصال، حاول مرة أخرى</div>}
 
           {status==="no_phone" && (
-            <div style={{background:"#fef2f2",border:"1px solid #fecaca",borderRadius:14,padding:"22px",textAlign:"center"}}>
-              <div style={{width:56,height:56,borderRadius:"50%",background:"#fee2e2",margin:"0 auto 12px",display:"flex",alignItems:"center",justifyContent:"center"}}>
-                <SvgIcon d="M6 18L18 6M6 6l12 12" size={26} color="#dc2626"/>
+            <div style={{background:"rgba(248,113,113,.08)",border:"1px solid rgba(248,113,113,.30)",borderRadius:14,padding:"22px",textAlign:"center"}}>
+              <div style={{width:56,height:56,borderRadius:"50%",background:"rgba(248,113,113,.20)",margin:"0 auto 12px",display:"flex",alignItems:"center",justifyContent:"center"}}>
+                <SvgIcon d="M6 18L18 6M6 6l12 12" size={26} color={T.danger}/>
               </div>
-              <h4 style={{color:"#dc2626",margin:"0 0 8px",fontSize:16}}>رقم الهاتف غير مسجل</h4>
-              <p style={{color:"#64748b",fontSize:13,margin:0}}>لا يوجد سجل بهذا الرقم في قاعدة بيانات الرابطة</p>
+              <h4 style={{color:T.danger,margin:"0 0 8px",fontSize:16}}>رقم الهاتف غير مسجل</h4>
+              <p style={{color:T.text3,fontSize:13,margin:0}}>لا يوجد سجل بهذا الرقم في قاعدة بيانات الرابطة</p>
             </div>
           )}
 
           {status==="no_name" && (
-            <div style={{background:"#fffbeb",border:"1px solid #fde68a",borderRadius:14,padding:"22px",textAlign:"center"}}>
-              <div style={{width:56,height:56,borderRadius:"50%",background:"#fef3c7",margin:"0 auto 12px",display:"flex",alignItems:"center",justifyContent:"center"}}>
-                <SvgIcon d="M12 9v2m0 4h.01M10.29 3.86L1.82 18a2 2 0 001.71 3h16.94a2 2 0 001.71-3L13.71 3.86a2 2 0 00-3.42 0z" size={26} color="#d97706"/>
+            <div style={{background:"rgba(251,191,36,.10)",border:"1px solid rgba(251,191,36,.35)",borderRadius:14,padding:"22px",textAlign:"center"}}>
+              <div style={{width:56,height:56,borderRadius:"50%",background:"rgba(251,191,36,.18)",margin:"0 auto 12px",display:"flex",alignItems:"center",justifyContent:"center"}}>
+                <SvgIcon d="M12 9v2m0 4h.01M10.29 3.86L1.82 18a2 2 0 001.71 3h16.94a2 2 0 001.71-3L13.71 3.86a2 2 0 00-3.42 0z" size={26} color={T.warning}/>
               </div>
-              <h4 style={{color:"#92400e",margin:"0 0 8px",fontSize:16}}>الاسم لا يطابق السجل</h4>
-              <p style={{color:"#64748b",fontSize:13,margin:0}}>رقم الهاتف موجود لكن الاسم المدخل لا يتطابق — تأكد من كتابة الاسم كما سجّلته</p>
+              <h4 style={{color:T.warning,margin:"0 0 8px",fontSize:16}}>الاسم لا يطابق السجل</h4>
+              <p style={{color:T.text3,fontSize:13,margin:0}}>رقم الهاتف موجود لكن الاسم المدخل لا يتطابق — تأكد من كتابة الاسم كما سجّلته</p>
             </div>
           )}
 
           {status==="found" && result && (
             <div style={{
-              background:"linear-gradient(135deg,#f0fdf4,#dcfce7)",
-              border:"1px solid "+T.green+"55",borderRadius:T.radiusLg,padding:"22px",
-              borderRight:"4px solid "+T.green
+              background:"linear-gradient(135deg,rgba(74,222,128,.10),rgba(74,222,128,.04))",
+              border:"1px solid "+T.success+"55",borderRadius:T.radiusLg,padding:"22px",
+              borderRight:"4px solid "+T.success
             }}>
               <div style={{display:"flex",alignItems:"center",gap:12,marginBottom:18}}>
                 <div style={{
                   width:50,height:50,borderRadius:12,
-                  background:"linear-gradient(135deg,#047857,#065f46)",
+                  background:"linear-gradient(135deg,"+T.success+","+T.success+"cc)",
                   display:"flex",alignItems:"center",justifyContent:"center",flexShrink:0,
-                  boxShadow:"0 6px 18px rgba(4,120,87,.3)"
+                  boxShadow:"0 6px 18px rgba(74,222,128,.35)"
                 }}>
-                  <SvgIcon d="M5 13l4 4L19 7" size={24} color="#fff" sw={2.5}/>
+                  <SvgIcon d="M5 13l4 4L19 7" size={24} color={T.bg0} sw={2.5}/>
                 </div>
                 <div>
-                  <div style={{fontSize:10,color:T.green,fontWeight:700,letterSpacing:"1.5px",marginBottom:3,textTransform:"uppercase"}}>مؤكّد</div>
-                  <h4 style={{color:"#065f46",margin:0,fontSize:17,fontWeight:800}}>اسمك في القائمة الوطنية</h4>
-                  <p style={{color:"#166534",margin:"3px 0 0",fontSize:12}}>تسجيل مؤكَّد في أرشيف المنصة</p>
+                  <div style={{fontSize:10,color:T.success,fontWeight:700,letterSpacing:"1.5px",marginBottom:3,textTransform:"uppercase",fontFamily:T.fontMono}}>مؤكّد</div>
+                  <h4 style={{color:T.text,margin:0,fontSize:17,fontWeight:800}}>اسمك في القائمة الوطنية</h4>
+                  <p style={{color:T.text2,margin:"3px 0 0",fontSize:12}}>تسجيل مؤكَّد في أرشيف المنصة</p>
                 </div>
               </div>
               <div style={{display:"grid",gridTemplateColumns:"1fr 1fr",gap:10,marginBottom:16}}>
@@ -658,15 +670,15 @@ function SearchModal({onClose}) {
                   {l:"سنة التخرج",      v:result.graduation_year},
                   {l:"تاريخ التسجيل",   v:new Date(result.created_at).toLocaleDateString("en-GB")},
                 ].map(function(item){return(
-                  <div key={item.l} style={{background:"rgba(255,255,255,.8)",borderRadius:10,padding:"10px 14px"}}>
-                    <div style={{fontSize:11,color:"#64748b",marginBottom:3,fontWeight:600}}>{item.l}</div>
-                    <div style={{fontWeight:700,fontSize:13,color:"#0f172a"}}>{item.v}</div>
+                  <div key={item.l} style={{background:"rgba(0,0,0,.20)",border:"1px solid "+T.border,borderRadius:10,padding:"10px 14px"}}>
+                    <div style={{fontSize:11,color:T.text3,marginBottom:3,fontWeight:600}}>{item.l}</div>
+                    <div style={{fontWeight:700,fontSize:13,color:T.text}}>{item.v}</div>
                   </div>
                 );})}
               </div>
               {/* Download buttons */}
-              <div style={{borderTop:"1px solid #86efac",paddingTop:14}}>
-                <div style={{textAlign:"center",fontSize:12,color:"#15803d",fontWeight:600,marginBottom:10}}>
+              <div style={{borderTop:"1px solid "+T.success+"55",paddingTop:14}}>
+                <div style={{textAlign:"center",fontSize:12,color:T.success,fontWeight:700,marginBottom:10,letterSpacing:".5px"}}>
                   تحميل الاستمارات
                 </div>
                 <DownloadButtons data={{...result, phone: normalizePhone(phone)}}/>
@@ -675,7 +687,7 @@ function SearchModal({onClose}) {
           )}
 
           {status==="idle" && (
-            <div style={{textAlign:"center",padding:"12px",color:"#94a3b8",fontSize:12,borderTop:"1px solid #f1f5f9",marginTop:4}}>
+            <div style={{textAlign:"center",padding:"12px",color:T.text4,fontSize:12,borderTop:"1px solid "+T.border,marginTop:4}}>
               يجب تطابق الاسم الرباعي ورقم الهاتف معاً للتحقق من التسجيل
             </div>
           )}
@@ -687,12 +699,12 @@ function SearchModal({onClose}) {
 
 function NoEnvScreen() {
   return (
-    <div style={{minHeight:"100vh",display:"flex",alignItems:"center",justifyContent:"center",background:"#f1f5f9",direction:"rtl"}}>
-      <div style={{background:"#fff",borderRadius:16,padding:40,maxWidth:480,textAlign:"center",boxShadow:"0 4px 24px rgba(0,0,0,.1)"}}>
-        <div style={{width:60,height:60,borderRadius:"50%",background:"#e0f2fe",margin:"0 auto 16px",display:"flex",alignItems:"center",justifyContent:"center"}}>
-          <SvgIcon d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z M15 12a3 3 0 11-6 0 3 3 0 016 0z" size={28} color="#0369a1"/>
+    <div style={{minHeight:"100vh",display:"flex",alignItems:"center",justifyContent:"center",background:T.bg0,direction:"rtl"}}>
+      <div style={{background:T.bg2,border:"1px solid "+T.border2,borderRadius:16,padding:40,maxWidth:480,textAlign:"center",boxShadow:T.shadowLg}}>
+        <div style={{width:60,height:60,borderRadius:"50%",background:T.cyan+"18",border:"1px solid "+T.cyan+"40",margin:"0 auto 16px",display:"flex",alignItems:"center",justifyContent:"center"}}>
+          <SvgIcon d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z M15 12a3 3 0 11-6 0 3 3 0 016 0z" size={28} color={T.cyan}/>
         </div>
-        <h2 style={{marginBottom:8}}>يلزم إعداد المتغيرات البيئية</h2>
+        <h2 style={{marginBottom:8,color:T.text}}>يلزم إعداد المتغيرات البيئية</h2>
       </div>
     </div>
   );
@@ -765,28 +777,29 @@ function RegisterPage() {
 
   if(st==="success") return (
     <div style={pageWrap}>
-      <div style={{...card,textAlign:"center",padding:"48px 24px",borderTop:"4px solid "+T.green}}>
+      <div style={{...card,textAlign:"center",padding:"48px 24px",borderTop:"4px solid "+T.success}}>
         <div style={{
           width:80,height:80,borderRadius:20,
-          background:"linear-gradient(135deg,"+T.green+"22,"+T.green+"08)",
-          border:"1px solid "+T.green+"40",
-          margin:"0 auto 18px",display:"flex",alignItems:"center",justifyContent:"center"
+          background:"linear-gradient(135deg,rgba(74,222,128,.22),rgba(74,222,128,.04))",
+          border:"1px solid "+T.success+"55",
+          margin:"0 auto 18px",display:"flex",alignItems:"center",justifyContent:"center",
+          boxShadow:"0 0 32px rgba(74,222,128,.20)"
         }}>
-          <SvgIcon d="M5 13l4 4L19 7" size={40} color={T.green} sw={2.5}/>
+          <SvgIcon d="M5 13l4 4L19 7" size={40} color={T.success} sw={2.5}/>
         </div>
-        <div style={{fontSize:11,color:T.green,fontWeight:700,letterSpacing:"2px",marginBottom:6,textTransform:"uppercase"}}>تم التسجيل</div>
-        <h2 style={{color:T.ink,fontSize:24,marginBottom:8,fontWeight:900,letterSpacing:"-.2px"}}>أُضيف اسمك إلى القائمة الوطنية</h2>
-        <p style={{color:T.text2,marginBottom:8,fontSize:14.5,lineHeight:1.9}}>شكراً لانضمامك إلى <strong>المنصة الوطنية لمهندسي العراق غير المعينين</strong></p>
+        <div style={{fontSize:11,color:T.success,fontWeight:700,letterSpacing:"2px",marginBottom:6,textTransform:"uppercase",fontFamily:T.fontMono}}>تم التسجيل</div>
+        <h2 style={{color:T.text,fontSize:24,marginBottom:8,fontWeight:900,letterSpacing:"-.2px"}}>أُضيف اسمك إلى القائمة الوطنية</h2>
+        <p style={{color:T.text2,marginBottom:8,fontSize:14.5,lineHeight:1.9}}>شكراً لانضمامك إلى <strong style={{color:T.cyan}}>المنصة الوطنية لمهندسي العراق غير المعينين</strong></p>
         <p style={{color:T.text3,fontSize:13,marginBottom:26}}>يمكنك الآن تحميل استمارة تسجيلك الرسمية أو استمارة التخويل لتمثيلك في المطالبة بحقوقك</p>
 
         {/* Download section */}
         <div style={{
-          background:T.bg2,borderRadius:T.radiusLg,padding:"22px 24px",
-          marginBottom:24,border:"1px solid "+T.border
+          background:T.bg1,borderRadius:T.radiusLg,padding:"22px 24px",
+          marginBottom:24,border:"1px solid "+T.border2
         }}>
           <div style={{display:"flex",alignItems:"center",gap:8,justifyContent:"center",marginBottom:14}}>
-            <SvgIcon d={P.download} size={18} color={T.ink}/>
-            <span style={{fontWeight:800,fontSize:14,color:T.ink}}>تحميل الاستمارات الرسمية</span>
+            <SvgIcon d={P.download} size={18} color={T.cyan}/>
+            <span style={{fontWeight:800,fontSize:14,color:T.text}}>تحميل الاستمارات الرسمية</span>
           </div>
           {saved && <DownloadButtons data={saved}/>}
         </div>
@@ -801,26 +814,28 @@ function RegisterPage() {
       <div style={card}>
         <div style={{
           display:"flex",alignItems:"flex-start",gap:14,marginBottom:22,
-          paddingBottom:18,borderBottom:"1px solid "+T.border
+          paddingBottom:18,borderBottom:"1px solid "+T.border2
         }}>
           <div style={{
             width:48,height:48,borderRadius:12,
-            background:"linear-gradient(135deg,"+T.ink+","+T.ink2+")",
-            display:"flex",alignItems:"center",justifyContent:"center",flexShrink:0
+            background:"linear-gradient(135deg,rgba(62,193,211,.20),rgba(62,193,211,.06))",
+            border:"1px solid rgba(62,193,211,.45)",
+            display:"flex",alignItems:"center",justifyContent:"center",flexShrink:0,
+            boxShadow:"0 0 24px rgba(62,193,211,.18)"
           }}>
-            <SvgIcon d={P.edit} size={22} color="#fbbf24"/>
+            <SvgIcon d={P.edit} size={22} color={T.cyan}/>
           </div>
           <div>
-            <div style={{fontSize:11,color:T.gold,fontWeight:700,letterSpacing:"1.5px",marginBottom:4,textTransform:"uppercase"}}>تسجيل جديد</div>
-            <h1 style={{fontSize:21,fontWeight:900,marginBottom:4,color:T.ink,letterSpacing:"-.2px"}}>أضف اسمك إلى القائمة الوطنية</h1>
+            <div style={{fontSize:11,color:T.cyan,fontWeight:700,letterSpacing:"1.5px",marginBottom:4,textTransform:"uppercase",fontFamily:T.fontMono}}>تسجيل جديد</div>
+            <h1 style={{fontSize:21,fontWeight:900,marginBottom:4,color:T.text,letterSpacing:"-.2px"}}>أضف اسمك إلى القائمة الوطنية</h1>
             <p style={{color:T.text3,fontSize:13,margin:0}}>المنصة الوطنية لمهندسي العراق غير المعينين — التسجيل مجاني وسري</p>
           </div>
         </div>
-        {st==="err" && <div style={{background:"#fef2f2",border:"1px solid #fecaca",color:"#b91c1c",padding:"12px 16px",borderRadius:10,marginBottom:16,fontSize:13,fontWeight:600}}>{msg}</div>}
+        {st==="err" && <div style={{background:"rgba(248,113,113,.12)",border:"1px solid rgba(248,113,113,.40)",color:T.danger,padding:"12px 16px",borderRadius:10,marginBottom:16,fontSize:13,fontWeight:600}}>{msg}</div>}
 
         {/* Academic Info */}
-        <div style={{background:"#f8fafc",borderRadius:12,padding:"20px",marginBottom:16}}>
-          <SectionHeader icon={P.grad} title="المعلومات الشخصية والأكاديمية" color="#1d4ed8"/>
+        <div style={{background:T.bg1,borderRadius:12,padding:"20px",marginBottom:16,border:"1px solid "+T.border}}>
+          <SectionHeader icon={P.grad} title="المعلومات الشخصية والأكاديمية" color={T.cyan}/>
           <div style={grid2}>
             <Field label="الاسم الرباعي الكامل" error={er.full_name}>
               <input value={f.full_name} onChange={e=>up("full_name",e.target.value)} placeholder="أدخل الاسم الرباعي" style={inp(er.full_name)}/>
@@ -856,8 +871,8 @@ function RegisterPage() {
         </div>
 
         {/* University Info */}
-        <div style={{background:T.ink+"06",borderRadius:T.radius,padding:"20px",marginBottom:16,border:"1px solid "+T.border}}>
-          <SectionHeader icon={P.grad} title="المؤهلات الهندسية" color={T.ink2}/>
+        <div style={{background:T.bg1,borderRadius:T.radius,padding:"20px",marginBottom:16,border:"1px solid "+T.border}}>
+          <SectionHeader icon={P.grad} title="المؤهلات الهندسية" color={T.info}/>
           <div style={grid2}>
             <Field label="الجامعة" error={er.university}>
               <input value={f.university} onChange={e=>up("university",e.target.value)} placeholder="مثال: جامعة بغداد" style={inp(er.university)}/>
@@ -872,22 +887,22 @@ function RegisterPage() {
         </div>
 
         {/* Gender + Employment */}
-        <div style={{background:"#fefce8",borderRadius:12,padding:"20px",marginBottom:16}}>
-          <SectionHeader icon={P.users} title="الجنس والوضع الوظيفي" color="#d97706"/>
+        <div style={{background:T.bg1,borderRadius:12,padding:"20px",marginBottom:16,border:"1px solid "+T.border}}>
+          <SectionHeader icon={P.users} title="الجنس والوضع الوظيفي" color={T.warning}/>
           <div style={grid2}>
             <Field label="الجنس">
               <div style={{display:"flex",gap:10}}>
                 {[{v:"ذكر",l:"ذكر"},{v:"أنثى",l:"أنثى"}].map(({v,l})=>{
                   var a=f.gender===v;
-                  return <div key={v} onClick={()=>up("gender",v)} style={{flex:1,textAlign:"center",padding:"10px",borderRadius:10,cursor:"pointer",fontWeight:600,fontSize:14,border:"2px solid "+(a?"#1d4ed8":"#e2e8f0"),background:a?"#dbeafe":"#fff",color:a?"#1e40af":"#64748b"}}>{l}</div>;
+                  return <div key={v} onClick={()=>up("gender",v)} style={{flex:1,textAlign:"center",padding:"10px",borderRadius:10,cursor:"pointer",fontWeight:600,fontSize:14,border:"2px solid "+(a?T.cyan:T.border2),background:a?"rgba(62,193,211,.14)":T.bg2,color:a?T.cyan:T.text3,transition:"all .15s"}}>{l}</div>;
                 })}
               </div>
             </Field>
             <Field label="الوضع الوظيفي">
               <div style={{display:"flex",gap:8,flexWrap:"wrap"}}>
-                {[{v:"موظف",c:"#22c55e"},{v:"غير موظف",c:"#ef4444"},{v:"طالب دراسات عليا",c:"#6366f1"}].map(({v,c})=>{
+                {[{v:"موظف",c:T.success},{v:"غير موظف",c:T.danger},{v:"طالب دراسات عليا",c:T.info}].map(({v,c})=>{
                   var a=f.employment_status===v;
-                  return <div key={v} onClick={()=>up("employment_status",v)} style={{padding:"7px 12px",borderRadius:10,cursor:"pointer",fontSize:12,fontWeight:600,border:"2px solid "+(a?c:"#e2e8f0"),background:a?(c+"22"):"#fff",color:a?c:"#64748b"}}>{v}</div>;
+                  return <div key={v} onClick={()=>up("employment_status",v)} style={{padding:"7px 12px",borderRadius:10,cursor:"pointer",fontSize:12,fontWeight:600,border:"2px solid "+(a?c:T.border2),background:a?(c+"22"):T.bg2,color:a?c:T.text3,transition:"all .15s"}}>{v}</div>;
                 })}
               </div>
             </Field>
@@ -895,19 +910,19 @@ function RegisterPage() {
         </div>
 
         {/* Marital */}
-        <div style={{background:"#f0fdf4",borderRadius:12,padding:"20px",marginBottom:20}}>
-          <SectionHeader icon={P.heart} title="الحالة الاجتماعية" color="#16a34a"/>
+        <div style={{background:T.bg1,borderRadius:12,padding:"20px",marginBottom:20,border:"1px solid "+T.border}}>
+          <SectionHeader icon={P.heart} title="الحالة الاجتماعية" color={T.success}/>
           <Field label="الحالة الاجتماعية">
             <div style={{display:"flex",gap:10,flexWrap:"wrap"}}>
               {["أعزب","متزوج","مطلق","أرمل"].map(v=>{
                 var a=f.marital_status===v;
-                return <div key={v} onClick={()=>setMarital(v)} style={{padding:"9px 18px",borderRadius:10,cursor:"pointer",fontSize:14,fontWeight:600,border:"2px solid "+(a?"#16a34a":"#e2e8f0"),background:a?"#dcfce7":"#fff",color:a?"#15803d":"#64748b"}}>{v}</div>;
+                return <div key={v} onClick={()=>setMarital(v)} style={{padding:"9px 18px",borderRadius:10,cursor:"pointer",fontSize:14,fontWeight:600,border:"2px solid "+(a?T.success:T.border2),background:a?"rgba(74,222,128,.14)":T.bg2,color:a?T.success:T.text3,transition:"all .15s"}}>{v}</div>;
               })}
             </div>
           </Field>
           <div style={{display:"flex",gap:28,flexWrap:"wrap",marginTop:4}}>
-            <Check value={f.has_wife} label="لديه زوجة حالياً" color="#22c55e" onChange={v=>up("has_wife",v)}/>
-            <Check value={f.has_children} label="لديه أطفال" color="#6366f1" onChange={setHasChildren}/>
+            <Check value={f.has_wife} label="لديه زوجة حالياً" color={T.success} onChange={v=>up("has_wife",v)}/>
+            <Check value={f.has_children} label="لديه أطفال" color={T.info} onChange={setHasChildren}/>
           </div>
           {f.has_children && (
             <div style={{marginTop:16,maxWidth:200}}>
@@ -918,11 +933,11 @@ function RegisterPage() {
           )}
         </div>
 
-        <button style={{...btn(),width:"100%",padding:"14px",fontSize:15,opacity:st==="loading"?0.7:1,display:"flex",alignItems:"center",justifyContent:"center",gap:10}} onClick={submit} disabled={st==="loading"}>
+        <button style={{...btnGold(),width:"100%",padding:"14px",fontSize:15,opacity:st==="loading"?0.7:1,display:"flex",alignItems:"center",justifyContent:"center",gap:10}} onClick={submit} disabled={st==="loading"}>
           {st==="loading" ? (
             <>جاري التسجيل...</>
           ) : (
-            <><SvgIcon d="M5 13l4 4L19 7" size={18} color="#fff"/> تسجيل الآن</>
+            <><SvgIcon d="M5 13l4 4L19 7" size={18} color={T.bg0} sw={2.5}/> تسجيل الآن</>
           )}
         </button>
       </div>
@@ -946,11 +961,11 @@ function DashboardPage() {
   useEffect(()=>{load();},[load]);
 
   if(!stats&&loading) return (
-    <div style={{textAlign:"center",padding:"80px 20px",color:"#94a3b8"}}>
-      <div style={{width:48,height:48,margin:"0 auto 16px",opacity:.4}}>
-        <SvgIcon d={P.chart} size={48} color="#94a3b8"/>
+    <div style={{textAlign:"center",padding:"80px 20px",color:T.text3}}>
+      <div style={{width:48,height:48,margin:"0 auto 16px",opacity:.6}}>
+        <SvgIcon d={P.chart} size={48} color={T.cyan}/>
       </div>
-      <div style={{fontSize:15}}>جاري تحميل الإحصائيات...</div>
+      <div style={{fontSize:15,color:T.text2}}>جاري تحميل الإحصائيات...</div>
     </div>
   );
 
@@ -964,28 +979,28 @@ function DashboardPage() {
   var pct = function(n){ return total>0 ? (n/total)*100 : 0; };
 
   var cards = [
-    {iconPath:P.users,    label:"إجمالي المهندسين",    val:total,      pct:100,             barPct:100,                  color:T.ink2},
-    {iconPath:P.male,     label:"الذكور",                val:male,       pct:pct(male),       barPct:pct(male),            color:"#0d9488"},
-    {iconPath:P.female,   label:"الإناث",                val:female,     pct:pct(female),     barPct:pct(female),          color:"#db2777"},
-    {iconPath:P.map,      label:"المحافظات",             val:provinces,  pct:0,               barPct:(provinces/18)*100,   color:T.gold},
-    {iconPath:P.grad,     label:"التخصصات الهندسية",     val:specs,      pct:0,               barPct:Math.min(specs*5,100),color:"#7c3aed"},
-    {iconPath:P.heart,    label:"متزوجون",                val:married,    pct:pct(married),    barPct:pct(married),         color:"#d97706"},
-    {iconPath:P.person,   label:"غير متزوجين",           val:notMarried, pct:pct(notMarried), barPct:pct(notMarried),      color:"#4f46e5"},
+    {iconPath:P.users,    label:"إجمالي المهندسين",    val:total,      pct:100,             barPct:100,                  color:T.cyan},
+    {iconPath:P.male,     label:"الذكور",                val:male,       pct:pct(male),       barPct:pct(male),            color:"#22d3ee"},
+    {iconPath:P.female,   label:"الإناث",                val:female,     pct:pct(female),     barPct:pct(female),          color:"#f472b6"},
+    {iconPath:P.map,      label:"المحافظات",             val:provinces,  pct:0,               barPct:(provinces/18)*100,   color:"#fbbf24"},
+    {iconPath:P.grad,     label:"التخصصات الهندسية",     val:specs,      pct:0,               barPct:Math.min(specs*5,100),color:"#a78bfa"},
+    {iconPath:P.heart,    label:"متزوجون",                val:married,    pct:pct(married),    barPct:pct(married),         color:"#fb923c"},
+    {iconPath:P.person,   label:"غير متزوجين",           val:notMarried, pct:pct(notMarried), barPct:pct(notMarried),      color:"#818cf8"},
   ];
 
   return (
     <div style={{...pageWrap,maxWidth:1100}}>
       <div style={{textAlign:"center",marginBottom:36}}>
-        <div style={{fontSize:11,fontWeight:700,letterSpacing:"2px",color:T.gold,marginBottom:8,textTransform:"uppercase"}}>
+        <div style={{fontSize:11,fontWeight:700,letterSpacing:"2px",color:T.cyan,marginBottom:8,textTransform:"uppercase",fontFamily:T.fontMono}}>
           الأرقام الرسمية
         </div>
-        <h2 style={{color:T.ink,fontSize:"clamp(22px,3.5vw,28px)",fontWeight:900,marginBottom:8,letterSpacing:"-.3px"}}>
+        <h2 style={{color:T.text,fontSize:"clamp(22px,3.5vw,30px)",fontWeight:900,marginBottom:8,letterSpacing:"-.3px"}}>
           الإحصائيات العامة للمهندسين
         </h2>
         <p style={{color:T.text3,fontSize:14,lineHeight:1.8,maxWidth:560,margin:"0 auto"}}>
           المنصة الوطنية لمهندسي العراق غير المعينين — بيانات محدّثة لحظياً
         </p>
-        <div style={{width:60,height:2,background:T.gold,margin:"18px auto 0"}}/>
+        <div style={{width:60,height:2,background:T.cyan,margin:"18px auto 0",boxShadow:"0 0 12px "+T.cyan}}/>
       </div>
       <div style={{display:"grid",gridTemplateColumns:"repeat(auto-fill,minmax(200px,1fr))",gap:18}}>
         {cards.map(function(c){
@@ -995,8 +1010,8 @@ function DashboardPage() {
         })}
       </div>
       <div style={{
-        textAlign:"center",marginTop:28,color:T.text3,fontSize:12,
-        background:T.surface,padding:"12px 18px",borderRadius:T.radius,
+        textAlign:"center",color:T.text3,fontSize:12,
+        background:T.bg2,padding:"12px 18px",borderRadius:T.radius,
         border:"1px dashed "+T.border2,maxWidth:480,margin:"28px auto 0"
       }}>
         تُحدَّث الإحصائيات تلقائياً مع كل تسجيل جديد
@@ -1103,28 +1118,29 @@ function AdminPage() {
 
   if(!authed) return (
     <div style={{...pageWrap,maxWidth:460}}>
-      <div style={{...card,textAlign:"center",padding:"36px 28px",borderTop:"3px solid "+T.gold}}>
+      <div style={{...card,textAlign:"center",padding:"36px 28px",borderTop:"3px solid "+T.cyan}}>
         <div style={{
           width:72,height:72,borderRadius:16,
-          background:"linear-gradient(135deg,"+T.ink+","+T.ink2+")",
+          background:"linear-gradient(135deg,rgba(62,193,211,.20),rgba(62,193,211,.06))",
+          border:"1px solid rgba(62,193,211,.45)",
           margin:"0 auto 18px",display:"flex",alignItems:"center",justifyContent:"center",
-          boxShadow:"0 8px 24px rgba(15,23,42,.2)"
+          boxShadow:"0 8px 24px rgba(0,0,0,.4),0 0 32px rgba(62,193,211,.25)"
         }}>
-          <SvgIcon d={P.lock} size={32} color="#fbbf24"/>
+          <SvgIcon d={P.lock} size={32} color={T.cyan}/>
         </div>
-        <div style={{fontSize:11,color:T.gold,fontWeight:700,letterSpacing:"2px",marginBottom:6,textTransform:"uppercase"}}>منطقة محمية</div>
-        <h2 style={{marginBottom:6,color:T.ink,fontSize:20,fontWeight:900,letterSpacing:"-.2px"}}>لوحة إدارة المنصة</h2>
+        <div style={{fontSize:11,color:T.cyan,fontWeight:700,letterSpacing:"2px",marginBottom:6,textTransform:"uppercase",fontFamily:T.fontMono}}>منطقة محمية</div>
+        <h2 style={{marginBottom:6,color:T.text,fontSize:20,fontWeight:900,letterSpacing:"-.2px"}}>لوحة إدارة المنصة</h2>
         <p style={{color:T.text3,fontSize:13,marginBottom:22}}>ادخل كلمة المرور المخصصة لك</p>
-        {pwdErr && <div style={{background:"#fef2f2",border:"1px solid #fecaca",color:"#b91c1c",padding:"10px 14px",borderRadius:T.radius,marginBottom:14,fontSize:13,fontWeight:600}}>{pwdErr}</div>}
+        {pwdErr && <div style={{background:"rgba(248,113,113,.12)",border:"1px solid rgba(248,113,113,.40)",color:T.danger,padding:"10px 14px",borderRadius:T.radius,marginBottom:14,fontSize:13,fontWeight:600}}>{pwdErr}</div>}
         <input type="password" value={pwd} onChange={e=>{setPwd(e.target.value);setPwdErr("");}}
           onKeyDown={e=>e.key==="Enter"&&login()}
           placeholder="كلمة المرور" style={{...inp(pwdErr),marginBottom:14,textAlign:"center",fontFamily:T.fontMono}}/>
-        <button style={{...btn(T.ink2,T.ink),width:"100%",padding:14,display:"flex",alignItems:"center",justifyContent:"center",gap:8}} onClick={login}>
-          <SvgIcon d={P.shield} size={18} color="#fbbf24"/> دخول آمن
+        <button style={{...btnGold(),width:"100%",padding:14,display:"flex",alignItems:"center",justifyContent:"center",gap:8}} onClick={login}>
+          <SvgIcon d={P.shield} size={18} color={T.bg0} sw={2.2}/> دخول آمن
         </button>
         <div style={{marginTop:18,display:"flex",gap:8,justifyContent:"center",flexWrap:"wrap"}}>
-          <span style={{background:T.green+"15",color:T.green,borderRadius:20,padding:"5px 14px",fontSize:11,fontWeight:700,border:"1px solid "+T.green+"30"}}>مدير كامل</span>
-          <span style={{background:T.blue+"15",color:T.blue,borderRadius:20,padding:"5px 14px",fontSize:11,fontWeight:700,border:"1px solid "+T.blue+"30"}}>مدير قراءة</span>
+          <span style={{background:T.success+"15",color:T.success,borderRadius:20,padding:"5px 14px",fontSize:11,fontWeight:700,border:"1px solid "+T.success+"40"}}>مدير كامل</span>
+          <span style={{background:T.info+"15",color:T.info,borderRadius:20,padding:"5px 14px",fontSize:11,fontWeight:700,border:"1px solid "+T.info+"40"}}>مدير قراءة</span>
         </div>
       </div>
     </div>
@@ -1190,46 +1206,46 @@ function AdminPage() {
     <div style={pageWrap}>
       <div style={{display:"flex",justifyContent:"space-between",alignItems:"center",marginBottom:20,flexWrap:"wrap",gap:10}}>
         <div>
-          <h2 style={{margin:0,color:"#0f172a",display:"flex",alignItems:"center",gap:10}}>
-            <SvgIcon d={P.shield} size={22} color="#1d4ed8"/> لوحة الإدارة
+          <h2 style={{margin:0,color:T.text,display:"flex",alignItems:"center",gap:10,fontSize:22,fontWeight:900,letterSpacing:"-.3px"}}>
+            <SvgIcon d={P.shield} size={22} color={T.cyan}/> لوحة الإدارة
           </h2>
           <div style={{marginTop:6}}>
             {isReadonly
-              ? <span style={{background:"#eff6ff",color:"#2563eb",borderRadius:20,padding:"3px 12px",fontSize:11,fontWeight:700}}>مدير قراءة فقط — لا يمكن التعديل أو الحذف</span>
-              : <span style={{background:"#f0fdf4",color:"#16a34a",borderRadius:20,padding:"3px 12px",fontSize:11,fontWeight:700}}>مدير كامل الصلاحيات</span>
+              ? <span style={{background:T.info+"18",color:T.info,borderRadius:20,padding:"3px 12px",fontSize:11,fontWeight:700,border:"1px solid "+T.info+"40"}}>مدير قراءة فقط — لا يمكن التعديل أو الحذف</span>
+              : <span style={{background:T.success+"18",color:T.success,borderRadius:20,padding:"3px 12px",fontSize:11,fontWeight:700,border:"1px solid "+T.success+"40"}}>مدير كامل الصلاحيات</span>
             }
           </div>
         </div>
         <div style={{display:"flex",gap:8,flexWrap:"wrap"}}>
-          <button style={btn("#6366f1","#4f46e5")} onClick={loadAll}>تحديث</button>
-          <button style={btn("#15803d","#16a34a")} onClick={exportCSV}>تصدير CSV</button>
-          <button style={btn("#dc2626","#b91c1c")} onClick={logout}>خروج</button>
+          <button style={btn()} onClick={loadAll}>تحديث</button>
+          <button style={{...btn(),color:T.success,borderColor:T.success+"55"}} onClick={exportCSV}>تصدير CSV</button>
+          <button style={{...btn(),color:T.danger,borderColor:T.danger+"55"}} onClick={logout}>خروج</button>
         </div>
       </div>
 
       {/* Stat Cards */}
       <div style={{display:"flex",gap:12,marginBottom:20,flexWrap:"wrap"}}>
         {[
-          {l:"إجمالي الأعضاء",  v:members.length,  color:"#1d4ed8",icon:P.users},
-          {l:"غير موظف",         v:members.filter(m=>m.employment_status==="غير موظف").length, color:"#dc2626",icon:P.person},
-          {l:"موظف",             v:members.filter(m=>m.employment_status==="موظف").length,     color:"#16a34a",icon:P.users},
-          {l:"تكرارات",          v:dupIds.size,     color:"#d97706",icon:P.users},
-          {l:"النتائج",          v:filtered.length, color:"#7c3aed",icon:P.chart},
+          {l:"إجمالي الأعضاء",  v:members.length,  color:T.cyan,    icon:P.users},
+          {l:"غير موظف",         v:members.filter(m=>m.employment_status==="غير موظف").length, color:T.danger,  icon:P.person},
+          {l:"موظف",             v:members.filter(m=>m.employment_status==="موظف").length,     color:T.success, icon:P.users},
+          {l:"تكرارات",          v:dupIds.size,     color:T.warning, icon:P.users},
+          {l:"النتائج",          v:filtered.length, color:T.info,    icon:P.chart},
         ].map(function(c){
           return (
-            <div key={c.l} style={{background:"#fff",borderRadius:14,padding:"16px 20px",flex:"1 1 130px",borderRight:"4px solid "+c.color,boxShadow:"0 2px 10px rgba(0,0,0,.06)"}}>
-              <div style={{fontSize:22,fontWeight:800,color:"#0f172a"}}>{c.v.toLocaleString("en-US")}</div>
-              <div style={{fontSize:12,color:"#64748b",marginTop:4}}>{c.l}</div>
+            <div key={c.l} style={{background:T.bg2,borderRadius:14,padding:"16px 20px",flex:"1 1 130px",borderRight:"4px solid "+c.color,border:"1px solid "+T.border,boxShadow:T.shadow}}>
+              <div style={{fontSize:22,fontWeight:800,color:T.text,fontFamily:T.fontMono}}>{c.v.toLocaleString("en-US")}</div>
+              <div style={{fontSize:12,color:T.text3,marginTop:4}}>{c.l}</div>
             </div>
           );
         })}
       </div>
 
       {/* Tabs */}
-      <div style={{display:"flex",gap:6,marginBottom:16,borderBottom:"2px solid #f1f5f9",paddingBottom:0}}>
+      <div style={{display:"flex",gap:6,marginBottom:16,borderBottom:"2px solid "+T.border2,paddingBottom:0,flexWrap:"wrap"}}>
         {adminTabs.map(t=>(
-          <button key={t.k} onClick={()=>setTab(t.k)} style={{padding:"10px 18px",borderRadius:"10px 10px 0 0",border:"none",cursor:"pointer",fontWeight:700,fontSize:13,background:tab===t.k?"#1d4ed8":"#f8fafc",color:tab===t.k?"#fff":"#475569",display:"flex",alignItems:"center",gap:7,marginBottom:tab===t.k?"-2px":"0",borderBottom:tab===t.k?"2px solid #1d4ed8":"none"}}>
-            <SvgIcon d={t.icon} size={15} color={tab===t.k?"#fff":"#475569"}/>{t.l}
+          <button key={t.k} onClick={()=>setTab(t.k)} style={{padding:"10px 18px",borderRadius:"10px 10px 0 0",border:"none",cursor:"pointer",fontWeight:700,fontSize:13,background:tab===t.k?T.cyan:T.bg2,color:tab===t.k?T.bg0:T.text2,display:"flex",alignItems:"center",gap:7,marginBottom:tab===t.k?"-2px":"0",borderBottom:tab===t.k?"2px solid "+T.cyan:"none",fontFamily:T.font,transition:"all .15s"}}>
+            <SvgIcon d={t.icon} size={15} color={tab===t.k?T.bg0:T.text2}/>{t.l}
           </button>
         ))}
       </div>
@@ -1256,47 +1272,47 @@ function AdminPage() {
           </div>
         </div>
         <div style={card}>
-          {loading ? <div style={{textAlign:"center",padding:40,color:"#94a3b8"}}>جاري التحميل...</div> : (
+          {loading ? <div style={{textAlign:"center",padding:40,color:T.text3}}>جاري التحميل...</div> : (
             <div style={{overflowX:"auto"}}>
-              <table style={{width:"100%",borderCollapse:"collapse",fontSize:12}}>
+              <table style={{width:"100%",borderCollapse:"collapse",fontSize:12,color:T.text2}}>
                 <thead>
-                  <tr style={{background:"#f8fafc"}}>
+                  <tr style={{background:T.bg1}}>
                     {["#","الاسم","المحافظة","الجامعة","الكلية/القسم","التخصص","سنة","الجنس","التوظيف","الحالة","الهاتف","التسجيل","حذف"].map(h=>(
-                      <th key={h} style={{padding:"9px",textAlign:"right",borderBottom:"2px solid #e2e8f0",fontWeight:700,color:"#374151",whiteSpace:"nowrap"}}>{h}</th>
+                      <th key={h} style={{padding:"9px",textAlign:"right",borderBottom:"2px solid "+T.border2,fontWeight:700,color:T.text,whiteSpace:"nowrap"}}>{h}</th>
                     ))}
                   </tr>
                 </thead>
                 <tbody>
                   {filtered.map((r,i)=>{
                     var isDup=dupIds.has(r.id);
-                    var ec=EMPLOY_COLORS[r.employment_status]||"#94a3b8";
+                    var ec=EMPLOY_COLORS[r.employment_status]||T.text3;
                     return (
-                      <tr key={r.id} style={{borderBottom:"1px solid #f1f5f9",background:isDup?"#fffbeb":i%2?"#fafafa":"#fff"}}>
-                        <td style={{padding:"8px 9px",color:"#94a3b8"}}>{i+1}{isDup&&<span style={{color:"#f59e0b",marginRight:3}} title="مكرر">!</span>}</td>
-                        <td style={{padding:"8px 9px",fontWeight:600,whiteSpace:"nowrap"}}>{r.full_name}</td>
-                        <td style={{padding:"8px 9px"}}><span style={{background:"#e0f2fe",color:"#0369a1",padding:"2px 7px",borderRadius:20,fontSize:11}}>{r.province}</span></td>
-                        <td style={{padding:"8px 9px",color:"#374151"}}>{r.university||"—"}</td>
-                        <td style={{padding:"8px 9px",color:"#374151"}}>{r.department||"—"}</td>
-                        <td style={{padding:"8px 9px",color:"#64748b"}}>{r.specialization||"—"}</td>
-                        <td style={{padding:"8px 9px",textAlign:"center"}}>{r.graduation_year}</td>
+                      <tr key={r.id} style={{borderBottom:"1px solid "+T.border,background:isDup?"rgba(251,191,36,.08)":i%2?T.bg1:T.bg2}}>
+                        <td style={{padding:"8px 9px",color:T.text4,fontFamily:T.fontMono}}>{i+1}{isDup&&<span style={{color:T.warning,marginRight:3}} title="مكرر">!</span>}</td>
+                        <td style={{padding:"8px 9px",fontWeight:600,whiteSpace:"nowrap",color:T.text}}>{r.full_name}</td>
+                        <td style={{padding:"8px 9px"}}><span style={{background:T.cyan+"18",color:T.cyan,padding:"2px 7px",borderRadius:20,fontSize:11,border:"1px solid "+T.cyan+"30"}}>{r.province}</span></td>
+                        <td style={{padding:"8px 9px",color:T.text2}}>{r.university||"—"}</td>
+                        <td style={{padding:"8px 9px",color:T.text2}}>{r.department||"—"}</td>
+                        <td style={{padding:"8px 9px",color:T.text3}}>{r.specialization||"—"}</td>
+                        <td style={{padding:"8px 9px",textAlign:"center",fontFamily:T.fontMono}}>{r.graduation_year}</td>
                         <td style={{padding:"8px 9px",textAlign:"center"}}>{r.gender}</td>
-                        <td style={{padding:"8px 9px"}}><span style={{background:ec+"22",color:ec,padding:"2px 7px",borderRadius:20,fontSize:11,fontWeight:600}}>{r.employment_status||"—"}</span></td>
+                        <td style={{padding:"8px 9px"}}><span style={{background:ec+"22",color:ec,padding:"2px 7px",borderRadius:20,fontSize:11,fontWeight:600,border:"1px solid "+ec+"40"}}>{r.employment_status||"—"}</span></td>
                         <td style={{padding:"8px 9px"}}>{r.marital_status}</td>
-                        <td style={{padding:"8px 9px",direction:"ltr",textAlign:"left",color:"#0369a1",fontFamily:"monospace",whiteSpace:"nowrap"}}>{r.phone}</td>
-                        <td style={{padding:"8px 9px",color:"#94a3b8",fontSize:11,whiteSpace:"nowrap"}}>{new Date(r.created_at).toLocaleDateString("en-GB")}</td>
+                        <td style={{padding:"8px 9px",direction:"ltr",textAlign:"left",color:T.cyan,fontFamily:T.fontMono,whiteSpace:"nowrap"}}>{r.phone}</td>
+                        <td style={{padding:"8px 9px",color:T.text4,fontSize:11,whiteSpace:"nowrap",fontFamily:T.fontMono}}>{new Date(r.created_at).toLocaleDateString("en-GB")}</td>
                         <td style={{padding:"8px 9px"}}>
                           {isReadonly
-                            ? <span style={{color:"#cbd5e1",fontSize:11}}>—</span>
+                            ? <span style={{color:T.text4,fontSize:11}}>—</span>
                             : <button onClick={async function(e){e.stopPropagation();if(!window.confirm("هل تريد حذف سجل "+r.full_name+"؟\nلا يمكن التراجع عن هذا الإجراء.")){return;}try{await db.deleteGraduate(r.id);setMembers(function(prev){return prev.filter(function(m){return m.id!==r.id;});});}catch(err){alert("حدث خطأ أثناء الحذف");}}}
-                                style={{background:"#fef2f2",border:"1px solid #fecaca",color:"#dc2626",borderRadius:7,padding:"5px 10px",cursor:"pointer",fontSize:11,fontWeight:600,whiteSpace:"nowrap",display:"flex",alignItems:"center",gap:5}}>
-                                <SvgIcon d={P.trash} size={12} color="#dc2626"/> حذف
+                                style={{background:"rgba(248,113,113,.10)",border:"1px solid rgba(248,113,113,.40)",color:T.danger,borderRadius:7,padding:"5px 10px",cursor:"pointer",fontSize:11,fontWeight:600,whiteSpace:"nowrap",display:"flex",alignItems:"center",gap:5}}>
+                                <SvgIcon d={P.trash} size={12} color={T.danger}/> حذف
                               </button>
                           }
                         </td>
                       </tr>
                     );
                   })}
-                  {!filtered.length && <tr><td colSpan={12} style={{padding:36,textAlign:"center",color:"#94a3b8"}}>لا توجد نتائج</td></tr>}
+                  {!filtered.length && <tr><td colSpan={13} style={{padding:36,textAlign:"center",color:T.text3}}>لا توجد نتائج</td></tr>}
                 </tbody>
               </table>
             </div>
@@ -1307,27 +1323,27 @@ function AdminPage() {
       {/* Duplicates Tab */}
       {tab==="dups" && (
         <div style={card}>
-          <h3 style={{marginBottom:16,color:"#b45309",fontSize:16}}>التسجيلات المكررة (نفس الاسم)</h3>
+          <h3 style={{marginBottom:16,color:T.warning,fontSize:16,fontWeight:800}}>التسجيلات المكررة (نفس الاسم)</h3>
           {dupIds.size===0 ? (
-            <div style={{textAlign:"center",padding:40,color:"#22c55e",fontSize:15}}>لا توجد تسجيلات مكررة</div>
+            <div style={{textAlign:"center",padding:40,color:T.success,fontSize:15,fontWeight:600}}>لا توجد تسجيلات مكررة</div>
           ) : (
             <div style={{overflowX:"auto"}}>
               <table style={{width:"100%",borderCollapse:"collapse",fontSize:12}}>
                 <thead>
-                  <tr style={{background:"#fffbeb"}}>
+                  <tr style={{background:"rgba(251,191,36,.10)"}}>
                     {["الاسم","المحافظة","الجامعة","الهاتف","تاريخ التسجيل"].map(h=>(
-                      <th key={h} style={{padding:"10px",textAlign:"right",borderBottom:"2px solid #fde68a",fontWeight:700,color:"#92400e"}}>{h}</th>
+                      <th key={h} style={{padding:"10px",textAlign:"right",borderBottom:"2px solid "+T.warning+"40",fontWeight:700,color:T.warning}}>{h}</th>
                     ))}
                   </tr>
                 </thead>
                 <tbody>
                   {members.filter(r=>dupIds.has(r.id)).map((r,i)=>(
-                    <tr key={r.id} style={{borderBottom:"1px solid #fef9c3",background:i%2?"#fffbeb":"#fefce8"}}>
-                      <td style={{padding:"8px 10px",fontWeight:600}}>{r.full_name}</td>
+                    <tr key={r.id} style={{borderBottom:"1px solid "+T.border,background:i%2?"rgba(251,191,36,.06)":T.bg2,color:T.text2}}>
+                      <td style={{padding:"8px 10px",fontWeight:600,color:T.text}}>{r.full_name}</td>
                       <td style={{padding:"8px 10px"}}>{r.province}</td>
                       <td style={{padding:"8px 10px"}}>{r.university||"—"}</td>
-                      <td style={{padding:"8px 10px",direction:"ltr",fontFamily:"monospace"}}>{r.phone}</td>
-                      <td style={{padding:"8px 10px",fontSize:11,color:"#92400e"}}>{new Date(r.created_at).toLocaleDateString("en-GB")}</td>
+                      <td style={{padding:"8px 10px",direction:"ltr",fontFamily:T.fontMono,color:T.cyan}}>{r.phone}</td>
+                      <td style={{padding:"8px 10px",fontSize:11,color:T.warning,fontFamily:T.fontMono}}>{new Date(r.created_at).toLocaleDateString("en-GB")}</td>
                     </tr>
                   ))}
                 </tbody>
@@ -1343,38 +1359,38 @@ function AdminPage() {
           {/* Add Form — full admin only */}
           {!isReadonly && (
             <div style={card}>
-              <SectionHeader icon={P.plus} title="إضافة منسق جديد" color="#0d9488"/>
-              {coordErr && <div style={{background:"#fef2f2",border:"1px solid #fecaca",color:"#dc2626",padding:"10px 14px",borderRadius:8,marginBottom:12,fontSize:13}}>{coordErr}</div>}
+              <SectionHeader icon={P.plus} title="إضافة منسق جديد" color={T.cyan}/>
+              {coordErr && <div style={{background:"rgba(248,113,113,.12)",border:"1px solid rgba(248,113,113,.40)",color:T.danger,padding:"10px 14px",borderRadius:8,marginBottom:12,fontSize:13}}>{coordErr}</div>}
               <div style={{display:"grid",gridTemplateColumns:"repeat(auto-fill,minmax(200px,1fr))",gap:12,marginBottom:12}}>
                 <div>
-                  <label style={{display:"block",fontSize:12,fontWeight:600,color:"#64748b",marginBottom:5}}>المحافظة</label>
+                  <label style={{display:"block",fontSize:12,fontWeight:600,color:T.text2,marginBottom:5}}>المحافظة</label>
                   <select value={newCoord.province} onChange={function(e){setNewCoord(function(p){return{...p,province:e.target.value,district:""};});}}
                     style={{...inp(false),marginBottom:0,cursor:"pointer"}}>
                     {PROVINCES.map(function(p){return <option key={p} value={p}>{p}</option>;})}
                   </select>
                 </div>
                 <div>
-                  <label style={{display:"block",fontSize:12,fontWeight:600,color:"#64748b",marginBottom:5}}>القضاء / المدينة</label>
+                  <label style={{display:"block",fontSize:12,fontWeight:600,color:T.text2,marginBottom:5}}>القضاء / المدينة</label>
                   <input value={newCoord.district}
                     onChange={function(e){setNewCoord(function(p){return{...p,district:e.target.value};});setCoordErr("");}}
                     placeholder="مثال: بعقوبة" style={{...inp(false),marginBottom:0}}/>
                 </div>
                 <div>
-                  <label style={{display:"block",fontSize:12,fontWeight:600,color:"#64748b",marginBottom:5}}>اسم المنسق</label>
+                  <label style={{display:"block",fontSize:12,fontWeight:600,color:T.text2,marginBottom:5}}>اسم المنسق</label>
                   <input value={newCoord.name}
                     onChange={function(e){setNewCoord(function(p){return{...p,name:e.target.value};});setCoordErr("");}}
                     placeholder="الاسم الكامل" style={{...inp(false),marginBottom:0}}/>
                 </div>
                 <div>
-                  <label style={{display:"block",fontSize:12,fontWeight:600,color:"#64748b",marginBottom:5}}>رقم الهاتف</label>
+                  <label style={{display:"block",fontSize:12,fontWeight:600,color:T.text2,marginBottom:5}}>رقم الهاتف</label>
                   <input value={newCoord.phone}
                     onChange={function(e){setNewCoord(function(p){return{...p,phone:e.target.value};});setCoordErr("");}}
                     placeholder="07XXXXXXXXX" style={{...inp(false),marginBottom:0,direction:"ltr",textAlign:"right"}}/>
                 </div>
               </div>
               <button onClick={addCoord} disabled={coordLoading}
-                style={{...btn("#0d9488","#065f46"),display:"flex",alignItems:"center",gap:8,opacity:coordLoading?.6:1}}>
-                <SvgIcon d={P.plus} size={16} color="#fff"/>
+                style={{...btnGold(),display:"flex",alignItems:"center",gap:8,opacity:coordLoading?.6:1}}>
+                <SvgIcon d={P.plus} size={16} color={T.bg0} sw={2.4}/>
                 {coordLoading?"جاري الإضافة...":"إضافة المنسق"}
               </button>
             </div>
@@ -1383,53 +1399,54 @@ function AdminPage() {
           {/* Coordinators Table */}
           <div style={card}>
             <div style={{display:"flex",justifyContent:"space-between",alignItems:"center",marginBottom:14,flexWrap:"wrap",gap:10}}>
-              <SectionHeader icon={P.coord} title={"قائمة المنسقين ("+coords.length+")"} color="#0d9488"/>
+              <SectionHeader icon={P.coord} title={"قائمة المنسقين ("+coords.length+")"} color={T.cyan}/>
               <div style={{display:"flex",gap:8}}>
                 <select value={coordSearchProv} onChange={function(e){setCSP(e.target.value);}}
                   style={{...inp(false),marginBottom:0,width:"auto",minWidth:140,cursor:"pointer"}}>
                   <option value="">كل المحافظات</option>
                   {PROVINCES.map(function(p){return <option key={p} value={p}>{p}</option>;})}
                 </select>
-                <button onClick={loadCoords} style={btn("#6366f1","#4f46e5")}>تحديث</button>
+                <button onClick={loadCoords} style={btn()}>تحديث</button>
               </div>
             </div>
             {coordLoading ? (
-              <div style={{textAlign:"center",padding:36,color:"#94a3b8"}}>جاري التحميل...</div>
+              <div style={{textAlign:"center",padding:36,color:T.text3}}>جاري التحميل...</div>
             ) : (
               <div style={{overflowX:"auto"}}>
                 <table style={{width:"100%",borderCollapse:"collapse",fontSize:13}}>
                   <thead>
-                    <tr style={{background:"#f0fdfa"}}>
+                    <tr style={{background:T.bg1}}>
                       {["#","المحافظة","القضاء / المدينة","اسم المنسق","رقم الهاتف","تاريخ الإضافة",...(!isReadonly?["حذف"]:[])].map(function(h){
-                        return <th key={h} style={{padding:"10px",textAlign:"right",borderBottom:"2px solid #99f6e4",fontWeight:700,color:"#0f766e",whiteSpace:"nowrap"}}>{h}</th>;
+                        return <th key={h} style={{padding:"10px",textAlign:"right",borderBottom:"2px solid "+T.border2,fontWeight:700,color:T.text,whiteSpace:"nowrap"}}>{h}</th>;
                       })}
                     </tr>
                   </thead>
                   <tbody>
                     {(coordSearchProv ? coords.filter(function(c){return c.province===coordSearchProv;}) : coords)
                       .map(function(c,i){
+                        var pc = PROVINCE_COLORS[c.province]||T.cyan;
                         return (
-                          <tr key={c.id} style={{borderBottom:"1px solid #f0fdfa",background:i%2?"#f0fdfa22":"#fff"}}>
-                            <td style={{padding:"8px 10px",color:"#94a3b8"}}>{i+1}</td>
+                          <tr key={c.id} style={{borderBottom:"1px solid "+T.border,background:i%2?T.bg1:T.bg2,color:T.text2}}>
+                            <td style={{padding:"8px 10px",color:T.text4,fontFamily:T.fontMono}}>{i+1}</td>
                             <td style={{padding:"8px 10px"}}>
-                              <span style={{background:(PROVINCE_COLORS[c.province]||"#0d9488")+"22",color:PROVINCE_COLORS[c.province]||"#0d9488",padding:"2px 8px",borderRadius:20,fontSize:12,fontWeight:600}}>{c.province}</span>
+                              <span style={{background:pc+"22",color:pc,padding:"2px 8px",borderRadius:20,fontSize:12,fontWeight:600,border:"1px solid "+pc+"40"}}>{c.province}</span>
                             </td>
-                            <td style={{padding:"8px 10px",fontWeight:600}}>{c.district}</td>
+                            <td style={{padding:"8px 10px",fontWeight:600,color:T.text}}>{c.district}</td>
                             <td style={{padding:"8px 10px"}}>{c.name}</td>
-                            <td style={{padding:"8px 10px",direction:"ltr",fontFamily:"monospace",color:"#0369a1"}}>{c.phone}</td>
-                            <td style={{padding:"8px 10px",color:"#94a3b8",fontSize:11}}>{new Date(c.created_at).toLocaleDateString("en-GB")}</td>
+                            <td style={{padding:"8px 10px",direction:"ltr",fontFamily:T.fontMono,color:T.cyan}}>{c.phone}</td>
+                            <td style={{padding:"8px 10px",color:T.text4,fontSize:11,fontFamily:T.fontMono}}>{new Date(c.created_at).toLocaleDateString("en-GB")}</td>
                             {!isReadonly && (
                               <td style={{padding:"8px 10px"}}>
                                 <button onClick={function(){deleteCoord(c.id,c.name);}}
-                                  style={{background:"#fef2f2",border:"1px solid #fecaca",color:"#dc2626",borderRadius:7,padding:"5px 10px",cursor:"pointer",fontSize:11,fontWeight:600,display:"flex",alignItems:"center",gap:5}}>
-                                  <SvgIcon d={P.trash} size={12} color="#dc2626"/> حذف
+                                  style={{background:"rgba(248,113,113,.10)",border:"1px solid rgba(248,113,113,.40)",color:T.danger,borderRadius:7,padding:"5px 10px",cursor:"pointer",fontSize:11,fontWeight:600,display:"flex",alignItems:"center",gap:5}}>
+                                  <SvgIcon d={P.trash} size={12} color={T.danger}/> حذف
                                 </button>
                               </td>
                             )}
                           </tr>
                         );
                       })}
-                    {coords.length===0 && <tr><td colSpan={7} style={{padding:36,textAlign:"center",color:"#94a3b8"}}>لا توجد منسقون مسجلون</td></tr>}
+                    {coords.length===0 && <tr><td colSpan={7} style={{padding:36,textAlign:"center",color:T.text3}}>لا توجد منسقون مسجلون</td></tr>}
                   </tbody>
                 </table>
               </div>
@@ -1442,32 +1459,32 @@ function AdminPage() {
       {tab==="ticker" && (
         <div>
           <div style={card}>
-            <SectionHeader icon={P.plus} title="إضافة إشعار جديد" color="#1d4ed8"/>
+            <SectionHeader icon={P.plus} title="إضافة إشعار جديد" color={T.info}/>
             <div style={{display:"flex",gap:10}}>
               <input value={newMsg} onChange={e=>setNewMsg(e.target.value)}
                 onKeyDown={e=>e.key==="Enter"&&addTickerMsg()}
                 placeholder="اكتب نص الإشعار أو الخبر هنا..."
                 style={{...inp(false),flex:1,marginBottom:0}}/>
-              <button onClick={addTickerMsg} disabled={tickerLoading||!newMsg.trim()} style={{...btn(),padding:"11px 20px",whiteSpace:"nowrap",display:"flex",alignItems:"center",gap:8,opacity:!newMsg.trim()?0.5:1}}>
-                <SvgIcon d={P.plus} size={16} color="#fff"/> إضافة
+              <button onClick={addTickerMsg} disabled={tickerLoading||!newMsg.trim()} style={{...btnGold(),padding:"11px 20px",whiteSpace:"nowrap",display:"flex",alignItems:"center",gap:8,opacity:!newMsg.trim()?0.5:1}}>
+                <SvgIcon d={P.plus} size={16} color={T.bg0} sw={2.4}/> إضافة
               </button>
             </div>
-            <p style={{color:"#94a3b8",fontSize:12,marginTop:8}}>سيظهر الإشعار على الفور في شريط الأخبار في أعلى الصفحة عند زيارة الموقع</p>
+            <p style={{color:T.text3,fontSize:12,marginTop:8}}>سيظهر الإشعار على الفور في شريط الأخبار في أعلى الصفحة عند زيارة الموقع</p>
           </div>
 
           <div style={card}>
-            <SectionHeader icon={P.news} title="الإشعارات الحالية" color="#0d9488"/>
+            <SectionHeader icon={P.news} title="الإشعارات الحالية" color={T.cyan}/>
             {tickerLoading ? (
-              <div style={{textAlign:"center",padding:30,color:"#94a3b8"}}>جاري التحميل...</div>
+              <div style={{textAlign:"center",padding:30,color:T.text3}}>جاري التحميل...</div>
             ) : tickerMsgs.length===0 ? (
-              <div style={{textAlign:"center",padding:30,color:"#94a3b8"}}>لا توجد إشعارات حالياً</div>
+              <div style={{textAlign:"center",padding:30,color:T.text3}}>لا توجد إشعارات حالياً</div>
             ) : (
               <div>
                 {tickerMsgs.map(function(m){return(
-                  <div key={m.id} style={{display:"flex",alignItems:"flex-start",gap:12,padding:"14px 0",borderBottom:"1px solid #f1f5f9"}}>
-                    <div style={{flex:1,color:"#374151",fontSize:14,lineHeight:1.6}}>{m.message}</div>
-                    <button onClick={()=>deleteTickerMsg(m.id)} style={{background:"#fef2f2",border:"1px solid #fecaca",color:"#dc2626",borderRadius:8,padding:"6px 12px",cursor:"pointer",fontSize:12,fontWeight:600,whiteSpace:"nowrap",display:"flex",alignItems:"center",gap:6,flexShrink:0}}>
-                      <SvgIcon d={P.trash} size={14} color="#dc2626"/> حذف
+                  <div key={m.id} style={{display:"flex",alignItems:"flex-start",gap:12,padding:"14px 0",borderBottom:"1px solid "+T.border}}>
+                    <div style={{flex:1,color:T.text2,fontSize:14,lineHeight:1.6}}>{m.message}</div>
+                    <button onClick={()=>deleteTickerMsg(m.id)} style={{background:"rgba(248,113,113,.10)",border:"1px solid rgba(248,113,113,.40)",color:T.danger,borderRadius:8,padding:"6px 12px",cursor:"pointer",fontSize:12,fontWeight:600,whiteSpace:"nowrap",display:"flex",alignItems:"center",gap:6,flexShrink:0}}>
+                      <SvgIcon d={P.trash} size={14} color={T.danger}/> حذف
                     </button>
                   </div>
                 );})}
@@ -1487,31 +1504,31 @@ function AboutPage() {
       {/* Hero */}
       <div style={{
         ...card,
-        background:"linear-gradient(135deg,"+T.ink+","+T.ink2+" 60%,"+T.ink3+")",
-        color:"#fff",marginBottom:24,position:"relative",overflow:"hidden",
-        padding:"40px 32px",borderRight:"4px solid "+T.gold
+        background:"linear-gradient(135deg,"+T.bg1+","+T.bg2+" 60%,"+T.bg3+")",
+        color:T.text,marginBottom:24,position:"relative",overflow:"hidden",
+        padding:"40px 32px",borderRight:"4px solid "+T.cyan
       }}>
         <div style={{
-          position:"absolute",inset:0,backgroundImage:BLUEPRINT_BG,backgroundSize:BLUEPRINT_SIZE,opacity:.4,pointerEvents:"none"
+          position:"absolute",inset:0,backgroundImage:BLUEPRINT_BG,backgroundSize:BLUEPRINT_SIZE,opacity:.5,pointerEvents:"none"
         }}/>
         <div style={{position:"relative",textAlign:"center"}}>
           <div style={{
             width:78,height:78,borderRadius:18,
-            background:"rgba(201,161,74,.18)",border:"1px solid rgba(201,161,74,.4)",
+            background:"rgba(62,193,211,.18)",border:"1px solid rgba(62,193,211,.45)",
             margin:"0 auto 18px",display:"flex",alignItems:"center",justifyContent:"center",
-            boxShadow:"0 8px 28px rgba(0,0,0,.3)"
+            boxShadow:"0 8px 28px rgba(0,0,0,.4),0 0 36px rgba(62,193,211,.22)"
           }}>
-            <SvgIcon d={P.compass} size={38} color="#fbbf24" sw={1.7}/>
+            <SvgIcon d={P.compass} size={38} color={T.cyan} sw={1.7}/>
           </div>
-          <div style={{fontSize:11,color:"#fde68a",fontWeight:700,letterSpacing:"2px",marginBottom:8,textTransform:"uppercase"}}>
+          <div style={{fontSize:11,color:T.cyan,fontWeight:700,letterSpacing:"2px",marginBottom:8,textTransform:"uppercase",fontFamily:T.fontMono}}>
             عن المنصة
           </div>
-          <h1 style={{fontSize:"clamp(22px,3.5vw,30px)",marginBottom:16,fontWeight:900,letterSpacing:"-.3px",lineHeight:1.3}}>
+          <h1 style={{fontSize:"clamp(22px,3.5vw,32px)",marginBottom:16,fontWeight:900,letterSpacing:"-.3px",lineHeight:1.3,color:T.text}}>
             المنصة الوطنية لمهندسي العراق<br/>
-            <span style={{color:"#fbbf24"}}>غير المعينين</span>
+            <span style={{color:T.cyan}}>غير المعينين</span>
           </h1>
-          <div style={{width:60,height:2,background:"#c9a14a",margin:"0 auto 18px"}}/>
-          <p style={{fontSize:15,opacity:.9,maxWidth:680,margin:"0 auto",lineHeight:2}}>
+          <div style={{width:60,height:2,background:T.cyan,margin:"0 auto 18px",boxShadow:"0 0 12px "+T.cyan}}/>
+          <p style={{fontSize:15,color:T.text2,maxWidth:680,margin:"0 auto",lineHeight:2}}>
             منصة إلكترونية مستقلة تجمع خريجي كليات الهندسة العراقية من الباحثين عن فرص التعيين والعمل،
             وتعمل صوتاً موحّداً يعكس حجم الطاقات الهندسية الشابة غير المستغلة في العراق.
           </p>
@@ -1522,19 +1539,19 @@ function AboutPage() {
       <div style={{...card,padding:"32px 28px",marginBottom:20}}>
         <div style={{display:"flex",alignItems:"flex-start",gap:14,marginBottom:14}}>
           <div style={{
-            width:44,height:44,borderRadius:10,background:T.gold+"18",
-            border:"1px solid "+T.gold+"40",
+            width:44,height:44,borderRadius:10,background:T.cyan+"18",
+            border:"1px solid "+T.cyan+"45",
             display:"flex",alignItems:"center",justifyContent:"center",flexShrink:0
           }}>
-            <SvgIcon d={P.voice} size={22} color={T.gold}/>
+            <SvgIcon d={P.voice} size={22} color={T.cyan}/>
           </div>
           <div>
-            <div style={{fontSize:11,color:T.gold,fontWeight:700,letterSpacing:"1.5px",marginBottom:4,textTransform:"uppercase"}}>القصة</div>
-            <h2 style={{fontSize:20,fontWeight:800,color:T.ink,margin:0,letterSpacing:"-.2px"}}>لماذا أُسّست المنصة؟</h2>
+            <div style={{fontSize:11,color:T.cyan,fontWeight:700,letterSpacing:"1.5px",marginBottom:4,textTransform:"uppercase",fontFamily:T.fontMono}}>القصة</div>
+            <h2 style={{fontSize:20,fontWeight:800,color:T.text,margin:0,letterSpacing:"-.2px"}}>لماذا أُسّست المنصة؟</h2>
           </div>
         </div>
         <p style={{color:T.text2,fontSize:15,lineHeight:2.1,margin:0}}>
-          تأسّست المنصة لتكون <strong style={{color:T.ink}}>صوتاً موحّداً</strong> يعكس حجم الطاقات الهندسية الشابة غير المستغلة في العراق،
+          تأسّست المنصة لتكون <strong style={{color:T.cyan}}>صوتاً موحّداً</strong> يعكس حجم الطاقات الهندسية الشابة غير المستغلة في العراق،
           وتعمل كحلقة وصل مباشرة بين المهندس الخريج وصنّاع القرار. آلاف الكفاءات الهندسية تنتظر فرصة التعيين والمشاركة في مشاريع البناء الوطني،
           ودون أرشفة دقيقة وإحصاء رسمي يبقى صوتهم مشتّتاً وحقوقهم منسيّة.
         </p>
@@ -1543,21 +1560,22 @@ function AboutPage() {
       {/* Mission + Vision + Goal Grid */}
       <div style={{display:"grid",gridTemplateColumns:"repeat(auto-fit,minmax(280px,1fr))",gap:18,marginBottom:20}}>
         {[
-          {icon:P.target,      title:"رسالتنا",  color:T.blue,  text:"بناء قاعدة بيانات وطنية رسمية للمهندسين العراقيين الباحثين عن فرص التعيين، تكون مرجعاً موثوقاً للجهات الحكومية والمؤسسات التنموية."},
-          {icon:P.voice,       title:"رؤيتنا",   color:T.gold,  text:"أن نكون الصوت الجماعي للمهندسين العراقيين، ومنصّتهم الموحّدة في المطالبة بحقوقهم المهنية على المستوى الوطني."},
-          {icon:P.spark,       title:"أهدافنا",  color:T.teal,  text:"أرشفة الكفاءات الهندسية رسمياً، رصد نسب البطالة بين المهندسين، وتقديم تقارير موثوقة للجهات المعنية وصنّاع القرار."},
-          {icon:P.shieldCheck, title:"الخصوصية", color:T.green, text:"نلتزم بحماية بيانات المهندسين وسريّتها التامة. لا تُشارك أي بيانات شخصية مع جهات خارجية دون موافقة صريحة."},
+          {icon:P.target,      title:"رسالتنا",  color:T.info,    text:"بناء قاعدة بيانات وطنية رسمية للمهندسين العراقيين الباحثين عن فرص التعيين، تكون مرجعاً موثوقاً للجهات الحكومية والمؤسسات التنموية."},
+          {icon:P.voice,       title:"رؤيتنا",   color:T.cyan,    text:"أن نكون الصوت الجماعي للمهندسين العراقيين، ومنصّتهم الموحّدة في المطالبة بحقوقهم المهنية على المستوى الوطني."},
+          {icon:P.spark,       title:"أهدافنا",  color:T.warning, text:"أرشفة الكفاءات الهندسية رسمياً، رصد نسب البطالة بين المهندسين، وتقديم تقارير موثوقة للجهات المعنية وصنّاع القرار."},
+          {icon:P.shieldCheck, title:"الخصوصية", color:T.success, text:"نلتزم بحماية بيانات المهندسين وسريّتها التامة. لا تُشارك أي بيانات شخصية مع جهات خارجية دون موافقة صريحة."},
         ].map(function({icon,title,text,color}){return(
           <div key={title} style={{
             ...card,marginBottom:0,borderTop:"3px solid "+color,padding:"24px 22px"
           }}>
             <div style={{
-              width:48,height:48,borderRadius:12,background:color+"15",
+              width:48,height:48,borderRadius:12,background:color+"18",
+              border:"1px solid "+color+"40",
               display:"flex",alignItems:"center",justifyContent:"center",marginBottom:16
             }}>
               <SvgIcon d={icon} size={24} color={color}/>
             </div>
-            <h3 style={{marginBottom:10,color:T.ink,fontSize:16,fontWeight:800}}>{title}</h3>
+            <h3 style={{marginBottom:10,color:T.text,fontSize:16,fontWeight:800}}>{title}</h3>
             <p style={{color:T.text2,lineHeight:2,fontSize:13.5,margin:0}}>{text}</p>
           </div>
         );})}
@@ -1565,21 +1583,22 @@ function AboutPage() {
 
       {/* Goal Banner */}
       <div style={{
-        background:"linear-gradient(135deg,"+T.ink+","+T.ink2+")",
+        background:"linear-gradient(135deg,"+T.bg1+","+T.bg2+")",
+        border:"1px solid "+T.border2,
         borderRadius:T.radiusLg,padding:"32px 28px",
         position:"relative",overflow:"hidden",
-        borderRight:"4px solid "+T.gold,marginBottom:20
+        borderRight:"4px solid "+T.cyan,marginBottom:20
       }}>
         <div style={{
-          position:"absolute",top:-40,left:-40,width:200,height:200,borderRadius:"50%",
-          background:"radial-gradient(circle,rgba(201,161,74,.18),transparent 70%)",pointerEvents:"none"
+          position:"absolute",top:-40,left:-40,width:240,height:240,borderRadius:"50%",
+          background:"radial-gradient(circle,rgba(62,193,211,.18),transparent 70%)",pointerEvents:"none"
         }}/>
         <div style={{position:"relative"}}>
-          <div style={{fontSize:11,color:"#fde68a",fontWeight:700,letterSpacing:"2px",marginBottom:8,textTransform:"uppercase"}}>الهدف الأساسي</div>
-          <h3 style={{color:"#fff",fontSize:20,fontWeight:800,marginBottom:14,lineHeight:1.5}}>
+          <div style={{fontSize:11,color:T.cyan,fontWeight:700,letterSpacing:"2px",marginBottom:8,textTransform:"uppercase",fontFamily:T.fontMono}}>الهدف الأساسي</div>
+          <h3 style={{color:T.text,fontSize:20,fontWeight:800,marginBottom:14,lineHeight:1.5}}>
             أرشفة وإحصاء كفاءات الهندسة العراقية رسمياً
           </h3>
-          <p style={{color:"#cbd5e1",fontSize:14,lineHeight:2,margin:0}}>
+          <p style={{color:T.text2,fontSize:14,lineHeight:2,margin:0}}>
             لتسهيل المطالبة بحقوق المهندسين في التعيينات المركزية والمشاريع التنموية،
             وضمان عدم تجاهل أي طاقة هندسية شابة في خطط الدولة الاقتصادية والتنموية.
           </p>
@@ -1588,16 +1607,16 @@ function AboutPage() {
 
       {/* Contact */}
       <div style={{...card,textAlign:"center",padding:"30px 24px"}}>
-        <div style={{fontSize:11,color:T.gold,fontWeight:700,letterSpacing:"2px",marginBottom:6,textTransform:"uppercase"}}>تواصل</div>
-        <h3 style={{marginBottom:12,color:T.ink,fontSize:18,fontWeight:800}}>للاستفسار والتواصل</h3>
+        <div style={{fontSize:11,color:T.cyan,fontWeight:700,letterSpacing:"2px",marginBottom:6,textTransform:"uppercase",fontFamily:T.fontMono}}>تواصل</div>
+        <h3 style={{marginBottom:12,color:T.text,fontSize:18,fontWeight:800}}>للاستفسار والتواصل</h3>
         <p style={{color:T.text3,marginBottom:18,fontSize:14,maxWidth:480,margin:"0 auto 18px",lineHeight:1.9}}>
           لأي استفسار حول التسجيل أو خدمات المنصة، تواصل عبر منسق محافظتك أو زر الموقع الرسمي:
         </p>
         <div style={{display:"flex",justifyContent:"center",gap:12,flexWrap:"wrap"}}>
           <span style={{
-            background:T.ink+"08",color:T.ink,padding:"10px 22px",
+            background:T.cyan+"14",color:T.cyan,padding:"10px 22px",
             borderRadius:30,fontSize:13,fontWeight:700,
-            border:"1px solid "+T.border2,fontFamily:T.fontMono,letterSpacing:".3px"
+            border:"1px solid "+T.cyan+"40",fontFamily:T.fontMono,letterSpacing:".3px"
           }}>iraq-graduates.vercel.app</span>
         </div>
       </div>
@@ -1619,31 +1638,32 @@ function PrivacyPage() {
     <div style={pageWrap}>
       <div style={{
         ...card,
-        background:"linear-gradient(135deg,"+T.ink+","+T.ink2+")",
-        color:"#fff",textAlign:"center",marginBottom:20,position:"relative",overflow:"hidden",
-        padding:"36px 28px",borderRight:"4px solid "+T.gold
+        background:"linear-gradient(135deg,"+T.bg1+","+T.bg2+")",
+        color:T.text,textAlign:"center",marginBottom:20,position:"relative",overflow:"hidden",
+        padding:"36px 28px",borderRight:"4px solid "+T.cyan
       }}>
-        <div style={{position:"absolute",inset:0,backgroundImage:BLUEPRINT_BG,backgroundSize:BLUEPRINT_SIZE,opacity:.35,pointerEvents:"none"}}/>
+        <div style={{position:"absolute",inset:0,backgroundImage:BLUEPRINT_BG,backgroundSize:BLUEPRINT_SIZE,opacity:.5,pointerEvents:"none"}}/>
         <div style={{position:"relative"}}>
           <div style={{
             width:64,height:64,borderRadius:16,
-            background:"rgba(201,161,74,.18)",border:"1px solid rgba(201,161,74,.4)",
-            margin:"0 auto 14px",display:"flex",alignItems:"center",justifyContent:"center"
+            background:"rgba(62,193,211,.18)",border:"1px solid rgba(62,193,211,.45)",
+            margin:"0 auto 14px",display:"flex",alignItems:"center",justifyContent:"center",
+            boxShadow:"0 0 28px rgba(62,193,211,.22)"
           }}>
-            <SvgIcon d={P.shieldCheck} size={30} color="#fbbf24"/>
+            <SvgIcon d={P.shieldCheck} size={30} color={T.cyan}/>
           </div>
-          <div style={{fontSize:11,color:"#fde68a",fontWeight:700,letterSpacing:"2px",marginBottom:6,textTransform:"uppercase"}}>الخصوصية</div>
-          <h1 style={{fontSize:24,marginBottom:8,fontWeight:900,letterSpacing:"-.2px"}}>سياسة خصوصية المهندسين</h1>
-          <p style={{opacity:.7,fontSize:12,fontFamily:T.fontMono}}>آخر تحديث: {new Date().toLocaleDateString("en-GB")}</p>
+          <div style={{fontSize:11,color:T.cyan,fontWeight:700,letterSpacing:"2px",marginBottom:6,textTransform:"uppercase",fontFamily:T.fontMono}}>الخصوصية</div>
+          <h1 style={{fontSize:24,marginBottom:8,fontWeight:900,letterSpacing:"-.2px",color:T.text}}>سياسة خصوصية المهندسين</h1>
+          <p style={{color:T.text3,fontSize:12,fontFamily:T.fontMono}}>آخر تحديث: {new Date().toLocaleDateString("en-GB")}</p>
         </div>
       </div>
       <div style={card}>
         <p style={{color:T.text2,lineHeight:2.1,marginBottom:24,fontSize:14.5,borderBottom:"1px solid "+T.border,paddingBottom:22}}>
-          تصف هذه السياسة كيف تجمع <strong style={{color:T.ink}}>المنصة الوطنية لمهندسي العراق غير المعينين</strong> بياناتكم وتستخدمها وتحميها. باستخدام هذا الموقع، فإنكم توافقون على الشروط المذكورة أدناه.
+          تصف هذه السياسة كيف تجمع <strong style={{color:T.cyan}}>المنصة الوطنية لمهندسي العراق غير المعينين</strong> بياناتكم وتستخدمها وتحميها. باستخدام هذا الموقع، فإنكم توافقون على الشروط المذكورة أدناه.
         </p>
         {sections.map(function({title,text},i){return(
           <div key={title} style={{marginBottom:20,paddingBottom:20,borderBottom:i<sections.length-1?"1px solid "+T.border:"none"}}>
-            <h3 style={{color:T.ink,marginBottom:10,fontSize:15.5,fontWeight:800}}>{title}</h3>
+            <h3 style={{color:T.text,marginBottom:10,fontSize:15.5,fontWeight:800}}>{title}</h3>
             <p style={{color:T.text2,lineHeight:2.1,margin:0,fontSize:14}}>{text}</p>
           </div>
         );})}
@@ -1707,12 +1727,12 @@ function CoordinatorsPage() {
     });
   }, [list, search]);
 
-  var col     = PROVINCE_COLORS[selProv] || "#1d4ed8";
+  var col     = PROVINCE_COLORS[selProv] || T.cyan;
   var isEmpty = !loadingDB && list.length === 0;
 
   if(loadingDB) return (
-    <div style={{textAlign:"center",padding:"80px 20px",color:"#94a3b8"}}>
-      <div style={{fontSize:15}}>جاري تحميل بيانات المنسقين...</div>
+    <div style={{textAlign:"center",padding:"80px 20px",color:T.text3}}>
+      <div style={{fontSize:15,color:T.text2}}>جاري تحميل بيانات المنسقين...</div>
     </div>
   );
 
@@ -1721,36 +1741,36 @@ function CoordinatorsPage() {
       {/* Header */}
       <div style={{
         ...card,
-        background:"linear-gradient(135deg,"+T.ink+","+T.ink2+" 60%,"+T.ink3+")",
-        color:"#fff",textAlign:"center",marginBottom:20,position:"relative",overflow:"hidden",
-        padding:"38px 28px",borderRight:"4px solid "+T.gold
+        background:"linear-gradient(135deg,"+T.bg1+","+T.bg2+" 60%,"+T.bg3+")",
+        color:T.text,textAlign:"center",marginBottom:20,position:"relative",overflow:"hidden",
+        padding:"38px 28px",borderRight:"4px solid "+T.cyan
       }}>
-        <div style={{position:"absolute",inset:0,backgroundImage:BLUEPRINT_BG,backgroundSize:BLUEPRINT_SIZE,opacity:.35,pointerEvents:"none"}}/>
+        <div style={{position:"absolute",inset:0,backgroundImage:BLUEPRINT_BG,backgroundSize:BLUEPRINT_SIZE,opacity:.5,pointerEvents:"none"}}/>
         <div style={{position:"relative"}}>
           <div style={{
             width:72,height:72,borderRadius:18,
-            background:"rgba(201,161,74,.18)",border:"1px solid rgba(201,161,74,.4)",
+            background:"rgba(62,193,211,.18)",border:"1px solid rgba(62,193,211,.45)",
             margin:"0 auto 16px",display:"flex",alignItems:"center",justifyContent:"center",
-            boxShadow:"0 8px 24px rgba(0,0,0,.3)"
+            boxShadow:"0 8px 24px rgba(0,0,0,.4),0 0 32px rgba(62,193,211,.20)"
           }}>
-            <SvgIcon d={P.coord} size={34} color="#fbbf24"/>
+            <SvgIcon d={P.coord} size={34} color={T.cyan}/>
           </div>
-          <div style={{fontSize:11,color:"#fde68a",fontWeight:700,letterSpacing:"2px",marginBottom:8,textTransform:"uppercase"}}>الشبكة الميدانية</div>
-          <h1 style={{fontSize:24,marginBottom:10,fontWeight:900,letterSpacing:"-.2px"}}>منسقو المهندسين في المحافظات</h1>
-          <p style={{opacity:.85,fontSize:14,maxWidth:600,margin:"0 auto 18px",lineHeight:1.9}}>
+          <div style={{fontSize:11,color:T.cyan,fontWeight:700,letterSpacing:"2px",marginBottom:8,textTransform:"uppercase",fontFamily:T.fontMono}}>الشبكة الميدانية</div>
+          <h1 style={{fontSize:24,marginBottom:10,fontWeight:900,letterSpacing:"-.2px",color:T.text}}>منسقو المهندسين في المحافظات</h1>
+          <p style={{color:T.text2,fontSize:14,maxWidth:600,margin:"0 auto 18px",lineHeight:1.9}}>
             اختر محافظتك للتواصل المباشر مع المنسق المسؤول عن قضائك والانضمام إلى شبكة مهندسي منطقتك.
           </p>
           <div style={{display:"flex",gap:10,justifyContent:"center",flexWrap:"wrap"}}>
             <span style={{
-              background:"rgba(201,161,74,.18)",border:"1px solid rgba(201,161,74,.35)",
-              color:"#fde68a",borderRadius:20,padding:"5px 16px",fontSize:12.5,fontWeight:700,
+              background:"rgba(62,193,211,.18)",border:"1px solid rgba(62,193,211,.40)",
+              color:T.cyan,borderRadius:20,padding:"5px 16px",fontSize:12.5,fontWeight:700,
               fontFamily:T.fontMono,letterSpacing:".3px"
             }}>
               {allCoords.length} منسق مسجّل
             </span>
             <span style={{
-              background:"rgba(255,255,255,.08)",border:"1px solid rgba(255,255,255,.15)",
-              color:"#cbd5e1",borderRadius:20,padding:"5px 16px",fontSize:12.5,fontWeight:700,
+              background:"rgba(255,255,255,.06)",border:"1px solid "+T.border2,
+              color:T.text2,borderRadius:20,padding:"5px 16px",fontSize:12.5,fontWeight:700,
               fontFamily:T.fontMono,letterSpacing:".3px"
             }}>
               {activeProvinces.length} / {PROVINCES.length} محافظة مفعّلة
@@ -1763,10 +1783,10 @@ function CoordinatorsPage() {
       <div style={{...card,padding:"18px 20px",marginBottom:16}}>
         <div style={{display:"flex",gap:12,flexWrap:"wrap",alignItems:"center"}}>
           <div style={{flex:"1 1 220px"}}>
-            <label style={{display:"block",fontSize:12,fontWeight:600,color:"#64748b",marginBottom:6}}>اختر المحافظة</label>
+            <label style={{display:"block",fontSize:12,fontWeight:600,color:T.text2,marginBottom:6}}>اختر المحافظة</label>
             <div style={{position:"relative"}}>
               <select value={selProv} onChange={function(e){setSelProv(e.target.value);setSearch("");}}
-                style={{...inp(false),marginBottom:0,paddingRight:36,cursor:"pointer",borderColor:col,fontWeight:700,color:"#0f172a"}}>
+                style={{...inp(false),marginBottom:0,paddingRight:36,cursor:"pointer",borderColor:col,fontWeight:700,color:T.text}}>
                 {PROVINCES.map(function(p){
                   var cnt = allCoords.filter(function(c){return c.province===p;}).length;
                   return (
@@ -1778,20 +1798,20 @@ function CoordinatorsPage() {
               </select>
               <div style={{position:"absolute",right:10,top:"50%",transform:"translateY(-50%)",pointerEvents:"none"}}>
                 <div style={{width:22,height:22,borderRadius:"50%",background:col,display:"flex",alignItems:"center",justifyContent:"center"}}>
-                  <SvgIcon d={P.map} size={12} color="#fff"/>
+                  <SvgIcon d={P.map} size={12} color={T.bg0}/>
                 </div>
               </div>
             </div>
           </div>
           {!isEmpty && (
             <div style={{flex:"1 1 220px"}}>
-              <label style={{display:"block",fontSize:12,fontWeight:600,color:"#64748b",marginBottom:6}}>بحث في المنسقين</label>
-              <div style={{display:"flex",alignItems:"center",gap:8,background:"#f8fafc",border:"1.5px solid #e2e8f0",borderRadius:10,padding:"0 12px"}}>
-                <SvgIcon d={P.search} size={15} color="#94a3b8"/>
+              <label style={{display:"block",fontSize:12,fontWeight:600,color:T.text2,marginBottom:6}}>بحث في المنسقين</label>
+              <div style={{display:"flex",alignItems:"center",gap:8,background:T.bg1,border:"1.5px solid "+T.border2,borderRadius:10,padding:"0 12px"}}>
+                <SvgIcon d={P.search} size={15} color={T.text3}/>
                 <input value={search} onChange={function(e){setSearch(e.target.value);}}
                   placeholder="اسم أو قضاء أو هاتف..."
-                  style={{border:"none",outline:"none",background:"transparent",flex:1,padding:"11px 0",fontSize:14}}/>
-                {search && <button onClick={function(){setSearch("");}} style={{background:"none",border:"none",cursor:"pointer",color:"#94a3b8",padding:"4px",fontSize:16,lineHeight:1}}>×</button>}
+                  style={{border:"none",outline:"none",background:"transparent",flex:1,padding:"11px 0",fontSize:14,color:T.text,fontFamily:T.font}}/>
+                {search && <button onClick={function(){setSearch("");}} style={{background:"none",border:"none",cursor:"pointer",color:T.text3,padding:"4px",fontSize:16,lineHeight:1}}>×</button>}
               </div>
             </div>
           )}
@@ -1800,14 +1820,14 @@ function CoordinatorsPage() {
         {activeProvinces.length>0 && (
           <div style={{marginTop:14,display:"flex",gap:6,flexWrap:"wrap"}}>
             {activeProvinces.map(function(p){
-              var c=PROVINCE_COLORS[p]||"#1d4ed8";
+              var c=PROVINCE_COLORS[p]||T.cyan;
               var cnt=allCoords.filter(function(x){return x.province===p;}).length;
               var active=selProv===p;
               return (
                 <button key={p} onClick={function(){setSelProv(p);setSearch("");}}
-                  style={{padding:"5px 14px",borderRadius:20,border:"1.5px solid "+(active?c:"#e2e8f0"),
-                    background:active?c+"22":"#fff",color:active?c:"#64748b",
-                    fontWeight:active?700:500,fontSize:12,cursor:"pointer"}}>
+                  style={{padding:"5px 14px",borderRadius:20,border:"1.5px solid "+(active?c:T.border2),
+                    background:active?c+"22":T.bg2,color:active?c:T.text3,
+                    fontWeight:active?700:500,fontSize:12,cursor:"pointer",fontFamily:T.font,transition:"all .15s"}}>
                   {p} <span style={{opacity:.7}}>({cnt})</span>
                 </button>
               );
@@ -1818,10 +1838,10 @@ function CoordinatorsPage() {
 
       {/* Province Label */}
       <div style={{display:"flex",alignItems:"center",gap:10,marginBottom:16}}>
-        <div style={{width:4,height:28,borderRadius:2,background:col}}/>
-        <h2 style={{fontSize:17,fontWeight:700,color:"#0f172a",margin:0}}>محافظة {selProv}</h2>
+        <div style={{width:4,height:28,borderRadius:2,background:col,boxShadow:"0 0 12px "+col}}/>
+        <h2 style={{fontSize:17,fontWeight:700,color:T.text,margin:0}}>محافظة {selProv}</h2>
         {!isEmpty && (
-          <span style={{background:col+"22",color:col,borderRadius:20,padding:"3px 12px",fontSize:12,fontWeight:700}}>
+          <span style={{background:col+"22",color:col,borderRadius:20,padding:"3px 12px",fontSize:12,fontWeight:700,border:"1px solid "+col+"40"}}>
             {filtered.length} منسق
           </span>
         )}
@@ -1829,46 +1849,53 @@ function CoordinatorsPage() {
 
       {isEmpty ? (
         <div style={{...card,textAlign:"center",padding:"56px 24px"}}>
-          <div style={{width:64,height:64,borderRadius:"50%",background:"#f1f5f9",margin:"0 auto 16px",display:"flex",alignItems:"center",justifyContent:"center"}}>
-            <SvgIcon d={P.coord} size={30} color="#94a3b8"/>
+          <div style={{width:64,height:64,borderRadius:"50%",background:T.bg3,margin:"0 auto 16px",display:"flex",alignItems:"center",justifyContent:"center"}}>
+            <SvgIcon d={P.coord} size={30} color={T.text3}/>
           </div>
-          <h3 style={{color:"#64748b",marginBottom:8,fontSize:17}}>لم يُضف منسقو محافظة {selProv} بعد</h3>
-          <p style={{color:"#94a3b8",fontSize:13,margin:0}}>سيتم إضافة المنسقين قريباً — تابع الموقع للتحديثات</p>
+          <h3 style={{color:T.text2,marginBottom:8,fontSize:17,fontWeight:700}}>لم يُضف منسقو محافظة {selProv} بعد</h3>
+          <p style={{color:T.text3,fontSize:13,margin:0}}>سيتم إضافة المنسقين قريباً — تابع الموقع للتحديثات</p>
         </div>
       ) : filtered.length===0 ? (
-        <div style={{...card,textAlign:"center",padding:"40px 24px",color:"#94a3b8"}}>لا توجد نتائج مطابقة للبحث</div>
+        <div style={{...card,textAlign:"center",padding:"40px 24px",color:T.text3}}>لا توجد نتائج مطابقة للبحث</div>
       ) : (
         <div style={{display:"grid",gridTemplateColumns:"repeat(auto-fill,minmax(280px,1fr))",gap:16}}>
           {filtered.map(function(c,i){
             return (
-              <div key={c.id||i} style={{background:"#fff",borderRadius:16,padding:"20px",boxShadow:"0 2px 14px rgba(0,0,0,.07)",border:"1px solid #f1f5f9",borderTop:"4px solid "+col,display:"flex",flexDirection:"column",gap:12}}>
+              <div key={c.id||i} style={{background:T.bg2,borderRadius:16,padding:"20px",boxShadow:T.shadow,border:"1px solid "+T.border2,borderTop:"4px solid "+col,display:"flex",flexDirection:"column",gap:12}}>
                 <div style={{display:"flex",alignItems:"center",gap:12}}>
-                  <div style={{width:50,height:50,borderRadius:"50%",background:col+"22",display:"flex",alignItems:"center",justifyContent:"center",flexShrink:0}}>
+                  <div style={{width:50,height:50,borderRadius:"50%",background:col+"22",border:"1px solid "+col+"50",display:"flex",alignItems:"center",justifyContent:"center",flexShrink:0}}>
                     <span style={{fontSize:20,fontWeight:800,color:col}}>{c.name.trim()[0]}</span>
                   </div>
                   <div>
-                    <div style={{fontWeight:700,fontSize:15,color:"#0f172a",lineHeight:1.3}}>{c.name}</div>
-                    <div style={{fontSize:12,color:"#64748b",marginTop:3,display:"flex",alignItems:"center",gap:5}}>
-                      <SvgIcon d={P.map} size={12} color="#94a3b8"/>
+                    <div style={{fontWeight:700,fontSize:15,color:T.text,lineHeight:1.3}}>{c.name}</div>
+                    <div style={{fontSize:12,color:T.text3,marginTop:3,display:"flex",alignItems:"center",gap:5}}>
+                      <SvgIcon d={P.map} size={12} color={T.text4}/>
                       {c.district}
                     </div>
                   </div>
                 </div>
-                <div style={{background:col+"11",borderRadius:10,padding:"8px 12px",display:"flex",alignItems:"center",gap:8}}>
+                <div style={{background:col+"14",border:"1px solid "+col+"30",borderRadius:10,padding:"8px 12px",display:"flex",alignItems:"center",gap:8}}>
                   <SvgIcon d={P.map} size={15} color={col}/>
                   <span style={{fontSize:13,color:col,fontWeight:600}}>منسق {c.district}</span>
                 </div>
                 <a href={"tel:"+c.phone} style={{textDecoration:"none"}}>
-                  <div style={{background:"#f0fdf4",border:"1px solid #86efac",borderRadius:10,padding:"10px 14px",display:"flex",alignItems:"center",justifyContent:"space-between",cursor:"pointer"}}>
-                    <span style={{fontFamily:"monospace",fontSize:15,fontWeight:700,color:"#15803d",direction:"ltr"}}>{c.phone}</span>
-                    <div style={{width:32,height:32,borderRadius:"50%",background:"#16a34a",display:"flex",alignItems:"center",justifyContent:"center"}}>
-                      <SvgIcon d={P.phone} size={16} color="#fff"/>
+                  <div style={{background:"rgba(74,222,128,.08)",border:"1px solid rgba(74,222,128,.30)",borderRadius:10,padding:"10px 14px",display:"flex",alignItems:"center",justifyContent:"space-between",cursor:"pointer"}}>
+                    <span style={{fontFamily:"monospace",fontSize:15,fontWeight:700,color:T.success,direction:"ltr"}}>{c.phone}</span>
+                    <div style={{width:32,height:32,borderRadius:"50%",background:T.success,display:"flex",alignItems:"center",justifyContent:"center"}}>
+                      <SvgIcon d={P.phone} size={16} color={T.bg0}/>
                     </div>
                   </div>
                 </a>
                 <a href={"tel:"+c.phone} style={{textDecoration:"none"}}>
-                  <button style={{...btn("#15803d","#16a34a"),width:"100%",display:"flex",alignItems:"center",justifyContent:"center",gap:8,padding:"10px"}}>
-                    <SvgIcon d={P.phone} size={16} color="#fff"/>اتصل الآن
+                  <button style={{
+                    background:"linear-gradient(135deg,"+T.success+","+T.success+"dd)",
+                    color:T.bg0,border:"none",padding:"10px",borderRadius:T.radius,
+                    fontSize:13,fontWeight:800,cursor:"pointer",
+                    boxShadow:"0 4px 14px rgba(74,222,128,.30)",
+                    transition:"transform .15s",fontFamily:T.font,
+                    width:"100%",display:"flex",alignItems:"center",justifyContent:"center",gap:8
+                  }}>
+                    <SvgIcon d={P.phone} size={16} color={T.bg0}/>اتصل الآن
                   </button>
                 </a>
               </div>
@@ -2065,7 +2092,7 @@ function DownloadButtons({data}) {
   );
 }
 
-// ── Home Page — Bauhaus Civic Engineering edition ─────────────────────
+// ── Home Page — Modern Dark Engineering ───────────────────────────────
 function HomePage({setPage, openSearch}) {
   var [stats, setStats]   = useState(null);
   var [hover,  setHover]  = useState("");
@@ -2084,90 +2111,100 @@ function HomePage({setPage, openSearch}) {
       title:"سجّل اسمك في القائمة الوطنية",
       desc:"أضف بياناتك إلى الأرشيف الرسمي لمهندسي العراق غير المعينين. التسجيل مجاني وسري ولا يستغرق سوى دقيقتين.",
       cta:"ابدأ التسجيل الآن",
-      accent:T.ink, accentBg:T.ink+"08",
     },
     {
       k:"dashboard", num:"02", icon:P.chart,
       title:"الأرقام والإحصائيات",
       desc:"اطّلع على الحجم الحقيقي للكفاءات الهندسية غير المستثمرة في العراق — موزّعة حسب المحافظة والتخصص وسنة التخرج.",
       cta:"عرض الإحصائيات",
-      accent:T.copper, accentBg:T.copper+"10",
     },
     {
       k:"coordinators", num:"03", icon:P.coord,
       title:"منسقو المحافظات",
       desc:"تواصل مع المنسق المسؤول عن محافظتك للانضمام إلى مجموعة مهندسي منطقتك ومتابعة المستجدات.",
       cta:"اعثر على منسقك",
-      accent:T.sage, accentBg:T.sage+"10",
     },
     {
       k:"about", num:"04", icon:P.voice,
       title:"رسالتنا وأهدافنا",
       desc:"تعرّف على مهمة المنصة كصوت موحّد للمهندسين العراقيين، وحلقة وصل بين الخريج وصناع القرار.",
       cta:"اقرأ عن المنصة",
-      accent:T.crimson, accentBg:T.crimson+"10",
     },
   ];
 
   var quickStats = [
-    {label:"مهندس مسجّل",            spec:"REG-01", val:total,      icon:P.users},
+    {label:"مهندس مسجّل",            spec:"REG-01",  val:total,      icon:P.users},
     {label:"بانتظار التعيين",         spec:"WAIT-02", val:unemployed, icon:P.briefcase},
     {label:"محافظة مفعّلة",           spec:"PROV-03", val:provinces,  icon:P.map},
   ];
 
   return (
-    <div style={{direction:"rtl",fontFamily:T.font,background:T.cream}}>
+    <div style={{direction:"rtl",fontFamily:T.font,background:T.bg0,color:T.text}}>
 
-      {/* ── HERO — Editorial Bauhaus Layout ── */}
+      {/* ── HERO — Dark with cyan accent ── */}
       <div style={{
         position:"relative",overflow:"hidden",
-        background:T.cream,
-        borderBottom:"1px solid "+T.border
+        background:"radial-gradient(ellipse at top right,#152340 0%,"+T.bg0+" 50%)"
       }}>
-        {/* Isometric grid backdrop */}
+        {/* Subtle iso grid */}
         <div style={{
           position:"absolute",inset:0,
           backgroundImage:ISO_GRID,backgroundSize:ISO_GRID_SIZE,
-          opacity:.6,pointerEvents:"none"
+          opacity:.8,pointerEvents:"none"
         }}/>
-        {/* Diagonal copper accent stripe (top-right) */}
+        {/* Cyan glow top-right */}
         <div style={{
-          position:"absolute",top:0,right:0,width:"40%",height:6,
-          background:"linear-gradient(90deg,transparent,"+T.copper+")",
+          position:"absolute",top:"-200px",left:"-100px",width:600,height:600,
+          background:"radial-gradient(circle,rgba(62,193,211,.10) 0%,transparent 65%)",
+          pointerEvents:"none"
+        }}/>
+        {/* Diagonal cyan accent stripe */}
+        <div style={{
+          position:"absolute",top:0,right:0,width:"40%",height:3,
+          background:"linear-gradient(90deg,transparent,"+T.cyan+")",
           pointerEvents:"none"
         }}/>
 
         <div style={{
-          maxWidth:1200,margin:"0 auto",padding:"56px 24px 72px",
+          maxWidth:1240,margin:"0 auto",padding:"64px 24px 80px",
           display:"grid",
           gridTemplateColumns:"minmax(0,1fr) auto",
-          alignItems:"center",gap:48,position:"relative"
+          alignItems:"center",gap:56,position:"relative"
         }}>
           {/* LEFT — Editorial text block */}
-          <div style={{maxWidth:680,minWidth:0,animation:"fade-up .6s ease-out"}}>
-            {/* Spec line — like a technical drawing label */}
+          <div style={{maxWidth:700,minWidth:0,animation:"fade-up .6s ease-out"}}>
+            {/* Spec line */}
             <div style={{
-              display:"flex",alignItems:"center",gap:14,marginBottom:28,
+              display:"flex",alignItems:"center",gap:14,marginBottom:30,
               fontFamily:T.fontMono,fontSize:11,color:T.text3,letterSpacing:"1.5px"
             }}>
-              <span style={{color:T.copper,fontWeight:700}}>● LIVE</span>
-              <span style={{flex:1,height:1,background:T.border}}/>
+              <span style={{
+                display:"inline-flex",alignItems:"center",gap:6,
+                color:T.cyan,fontWeight:700
+              }}>
+                <span style={{
+                  width:8,height:8,borderRadius:"50%",background:T.cyan,
+                  boxShadow:"0 0 12px "+T.cyan,animation:"pulse-cyan 2s ease-out infinite"
+                }}/>
+                LIVE
+              </span>
+              <span style={{flex:1,height:1,background:T.border2}}/>
               <span>DOC-001 / IQ-ENG-2026</span>
             </div>
 
-            {/* Big display title */}
+            {/* Big display title — Tajawal Black */}
             <h1 style={{
               fontFamily:T.fontDisp,
-              color:T.ink,
-              fontSize:"clamp(34px,6vw,68px)",
-              fontWeight:700,
+              color:T.text,
+              fontSize:"clamp(36px,6.4vw,72px)",
+              fontWeight:900,
               lineHeight:1.05,
-              letterSpacing:"-1px",
-              marginBottom:22
+              letterSpacing:"-1.5px",
+              marginBottom:24
             }}>
               المنصّة الوطنيّة <br/>
               <span style={{
-                background:"linear-gradient(135deg,"+T.copper+","+T.copperDk+")",
+                background:"linear-gradient(135deg,"+T.cyanLt+","+T.cyan+")",
                 WebkitBackgroundClip:"text",
                 WebkitTextFillColor:"transparent",
                 backgroundClip:"text"
@@ -2175,62 +2212,73 @@ function HomePage({setPage, openSearch}) {
                 لمهندسي العراق
               </span>
               <br/>
-              <span style={{fontSize:".7em",color:T.stone,fontWeight:500}}>
+              <span style={{fontSize:".62em",color:T.text3,fontWeight:500}}>
                 — غير المعيّنين —
               </span>
             </h1>
 
             <p style={{
               color:T.text2,fontSize:"clamp(15px,1.6vw,18px)",
-              lineHeight:1.9,marginBottom:14,fontWeight:400,maxWidth:560
+              lineHeight:1.9,marginBottom:18,fontWeight:400,maxWidth:580
             }}>
               صوت موحّد للكفاءات الهندسيّة الشابة في العراق. منصّة تجمع خرّيجي كليّات الهندسة الباحثين عن
-              فرص التعيين، وتعمل كحلقة وصل بين <strong style={{color:T.ink,fontWeight:700}}>المهندس</strong> و<strong style={{color:T.ink,fontWeight:700}}>صنّاع القرار</strong>.
+              فرص التعيين، وتعمل كحلقة وصل بين <strong style={{color:T.text,fontWeight:700}}>المهندس</strong> و<strong style={{color:T.text,fontWeight:700}}>صنّاع القرار</strong>.
             </p>
 
-            {/* Goal pill with copper indicator */}
+            {/* Goal pill */}
             <div style={{
               display:"flex",gap:12,alignItems:"flex-start",
-              background:T.paper,border:"1px solid "+T.border,
-              borderRight:"3px solid "+T.copper,
-              padding:"14px 16px",borderRadius:8,marginBottom:32,maxWidth:560
+              background:T.bg2,border:"1px solid "+T.border2,
+              borderRight:"3px solid "+T.cyan,
+              padding:"14px 16px",borderRadius:8,marginBottom:34,maxWidth:580
             }}>
-              <SvgIcon d={P.target} size={18} color={T.copper}/>
-              <p style={{color:T.text2,fontSize:13.5,lineHeight:1.7,margin:0,fontWeight:500}}>
-                <span style={{color:T.copper,fontWeight:700}}>الهدف:</span> أرشفة وإحصاء كفاءات الهندسة العراقيّة رسميّاً،
+              <SvgIcon d={P.target} size={18} color={T.cyan}/>
+              <p style={{color:T.text2,fontSize:13.5,lineHeight:1.75,margin:0,fontWeight:400}}>
+                <span style={{color:T.cyan,fontWeight:700}}>الهدف:</span> أرشفة وإحصاء كفاءات الهندسة العراقيّة رسميّاً،
                 لتسهيل المطالبة بالحقوق في التعيينات المركزيّة والمشاريع التنمويّة.
               </p>
             </div>
 
             {/* CTAs */}
-            <div style={{display:"flex",gap:14,flexWrap:"wrap",marginBottom:36}}>
+            <div style={{display:"flex",gap:14,flexWrap:"wrap",marginBottom:40}}>
               <button onClick={function(){setPage("register");}}
-                onMouseEnter={function(e){e.currentTarget.style.transform="translateY(-2px)";e.currentTarget.style.boxShadow="0 12px 32px rgba(184,115,51,.35)";}}
-                onMouseLeave={function(e){e.currentTarget.style.transform="none";e.currentTarget.style.boxShadow="0 6px 20px rgba(184,115,51,.25)";}}
+                onMouseEnter={function(e){
+                  e.currentTarget.style.transform="translateY(-2px)";
+                  e.currentTarget.style.boxShadow="0 14px 36px rgba(62,193,211,.45)";
+                }}
+                onMouseLeave={function(e){
+                  e.currentTarget.style.transform="none";
+                  e.currentTarget.style.boxShadow="0 8px 24px rgba(62,193,211,.35)";
+                }}
                 style={{
-                  background:"linear-gradient(135deg,"+T.copper+","+T.copperDk+")",
-                  color:"#fff",border:"none",padding:"15px 30px",borderRadius:8,
-                  fontSize:14.5,fontWeight:700,cursor:"pointer",
-                  boxShadow:"0 6px 20px rgba(184,115,51,.25)",
+                  background:"linear-gradient(135deg,"+T.cyanLt+","+T.cyan+")",
+                  color:T.bg0,border:"none",padding:"15px 30px",borderRadius:30,
+                  fontSize:14.5,fontWeight:800,cursor:"pointer",
+                  boxShadow:"0 8px 24px rgba(62,193,211,.35)",
                   display:"inline-flex",alignItems:"center",gap:10,
-                  letterSpacing:".3px",fontFamily:T.font,
+                  letterSpacing:".2px",fontFamily:T.font,
                   transition:"transform .2s, box-shadow .2s"
                 }}>
-                <SvgIcon d={P.edit} size={17} color="#fff"/>
+                <SvgIcon d={P.edit} size={17} color={T.bg0} sw={2.2}/>
                 سجّل اسمك الآن
-                <span style={{
-                  display:"inline-block",width:1,height:18,background:"rgba(255,255,255,.3)",margin:"0 4px"
-                }}/>
-                <SvgIcon d={P.arrow} size={15} color="#fff"/>
+                <SvgIcon d={P.arrow} size={15} color={T.bg0} sw={2.2}/>
               </button>
               <button onClick={openSearch}
-                onMouseEnter={function(e){e.currentTarget.style.borderColor=T.ink;e.currentTarget.style.color=T.ink;}}
-                onMouseLeave={function(e){e.currentTarget.style.borderColor=T.border2;e.currentTarget.style.color=T.text2;}}
+                onMouseEnter={function(e){
+                  e.currentTarget.style.borderColor=T.cyan;
+                  e.currentTarget.style.color=T.cyan;
+                  e.currentTarget.style.background="rgba(62,193,211,.06)";
+                }}
+                onMouseLeave={function(e){
+                  e.currentTarget.style.borderColor=T.border2;
+                  e.currentTarget.style.color=T.text2;
+                  e.currentTarget.style.background="transparent";
+                }}
                 style={{
                   background:"transparent",color:T.text2,
                   border:"1.5px solid "+T.border2,
-                  padding:"14px 26px",borderRadius:8,
-                  fontSize:14,fontWeight:600,cursor:"pointer",
+                  padding:"14px 26px",borderRadius:30,
+                  fontSize:14,fontWeight:700,cursor:"pointer",
                   display:"inline-flex",alignItems:"center",gap:10,
                   fontFamily:T.font,transition:"all .2s"
                 }}>
@@ -2239,8 +2287,8 @@ function HomePage({setPage, openSearch}) {
               </button>
             </div>
 
-            {/* Spec stats row — engineering data sheet style */}
-            <div style={{borderTop:"1px solid "+T.border,paddingTop:24}}>
+            {/* Spec stats row */}
+            <div style={{borderTop:"1px solid "+T.border,paddingTop:26}}>
               <div style={{
                 display:"grid",gridTemplateColumns:"repeat(auto-fit,minmax(140px,1fr))",
                 gap:0
@@ -2248,16 +2296,16 @@ function HomePage({setPage, openSearch}) {
                 {quickStats.map(function(s,i){
                   return (
                     <div key={s.label} style={{
-                      padding:"4px 14px 4px 0",
+                      padding:"4px 16px 4px 0",
                       borderRight:i<quickStats.length-1?"1px solid "+T.border:"none"
                     }}>
                       <div style={{
-                        fontSize:10,color:T.copper,fontFamily:T.fontMono,
-                        letterSpacing:"1.5px",marginBottom:6,fontWeight:600
+                        fontSize:10,color:T.cyan,fontFamily:T.fontMono,
+                        letterSpacing:"1.5px",marginBottom:8,fontWeight:600
                       }}>{s.spec}</div>
                       <div style={{
-                        fontSize:s.val===null?"28px":"38px",fontWeight:700,color:T.ink,
-                        lineHeight:1,marginBottom:6,fontFamily:T.fontDisp,letterSpacing:"-1px"
+                        fontSize:s.val===null?"28px":"40px",fontWeight:800,color:T.text,
+                        lineHeight:1,marginBottom:6,fontFamily:T.fontDisp,letterSpacing:"-1.5px"
                       }}>
                         {s.val===null
                           ? <span style={{display:"inline-block",width:50,height:30,background:T.bg2,borderRadius:4,opacity:.5}}/>
@@ -2272,50 +2320,54 @@ function HomePage({setPage, openSearch}) {
             </div>
           </div>
 
-          {/* RIGHT — Compass Rose with annotations (hidden on mobile) */}
+          {/* RIGHT — Compass with annotations */}
           <div className="hero-compass" style={{
             position:"relative",display:"flex",flexDirection:"column",alignItems:"center"
           }}>
             <style>{`
               @media (max-width: 900px) { .hero-compass { display: none !important; } }
               .compass-spin { animation: spin-slow 80s linear infinite; }
+              .cyan-glow {
+                filter: drop-shadow(0 0 20px rgba(62,193,211,.25)) drop-shadow(0 0 40px rgba(62,193,211,.15));
+              }
             `}</style>
-            {/* Spec callout above */}
             <div style={{
-              fontFamily:T.fontMono,fontSize:10,color:T.stone,
+              fontFamily:T.fontMono,fontSize:10,color:T.text4,
               letterSpacing:"2px",marginBottom:18,textAlign:"center"
             }}>
               IRAQI ENG. PLATFORM<br/>
-              <span style={{color:T.copper}}>EST. 2026</span>
+              <span style={{color:T.cyan}}>EST. 2026</span>
             </div>
             <div style={{position:"relative"}}>
-              {/* Outer concentric ring */}
               <div style={{
-                position:"absolute",inset:-26,
-                border:"1px dashed "+T.border2,borderRadius:"50%",opacity:.6
+                position:"absolute",inset:-30,
+                border:"1px dashed "+T.border2,borderRadius:"50%",opacity:.7
               }}/>
               <div style={{
-                position:"absolute",inset:-46,
-                border:"1px solid "+T.border,borderRadius:"50%",opacity:.4
+                position:"absolute",inset:-54,
+                border:"1px solid "+T.border,borderRadius:"50%",opacity:.5
               }}/>
-              <div className="compass-spin">
-                <CompassRose size={280} color={T.ink} accent={T.copper}/>
+              {/* Cyan ambient glow behind compass */}
+              <div style={{
+                position:"absolute",inset:0,borderRadius:"50%",
+                background:"radial-gradient(circle,rgba(62,193,211,.15),transparent 70%)",
+                pointerEvents:"none"
+              }}/>
+              <div className="compass-spin cyan-glow">
+                <CompassRose size={300} color="#c9d1e1" accent={T.cyan}/>
               </div>
-              {/* Floating iso cube */}
-              <div style={{position:"absolute",top:-14,right:-30,opacity:.7}}>
-                <IsoCube size={50} color={T.copper}/>
+              <div style={{position:"absolute",top:-14,right:-30,opacity:.8}}>
+                <IsoCube size={54} color={T.cyan}/>
               </div>
-              {/* Floating ruler/tools (left) */}
-              <div style={{position:"absolute",bottom:-10,left:-40,opacity:.6}}>
-                <DraftingTools size={86} color={T.ink} accent={T.copper}/>
+              <div style={{position:"absolute",bottom:-10,left:-40,opacity:.65}}>
+                <DraftingTools size={92} color="#c9d1e1" accent={T.cyan}/>
               </div>
             </div>
-            {/* Bottom annotation */}
             <div style={{
-              marginTop:24,padding:"8px 14px",
-              background:T.paper,border:"1px solid "+T.border,
+              marginTop:26,padding:"8px 16px",
+              background:T.bg2,border:"1px solid "+T.border2,
               borderRadius:6,fontFamily:T.fontMono,fontSize:10,color:T.text3,
-              letterSpacing:"1px"
+              letterSpacing:"1.5px"
             }}>
               ARCHITECTURAL · ENGINEERING · ARCHIVE
             </div>
@@ -2324,43 +2376,42 @@ function HomePage({setPage, openSearch}) {
       </div>
 
       {/* ── Caliper Divider ── */}
-      <div style={{maxWidth:1200,margin:"0 auto",padding:"40px 24px 0"}}>
-        <CaliperDivider color={T.copper}/>
+      <div style={{maxWidth:1240,margin:"0 auto",padding:"44px 24px 0"}}>
+        <CaliperDivider color={T.cyan}/>
       </div>
 
       {/* ── Mission strip ── */}
-      <div style={{padding:"56px 20px"}}>
+      <div style={{padding:"60px 20px"}}>
         <div style={{maxWidth:920,margin:"0 auto",textAlign:"center"}}>
-          <Eyebrow text="رسالتنا" color={T.copper}/>
+          <Eyebrow text="رسالتنا / MISSION" color={T.cyan}/>
           <p style={{
-            fontFamily:T.fontDisp,
-            color:T.ink,fontSize:"clamp(18px,2.5vw,28px)",lineHeight:1.6,
-            margin:0,fontWeight:500,letterSpacing:"-.2px"
+            color:T.text,fontSize:"clamp(18px,2.5vw,28px)",lineHeight:1.6,
+            margin:0,fontWeight:500,letterSpacing:"-.3px"
           }}>
-            تأسّست المنصّة لتكون <em style={{color:T.copper,fontStyle:"normal",fontWeight:600}}>صوتاً موحّداً</em> يعكس
-            حجم الطاقات الهندسيّة الشابة غير المستغلّة في العراق، وحلقة وصل بين <em style={{color:T.copper,fontStyle:"normal",fontWeight:600}}>الخرّيج</em> و
-            <em style={{color:T.copper,fontStyle:"normal",fontWeight:600}}>صنّاع القرار</em>.
+            تأسّست المنصّة لتكون <em style={{color:T.cyan,fontStyle:"normal",fontWeight:700}}>صوتاً موحّداً</em> يعكس
+            حجم الطاقات الهندسيّة الشابة غير المستغلّة في العراق، وحلقة وصل بين <em style={{color:T.cyan,fontStyle:"normal",fontWeight:700}}>الخرّيج</em> و
+            <em style={{color:T.cyan,fontStyle:"normal",fontWeight:700}}>صنّاع القرار</em>.
           </p>
         </div>
       </div>
 
       {/* ── Feature Cards — Spec Sheet Style ── */}
-      <div style={{maxWidth:1200,margin:"0 auto",padding:"20px 24px 40px"}}>
-        <div style={{textAlign:"center",marginBottom:44}}>
-          <Eyebrow text="الخدمات / SERVICES" color={T.copper}/>
+      <div style={{maxWidth:1240,margin:"0 auto",padding:"20px 24px 40px"}}>
+        <div style={{textAlign:"center",marginBottom:46}}>
+          <Eyebrow text="الخدمات / SERVICES" color={T.cyan}/>
           <h2 style={{
             fontFamily:T.fontDisp,
-            fontSize:"clamp(26px,4vw,40px)",fontWeight:600,color:T.ink,
-            marginBottom:12,letterSpacing:"-.5px",lineHeight:1.2
+            fontSize:"clamp(28px,4.2vw,44px)",fontWeight:900,color:T.text,
+            marginBottom:14,letterSpacing:"-.8px",lineHeight:1.15
           }}>
             كيف يمكنك المشاركة؟
           </h2>
-          <p style={{color:T.text2,fontSize:15,maxWidth:560,margin:"0 auto",lineHeight:1.8}}>
+          <p style={{color:T.text2,fontSize:15,maxWidth:560,margin:"0 auto",lineHeight:1.85}}>
             أربع خطوات تتيح لك الانضمام إلى الأرشيف الوطنيّ، ومتابعة المؤشّرات، والتواصل مع شبكة المهندسين.
           </p>
         </div>
 
-        <div style={{display:"grid",gridTemplateColumns:"repeat(auto-fit,minmax(260px,1fr))",gap:16}}>
+        <div style={{display:"grid",gridTemplateColumns:"repeat(auto-fit,minmax(260px,1fr))",gap:18}}>
           {featureCards.map(function(fc, idx){
             var isHov = hover===fc.k;
             return (
@@ -2369,57 +2420,66 @@ function HomePage({setPage, openSearch}) {
                 onMouseLeave={function(){setHover("");}}
                 onClick={function(){setPage(fc.k);}}
                 style={{
-                  background:T.paper,borderRadius:10,padding:"28px 24px 22px",
-                  boxShadow:isHov?T.shadowLg:T.shadow,
-                  border:"1px solid "+(isHov?fc.accent+"55":T.border),
-                  cursor:"pointer",transition:"all .25s cubic-bezier(.4,0,.2,1)",
-                  transform:isHov?"translateY(-4px)":"none",
+                  background:isHov ? T.bg3 : T.bg2,
+                  borderRadius:12,padding:"28px 24px 22px",
+                  boxShadow:isHov?"0 16px 48px rgba(0,0,0,.5),0 0 0 1px rgba(62,193,211,.4)":T.shadow,
+                  border:"1px solid "+(isHov?T.cyan+"66":T.border2),
+                  cursor:"pointer",transition:"all .3s cubic-bezier(.4,0,.2,1)",
+                  transform:isHov?"translateY(-6px)":"none",
                   display:"flex",flexDirection:"column",gap:16,
                   position:"relative",overflow:"hidden",
                   animation:"fade-up .5s ease-out "+(idx*80)+"ms backwards"
                 }}>
-                {/* Top spec line — number + brackets like blueprint */}
+                {/* hover-only gradient sweep */}
+                {isHov && <div style={{
+                  position:"absolute",inset:0,
+                  background:"linear-gradient(135deg,rgba(62,193,211,.06),transparent 60%)",
+                  pointerEvents:"none"
+                }}/>}
+
+                {/* Spec line top */}
                 <div style={{
                   display:"flex",justifyContent:"space-between",alignItems:"center",
-                  paddingBottom:14,borderBottom:"1px dashed "+T.border
+                  paddingBottom:14,borderBottom:"1px dashed "+T.border2,position:"relative"
                 }}>
                   <div style={{
-                    fontFamily:T.fontMono,fontSize:11,color:fc.accent,
+                    fontFamily:T.fontMono,fontSize:11,color:T.cyan,
                     letterSpacing:"1.5px",fontWeight:700
                   }}>
                     [ {fc.num} ]
                   </div>
                   <div style={{
-                    width:46,height:46,borderRadius:8,
-                    background:fc.accentBg,
-                    border:"1px solid "+fc.accent+"35",
+                    width:48,height:48,borderRadius:10,
+                    background:"linear-gradient(135deg,rgba(62,193,211,.18),rgba(62,193,211,.06))",
+                    border:"1px solid "+T.cyan+"40",
                     display:"flex",alignItems:"center",justifyContent:"center",
-                    transition:"all .25s",
-                    transform:isHov?"rotate(-6deg) scale(1.05)":"none"
+                    transition:"all .3s",
+                    transform:isHov?"rotate(-6deg) scale(1.05)":"none",
+                    boxShadow:isHov?"0 4px 16px rgba(62,193,211,.25)":"none"
                   }}>
-                    <SvgIcon d={fc.icon} size={22} color={fc.accent}/>
+                    <SvgIcon d={fc.icon} size={22} color={T.cyan}/>
                   </div>
                 </div>
 
-                <div style={{flex:1}}>
+                <div style={{flex:1,position:"relative"}}>
                   <h3 style={{
                     fontFamily:T.fontDisp,
-                    fontSize:18,fontWeight:600,color:T.ink,
-                    marginBottom:10,lineHeight:1.4,letterSpacing:"-.2px"
+                    fontSize:18,fontWeight:800,color:T.text,
+                    marginBottom:10,lineHeight:1.35,letterSpacing:"-.3px"
                   }}>{fc.title}</h3>
-                  <p style={{color:T.text2,fontSize:13.5,lineHeight:1.95,margin:0}}>{fc.desc}</p>
+                  <p style={{color:T.text2,fontSize:13.5,lineHeight:1.95,margin:0,fontWeight:400}}>{fc.desc}</p>
                 </div>
 
                 <div style={{
                   display:"flex",alignItems:"center",justifyContent:"space-between",
-                  paddingTop:14,borderTop:"1px solid "+T.border
+                  paddingTop:14,borderTop:"1px solid "+T.border2,position:"relative"
                 }}>
                   <div style={{
                     display:"inline-flex",alignItems:"center",gap:8,
-                    color:fc.accent,fontWeight:700,fontSize:13
+                    color:T.cyan,fontWeight:700,fontSize:13
                   }}>
                     {fc.cta}
-                    <SvgIcon d={P.arrow} size={14} color={fc.accent}/>
+                    <SvgIcon d={P.arrow} size={14} color={T.cyan}/>
                   </div>
                   <div style={{
                     fontFamily:T.fontMono,fontSize:10,color:T.text4,
@@ -2427,20 +2487,20 @@ function HomePage({setPage, openSearch}) {
                   }}>→ GO</div>
                 </div>
 
-                {/* Corner technical tick */}
+                {/* Corner ticks */}
                 <div style={{
                   position:"absolute",top:0,right:0,
                   width:14,height:14,
-                  borderRight:"2px solid "+fc.accent,
-                  borderTop:"2px solid "+fc.accent,
-                  opacity:isHov?1:.5,transition:"opacity .2s"
+                  borderRight:"2px solid "+T.cyan,
+                  borderTop:"2px solid "+T.cyan,
+                  opacity:isHov?1:.4,transition:"opacity .2s"
                 }}/>
                 <div style={{
                   position:"absolute",bottom:0,left:0,
                   width:14,height:14,
-                  borderLeft:"2px solid "+fc.accent,
-                  borderBottom:"2px solid "+fc.accent,
-                  opacity:isHov?1:.5,transition:"opacity .2s"
+                  borderLeft:"2px solid "+T.cyan,
+                  borderBottom:"2px solid "+T.cyan,
+                  opacity:isHov?1:.4,transition:"opacity .2s"
                 }}/>
               </div>
             );
@@ -2448,17 +2508,24 @@ function HomePage({setPage, openSearch}) {
         </div>
       </div>
 
-      {/* ── BIG NUMBER showcase — Editorial style ── */}
+      {/* ── BIG NUMBER — Editorial showcase ── */}
       <div style={{
-        background:T.paper,
+        background:T.bg1,
         borderTop:"1px solid "+T.border,
         borderBottom:"1px solid "+T.border,
-        padding:"64px 24px",position:"relative",overflow:"hidden"
+        padding:"72px 24px",position:"relative",overflow:"hidden"
       }}>
         <div style={{
           position:"absolute",inset:0,
           backgroundImage:DOT_GRID,backgroundSize:DOT_GRID_SIZE,
-          opacity:.5,pointerEvents:"none"
+          opacity:.7,pointerEvents:"none"
+        }}/>
+        {/* cyan glow */}
+        <div style={{
+          position:"absolute",right:"-100px",top:"50%",transform:"translateY(-50%)",
+          width:400,height:400,
+          background:"radial-gradient(circle,rgba(62,193,211,.12),transparent 70%)",
+          pointerEvents:"none"
         }}/>
         <div style={{maxWidth:1100,margin:"0 auto",position:"relative"}}>
           <div style={{
@@ -2467,14 +2534,14 @@ function HomePage({setPage, openSearch}) {
             gap:48,alignItems:"center"
           }}>
             <div>
-              <Eyebrow text="السجلّ الحيّ" color={T.copper} align="flex-start"/>
+              <Eyebrow text="السجلّ الحيّ / LIVE REGISTRY" color={T.cyan} align="flex-start"/>
               <h2 style={{
                 fontFamily:T.fontDisp,
-                fontSize:"clamp(28px,4vw,42px)",fontWeight:600,color:T.ink,
-                marginBottom:18,letterSpacing:"-.5px",lineHeight:1.2
+                fontSize:"clamp(28px,4vw,44px)",fontWeight:900,color:T.text,
+                marginBottom:20,letterSpacing:"-.8px",lineHeight:1.18
               }}>
                 كلّ اسم في القائمة <br/>
-                <span style={{color:T.copper}}>صوت إضافيّ</span> في الميزان.
+                <span style={{color:T.cyan}}>صوت إضافيّ</span> في الميزان.
               </h2>
               <p style={{color:T.text2,fontSize:15,lineHeight:1.95,margin:0,maxWidth:480}}>
                 كلّما زاد عدد المهندسين المسجّلين، زادت قوّة المطالبة الرسميّة بحقوقهم في التعيينات المركزيّة
@@ -2482,34 +2549,34 @@ function HomePage({setPage, openSearch}) {
               </p>
             </div>
             <div style={{textAlign:"center",position:"relative"}}>
-              {/* Big number with measurement marks */}
               <div style={{position:"relative",display:"inline-block"}}>
                 <div style={{
-                  position:"absolute",top:-12,left:0,right:0,height:8,
-                  borderTop:"1px solid "+T.copper,
-                  borderLeft:"1px solid "+T.copper,
-                  borderRight:"1px solid "+T.copper
+                  position:"absolute",top:-14,left:0,right:0,height:10,
+                  borderTop:"1px solid "+T.cyan,
+                  borderLeft:"1px solid "+T.cyan,
+                  borderRight:"1px solid "+T.cyan
                 }}/>
                 <div style={{
                   fontFamily:T.fontDisp,
-                  fontSize:"clamp(72px,18vw,180px)",fontWeight:700,
-                  color:T.ink,lineHeight:.95,letterSpacing:"-4px",
-                  background:"linear-gradient(180deg,"+T.ink+" 0%,"+T.copper+" 100%)",
+                  fontSize:"clamp(80px,18vw,200px)",fontWeight:900,
+                  color:T.text,lineHeight:.95,letterSpacing:"-6px",
+                  background:"linear-gradient(180deg,"+T.text+" 0%,"+T.cyan+" 100%)",
                   WebkitBackgroundClip:"text",
                   WebkitTextFillColor:"transparent",
-                  backgroundClip:"text"
+                  backgroundClip:"text",
+                  textShadow:"0 0 60px rgba(62,193,211,.25)"
                 }}>
                   {total===null ? "—" : total.toLocaleString("en-US")}
                 </div>
                 <div style={{
-                  position:"absolute",bottom:-12,left:0,right:0,height:8,
-                  borderBottom:"1px solid "+T.copper,
-                  borderLeft:"1px solid "+T.copper,
-                  borderRight:"1px solid "+T.copper
+                  position:"absolute",bottom:-14,left:0,right:0,height:10,
+                  borderBottom:"1px solid "+T.cyan,
+                  borderLeft:"1px solid "+T.cyan,
+                  borderRight:"1px solid "+T.cyan
                 }}/>
               </div>
               <div style={{
-                marginTop:24,fontFamily:T.fontMono,fontSize:12,
+                marginTop:28,fontFamily:T.fontMono,fontSize:12,
                 color:T.text3,letterSpacing:"3px",fontWeight:600
               }}>
                 مهندس مسجّل · LIVE COUNT
@@ -2519,49 +2586,49 @@ function HomePage({setPage, openSearch}) {
         </div>
       </div>
 
-      {/* ── Three Pillars — Bauhaus geometry ── */}
-      <div style={{padding:"72px 24px",background:T.cream}}>
+      {/* ── Three Pillars ── */}
+      <div style={{padding:"80px 24px",background:T.bg0}}>
         <div style={{maxWidth:1100,margin:"0 auto"}}>
-          <div style={{textAlign:"center",marginBottom:50}}>
-            <Eyebrow text="ثلاثة التزامات" color={T.copper}/>
+          <div style={{textAlign:"center",marginBottom:52}}>
+            <Eyebrow text="ثلاثة التزامات / 3 PILLARS" color={T.cyan}/>
             <h2 style={{
               fontFamily:T.fontDisp,
-              fontSize:"clamp(24px,3.5vw,36px)",fontWeight:600,color:T.ink,
-              margin:0,letterSpacing:"-.4px",lineHeight:1.3
+              fontSize:"clamp(26px,3.8vw,38px)",fontWeight:900,color:T.text,
+              margin:0,letterSpacing:"-.7px",lineHeight:1.25
             }}>
               لماذا تختار هذه المنصّة؟
             </h2>
           </div>
           <div style={{display:"grid",gridTemplateColumns:"repeat(auto-fit,minmax(260px,1fr))",gap:18}}>
             {[
-              {icon:P.shieldCheck, num:"I",   title:"بياناتك في أمان",  text:"تُخزَّن المعلومات على خوادم مشفّرة بمعايير دوليّة. رقم هاتفك لا يظهر للعموم أبداً.",color:T.sage},
-              {icon:P.voice,       num:"II",  title:"صوت موحّد",       text:"كلّما زاد عدد المسجّلين، زادت قوّة المطالبة بحقوق المهندسين أمام صنّاع القرار.",color:T.copper},
-              {icon:P.flag,        num:"III", title:"مستقلّة 100٪",    text:"المنصّة غير حكوميّة وغير حزبيّة — تخدم المهندس العراقيّ حصراً بلا أيّ ارتباطات.",color:T.crimson},
+              {icon:P.shieldCheck, num:"I",   title:"بياناتك في أمان",  text:"تُخزَّن المعلومات على خوادم مشفّرة بمعايير دوليّة. رقم هاتفك لا يظهر للعموم أبداً."},
+              {icon:P.voice,       num:"II",  title:"صوت موحّد",       text:"كلّما زاد عدد المسجّلين، زادت قوّة المطالبة بحقوق المهندسين أمام صنّاع القرار."},
+              {icon:P.flag,        num:"III", title:"مستقلّة 100٪",    text:"المنصّة غير حكوميّة وغير حزبيّة — تخدم المهندس العراقيّ حصراً بلا أيّ ارتباطات."},
             ].map(function(item){return(
               <div key={item.title} style={{
-                background:T.paper,borderRadius:10,padding:"28px 24px",
-                border:"1px solid "+T.border,
+                background:T.bg2,borderRadius:12,padding:"30px 26px",
+                border:"1px solid "+T.border2,
                 position:"relative",overflow:"hidden"
               }}>
-                {/* Roman numeral in corner */}
+                {/* Roman numeral background */}
                 <div style={{
-                  position:"absolute",top:14,left:18,
-                  fontFamily:T.fontDisp,fontSize:46,fontWeight:700,
-                  color:item.color,opacity:.10,lineHeight:1,letterSpacing:"-2px"
+                  position:"absolute",top:10,left:18,
+                  fontFamily:T.fontDisp,fontSize:54,fontWeight:900,
+                  color:T.cyan,opacity:.10,lineHeight:1,letterSpacing:"-3px"
                 }}>{item.num}</div>
                 <div style={{position:"relative"}}>
                   <div style={{
-                    width:46,height:46,borderRadius:8,
-                    background:item.color+"12",
-                    border:"1px solid "+item.color+"30",
-                    display:"flex",alignItems:"center",justifyContent:"center",marginBottom:18
+                    width:50,height:50,borderRadius:10,
+                    background:"linear-gradient(135deg,rgba(62,193,211,.18),rgba(62,193,211,.06))",
+                    border:"1px solid "+T.cyan+"40",
+                    display:"flex",alignItems:"center",justifyContent:"center",marginBottom:20
                   }}>
-                    <SvgIcon d={item.icon} size={22} color={item.color}/>
+                    <SvgIcon d={item.icon} size={24} color={T.cyan}/>
                   </div>
                   <h4 style={{
                     fontFamily:T.fontDisp,
-                    fontSize:18,fontWeight:600,marginBottom:10,color:T.ink,
-                    letterSpacing:"-.2px"
+                    fontSize:18,fontWeight:800,marginBottom:12,color:T.text,
+                    letterSpacing:"-.3px"
                   }}>{item.title}</h4>
                   <p style={{color:T.text2,fontSize:13.5,lineHeight:1.95,margin:0}}>{item.text}</p>
                 </div>
@@ -2571,57 +2638,70 @@ function HomePage({setPage, openSearch}) {
         </div>
       </div>
 
-      {/* ── Final CTA — Architectural plate ── */}
+      {/* ── Final CTA ── */}
       <div style={{
-        background:"linear-gradient(135deg,"+T.ink+" 0%,"+T.ink2+" 100%)",
-        padding:"72px 24px",textAlign:"center",position:"relative",overflow:"hidden"
+        background:"linear-gradient(135deg,"+T.bg1+" 0%,"+T.bg2+" 100%)",
+        padding:"80px 24px",textAlign:"center",position:"relative",overflow:"hidden",
+        borderTop:"1px solid "+T.border
       }}>
         <div style={{
           position:"absolute",inset:0,
-          backgroundImage:BLUEPRINT_BG,backgroundSize:BLUEPRINT_SIZE,opacity:.5,pointerEvents:"none"
+          backgroundImage:BLUEPRINT_BG,backgroundSize:BLUEPRINT_SIZE,opacity:.6,pointerEvents:"none"
         }}/>
-        {/* Copper accent corners */}
-        <div style={{position:"absolute",top:24,right:24,width:28,height:28,borderTop:"2px solid "+T.copper,borderRight:"2px solid "+T.copper,opacity:.6}}/>
-        <div style={{position:"absolute",bottom:24,left:24,width:28,height:28,borderBottom:"2px solid "+T.copper,borderLeft:"2px solid "+T.copper,opacity:.6}}/>
+        {/* Cyan ambient glow */}
+        <div style={{
+          position:"absolute",inset:0,
+          background:"radial-gradient(ellipse at center,rgba(62,193,211,.10),transparent 60%)",
+          pointerEvents:"none"
+        }}/>
+        {/* Corner ticks */}
+        <div style={{position:"absolute",top:28,right:28,width:32,height:32,borderTop:"2px solid "+T.cyan,borderRight:"2px solid "+T.cyan,opacity:.5}}/>
+        <div style={{position:"absolute",bottom:28,left:28,width:32,height:32,borderBottom:"2px solid "+T.cyan,borderLeft:"2px solid "+T.cyan,opacity:.5}}/>
 
-        <div style={{maxWidth:780,margin:"0 auto",position:"relative"}}>
+        <div style={{maxWidth:820,margin:"0 auto",position:"relative"}}>
           <div style={{
             display:"inline-flex",alignItems:"center",gap:10,
-            fontFamily:T.fontMono,fontSize:11,color:T.copperLt,
-            letterSpacing:"2px",marginBottom:18,fontWeight:600
+            fontFamily:T.fontMono,fontSize:11,color:T.cyan,
+            letterSpacing:"2px",marginBottom:20,fontWeight:600
           }}>
-            <span style={{width:30,height:1,background:T.copper}}/>
+            <span style={{width:34,height:1,background:T.cyan}}/>
             انضمّ إلى الميثاق
-            <span style={{width:30,height:1,background:T.copper}}/>
+            <span style={{width:34,height:1,background:T.cyan}}/>
           </div>
           <h2 style={{
             fontFamily:T.fontDisp,
-            color:"#fff",fontSize:"clamp(28px,4.5vw,46px)",fontWeight:600,
-            marginBottom:18,letterSpacing:"-.5px",lineHeight:1.2
+            color:T.text,fontSize:"clamp(30px,4.8vw,52px)",fontWeight:900,
+            marginBottom:20,letterSpacing:"-.8px",lineHeight:1.18
           }}>
             اجعل صوتك مسموعاً.
           </h2>
           <p style={{
-            color:"#cbd5e1",fontSize:16,lineHeight:1.95,marginBottom:32,
-            maxWidth:560,margin:"0 auto 32px"
+            color:T.text2,fontSize:16,lineHeight:1.95,marginBottom:36,
+            maxWidth:580,margin:"0 auto 36px"
           }}>
             انضمّ إلى المهندسين العراقيين الذين سجّلوا أسماءهم في القائمة الوطنيّة،
             وكن جزءاً من الصوت الجماعيّ الذي يطالب بحقوق التعيين.
           </p>
           <button onClick={function(){setPage("register");}}
-            onMouseEnter={function(e){e.currentTarget.style.transform="translateY(-2px)";}}
-            onMouseLeave={function(e){e.currentTarget.style.transform="none";}}
+            onMouseEnter={function(e){
+              e.currentTarget.style.transform="translateY(-2px)";
+              e.currentTarget.style.boxShadow="0 18px 48px rgba(62,193,211,.55)";
+            }}
+            onMouseLeave={function(e){
+              e.currentTarget.style.transform="none";
+              e.currentTarget.style.boxShadow="0 12px 36px rgba(62,193,211,.40)";
+            }}
             style={{
-              background:"linear-gradient(135deg,"+T.copper+","+T.copperDk+")",
-              color:"#fff",border:"none",padding:"16px 40px",borderRadius:8,
-              fontSize:15,fontWeight:700,cursor:"pointer",
-              boxShadow:"0 12px 32px rgba(184,115,51,.40)",
+              background:"linear-gradient(135deg,"+T.cyanLt+","+T.cyan+")",
+              color:T.bg0,border:"none",padding:"17px 42px",borderRadius:32,
+              fontSize:16,fontWeight:800,cursor:"pointer",
+              boxShadow:"0 12px 36px rgba(62,193,211,.40)",
               display:"inline-flex",alignItems:"center",gap:12,
-              letterSpacing:".3px",fontFamily:T.font,transition:"transform .2s"
+              letterSpacing:".2px",fontFamily:T.font,transition:"all .25s"
             }}>
-            <SvgIcon d={P.edit} size={18} color="#fff"/>
+            <SvgIcon d={P.edit} size={18} color={T.bg0} sw={2.2}/>
             سجّل اسمك الآن — مجّاناً
-            <SvgIcon d={P.arrow} size={15} color="#fff"/>
+            <SvgIcon d={P.arrow} size={16} color={T.bg0} sw={2.2}/>
           </button>
         </div>
       </div>
@@ -2648,44 +2728,44 @@ export default function App() {
   return (
     <div style={{fontFamily:T.font,minHeight:"100vh",background:T.bg,color:T.text,direction:"rtl"}}>
       <nav style={{
-        background:T.ink,
+        background:T.bg1,
         padding:"11px 24px",
         display:"flex",alignItems:"center",justifyContent:"space-between",
-        boxShadow:"0 1px 0 rgba(184,115,51,.18), 0 4px 20px rgba(0,0,0,.20)",
+        boxShadow:"0 1px 0 rgba(62,193,211,.18), 0 4px 20px rgba(0,0,0,.40)",
         flexWrap:"wrap",gap:4,
-        borderBottom:"1px solid rgba(184,115,51,.20)",
+        borderBottom:"1px solid "+T.border2,
         position:"relative"
       }}>
         {/* Logo — click to go home */}
         <div onClick={function(){setPage("home");}} style={{
-          color:"#fff",fontSize:15,fontWeight:700,padding:"4px 0",
+          color:T.text,fontSize:15,fontWeight:700,padding:"4px 0",
           display:"flex",alignItems:"center",gap:12,cursor:"pointer",userSelect:"none"
         }}>
           <div style={{
             width:42,height:42,borderRadius:8,
-            background:"linear-gradient(135deg,rgba(184,115,51,.28),rgba(184,115,51,.08))",
-            border:"1px solid rgba(184,115,51,.45)",
+            background:"linear-gradient(135deg,rgba(62,193,211,.22),rgba(62,193,211,.06))",
+            border:"1px solid rgba(62,193,211,.45)",
             display:"flex",alignItems:"center",justifyContent:"center",
-            boxShadow:"inset 0 1px 0 rgba(255,255,255,.08)"
+            boxShadow:"inset 0 1px 0 rgba(255,255,255,.06)"
           }}>
-            <SvgIcon d={P.compass} size={22} color={T.copperLt} sw={1.7}/>
+            <SvgIcon d={P.compass} size={22} color={T.cyan} sw={1.7}/>
           </div>
           <span style={{display:"flex",flexDirection:"column",lineHeight:1.25}}>
             <span style={{
               fontFamily:T.fontDisp,
-              fontSize:14.5,fontWeight:600,letterSpacing:"0",color:"#fff"
+              fontSize:14.5,fontWeight:800,letterSpacing:"0",color:T.text
             }}>منصّة مهندسي العراق</span>
             <span style={{
               fontFamily:T.fontMono,
-              fontSize:9.5,color:T.copperLt,fontWeight:500,letterSpacing:"1.5px"
+              fontSize:9.5,color:T.cyan,fontWeight:500,letterSpacing:"1.5px"
             }}>
               IRAQI · ENG · PLATFORM
             </span>
           </span>
           <span style={{
-            fontSize:9,background:"rgba(74,124,116,.20)",color:"#86c8b9",
+            fontSize:9,background:"rgba(74,222,128,.16)",color:T.success,
             padding:"3px 9px",borderRadius:4,fontWeight:700,letterSpacing:"1.5px",
-            border:"1px solid rgba(74,124,116,.35)",fontFamily:T.fontMono
+            border:"1px solid rgba(74,222,128,.35)",fontFamily:T.fontMono
           }}>● LIVE</span>
         </div>
 
@@ -2693,22 +2773,22 @@ export default function App() {
           {navItems.map(function(n){
             return (
               <button key={n.k} style={{...navBtn(page===n.k),display:"flex",alignItems:"center",gap:6,fontSize:12}} onClick={function(){setPage(n.k);}}>
-                <SvgIcon d={n.icon} size={13} color={page===n.k?T.copperLt:"rgba(255,255,255,.55)"}/>{n.l}
+                <SvgIcon d={n.icon} size={13} color={page===n.k?T.cyan:T.text3}/>{n.l}
               </button>
             );
           })}
           <button onClick={function(){setSearch(true);}}
-            onMouseEnter={function(e){e.currentTarget.style.background="rgba(184,115,51,.25)";}}
-            onMouseLeave={function(e){e.currentTarget.style.background="linear-gradient(135deg,rgba(184,115,51,.2),rgba(184,115,51,.08))";}}
+            onMouseEnter={function(e){e.currentTarget.style.background="rgba(62,193,211,.25)";}}
+            onMouseLeave={function(e){e.currentTarget.style.background="linear-gradient(135deg,rgba(62,193,211,.20),rgba(62,193,211,.06))";}}
             style={{
-              background:"linear-gradient(135deg,rgba(184,115,51,.2),rgba(184,115,51,.08))",
-              border:"1px solid rgba(184,115,51,.5)",color:T.copperLt,
+              background:"linear-gradient(135deg,rgba(62,193,211,.20),rgba(62,193,211,.06))",
+              border:"1px solid rgba(62,193,211,.50)",color:T.cyan,
               padding:"8px 14px",borderRadius:6,cursor:"pointer",
               fontSize:12,fontWeight:700,marginRight:6,
               display:"flex",alignItems:"center",gap:6,fontFamily:T.font,
               transition:"background .2s"
             }}>
-            <SvgIcon d={P.search} size={13} color={T.copperLt}/>
+            <SvgIcon d={P.search} size={13} color={T.cyan}/>
             تحقّق من تسجيلك
           </button>
         </div>
@@ -2727,59 +2807,59 @@ export default function App() {
       {showSearch && <SearchModal onClose={function(){setSearch(false);}}/>}
 
       <footer style={{
-        background:T.ink,
-        color:"#cbd5e1",padding:"56px 24px 24px",marginTop:0,
+        background:"linear-gradient(180deg,"+T.bg1+","+T.bg0+")",
+        color:T.text2,padding:"56px 24px 24px",marginTop:0,
         position:"relative",overflow:"hidden",
-        borderTop:"1px solid rgba(184,115,51,.2)"
+        borderTop:"1px solid "+T.border2
       }}>
         {/* subtle iso grid */}
         <div style={{
           position:"absolute",inset:0,
           backgroundImage:BLUEPRINT_BG,backgroundSize:BLUEPRINT_SIZE,
-          opacity:.35,pointerEvents:"none"
+          opacity:.4,pointerEvents:"none"
         }}/>
         <div style={{maxWidth:1200,margin:"0 auto",position:"relative"}}>
           {/* Top: caliper divider */}
           <div style={{marginBottom:36,opacity:.5}}>
-            <CaliperDivider color={T.copperLt}/>
+            <CaliperDivider color={T.cyan}/>
           </div>
 
           <div style={{
             display:"grid",gridTemplateColumns:"2fr 1fr 1.5fr",
             gap:48,marginBottom:36,paddingBottom:32,
-            borderBottom:"1px solid rgba(255,255,255,.08)"
+            borderBottom:"1px solid "+T.border2
           }}>
             {/* Brand */}
             <div style={{minWidth:0}}>
               <div style={{display:"flex",alignItems:"center",gap:12,marginBottom:16}}>
                 <div style={{
                   width:44,height:44,borderRadius:8,
-                  background:"rgba(184,115,51,.18)",
-                  border:"1px solid rgba(184,115,51,.4)",
+                  background:"rgba(62,193,211,.18)",
+                  border:"1px solid rgba(62,193,211,.45)",
                   display:"flex",alignItems:"center",justifyContent:"center"
                 }}>
-                  <SvgIcon d={P.compass} size={22} color={T.copperLt}/>
+                  <SvgIcon d={P.compass} size={22} color={T.cyan}/>
                 </div>
                 <div>
                   <div style={{
-                    color:"#fff",fontFamily:T.fontDisp,
-                    fontWeight:600,fontSize:16,letterSpacing:"-.2px"
+                    color:T.text,fontFamily:T.fontDisp,
+                    fontWeight:800,fontSize:16,letterSpacing:"-.2px"
                   }}>منصّة مهندسي العراق</div>
                   <div style={{
-                    color:T.copperLt,fontSize:10,fontFamily:T.fontMono,
+                    color:T.cyan,fontSize:10,fontFamily:T.fontMono,
                     letterSpacing:"1.5px",marginTop:2
                   }}>IRAQI · ENG · PLATFORM</div>
                 </div>
               </div>
-              <p style={{fontSize:13,lineHeight:2,color:"#94a3b8",margin:"0 0 14px",maxWidth:380}}>
+              <p style={{fontSize:13,lineHeight:2,color:T.text3,margin:"0 0 14px",maxWidth:380}}>
                 صوت موحّد للكفاءات الهندسيّة العراقيّة الباحثة عن فرص التعيين
                 والمشاركة في بناء الوطن.
               </p>
               <div style={{
                 display:"inline-flex",alignItems:"center",gap:8,
-                fontFamily:T.fontMono,fontSize:10,color:T.copperLt,
+                fontFamily:T.fontMono,fontSize:10,color:T.cyan,
                 letterSpacing:"1.5px",padding:"5px 10px",
-                background:"rgba(184,115,51,.1)",border:"1px solid rgba(184,115,51,.3)",
+                background:"rgba(62,193,211,.10)",border:"1px solid rgba(62,193,211,.30)",
                 borderRadius:4
               }}>
                 ● EST. 2026 · IRAQ
@@ -2788,35 +2868,35 @@ export default function App() {
             {/* Links */}
             <div>
               <h5 style={{
-                color:T.copperLt,fontSize:11,fontWeight:700,letterSpacing:"2px",
+                color:T.cyan,fontSize:11,fontWeight:700,letterSpacing:"2px",
                 marginBottom:16,textTransform:"uppercase",fontFamily:T.fontMono
               }}>الأقسام</h5>
               <div style={{display:"flex",flexDirection:"column",gap:10}}>
-                <span style={{cursor:"pointer",fontSize:13,color:"#cbd5e1",transition:"color .2s"}}
+                <span style={{cursor:"pointer",fontSize:13,color:T.text2,transition:"color .2s"}}
                   onClick={function(){setPage("about");}}
-                  onMouseEnter={function(e){e.currentTarget.style.color="#fff";}}
-                  onMouseLeave={function(e){e.currentTarget.style.color="#cbd5e1";}}>→ عن المنصّة</span>
-                <span style={{cursor:"pointer",fontSize:13,color:"#cbd5e1",transition:"color .2s"}}
+                  onMouseEnter={function(e){e.currentTarget.style.color=T.cyan;}}
+                  onMouseLeave={function(e){e.currentTarget.style.color=T.text2;}}>→ عن المنصّة</span>
+                <span style={{cursor:"pointer",fontSize:13,color:T.text2,transition:"color .2s"}}
                   onClick={function(){setPage("privacy");}}
-                  onMouseEnter={function(e){e.currentTarget.style.color="#fff";}}
-                  onMouseLeave={function(e){e.currentTarget.style.color="#cbd5e1";}}>→ سياسة الخصوصيّة</span>
-                <span style={{cursor:"pointer",fontSize:13,color:"#cbd5e1",transition:"color .2s"}}
+                  onMouseEnter={function(e){e.currentTarget.style.color=T.cyan;}}
+                  onMouseLeave={function(e){e.currentTarget.style.color=T.text2;}}>→ سياسة الخصوصيّة</span>
+                <span style={{cursor:"pointer",fontSize:13,color:T.text2,transition:"color .2s"}}
                   onClick={function(){setPage("coordinators");}}
-                  onMouseEnter={function(e){e.currentTarget.style.color="#fff";}}
-                  onMouseLeave={function(e){e.currentTarget.style.color="#cbd5e1";}}>→ المنسّقون</span>
-                <span style={{cursor:"pointer",fontSize:13,color:"#cbd5e1",transition:"color .2s"}}
+                  onMouseEnter={function(e){e.currentTarget.style.color=T.cyan;}}
+                  onMouseLeave={function(e){e.currentTarget.style.color=T.text2;}}>→ المنسّقون</span>
+                <span style={{cursor:"pointer",fontSize:13,color:T.text2,transition:"color .2s"}}
                   onClick={function(){setPage("dashboard");}}
-                  onMouseEnter={function(e){e.currentTarget.style.color="#fff";}}
-                  onMouseLeave={function(e){e.currentTarget.style.color="#cbd5e1";}}>→ الإحصائيّات</span>
+                  onMouseEnter={function(e){e.currentTarget.style.color=T.cyan;}}
+                  onMouseLeave={function(e){e.currentTarget.style.color=T.text2;}}>→ الإحصائيّات</span>
               </div>
             </div>
             {/* Mission */}
             <div>
               <h5 style={{
-                color:T.copperLt,fontSize:11,fontWeight:700,letterSpacing:"2px",
+                color:T.cyan,fontSize:11,fontWeight:700,letterSpacing:"2px",
                 marginBottom:16,textTransform:"uppercase",fontFamily:T.fontMono
               }}>هدفنا</h5>
-              <p style={{fontSize:13,lineHeight:2,color:"#94a3b8",margin:0}}>
+              <p style={{fontSize:13,lineHeight:2,color:T.text3,margin:0}}>
                 أرشفة وإحصاء كفاءات الهندسة العراقيّة رسميّاً، لتسهيل المطالبة
                 بحقوقهم في التعيينات المركزيّة والمشاريع التنمويّة.
               </p>
@@ -2824,7 +2904,7 @@ export default function App() {
           </div>
           <div style={{
             display:"flex",justifyContent:"space-between",alignItems:"center",
-            flexWrap:"wrap",gap:14,fontSize:11,color:"#64748b"
+            flexWrap:"wrap",gap:14,fontSize:11,color:T.text4
           }}>
             <span style={{fontFamily:T.font}}>
               المنصّة الوطنيّة لمهندسي العراق غير المعيّنين &copy; {CUR_YEAR}
@@ -2833,9 +2913,9 @@ export default function App() {
             </span>
             <span style={{
               fontFamily:T.fontMono,letterSpacing:"1.5px",
-              padding:"3px 8px",border:"1px solid rgba(184,115,51,.3)",
-              borderRadius:4,color:T.copperLt
-            }}>v3.0 · CIVIC ENGINEERING</span>
+              padding:"3px 8px",border:"1px solid rgba(62,193,211,.30)",
+              borderRadius:4,color:T.cyan
+            }}>v4.0 · DARK ENGINEERING</span>
           </div>
         </div>
       </footer>

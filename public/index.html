@@ -12,7 +12,7 @@
     <meta name="author"      content="المنصة الوطنية لمهندسي العراق غير المعينين" />
     <meta name="robots"      content="index, follow" />
     <meta name="language"    content="Arabic" />
-    <meta name="theme-color" content="#0a2540" />
+    <meta name="theme-color" content="#0a1220" />
     <link rel="canonical"    href="https://iraq-graduates.vercel.app/" />
 
     <!-- ── Open Graph / Facebook ─────────────────────────────────────── -->
@@ -61,29 +61,36 @@
     }
     </script>
 
-    <!-- ── Google Fonts: Reem Kufi (display) + Tajawal (body) + JetBrains Mono ── -->
+    <!-- ── Google Fonts: Tajawal (full weights) + JetBrains Mono ── -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Reem+Kufi+Fun:wght@400;500;600;700&family=Tajawal:wght@300;400;500;700;800;900&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@200;300;400;500;700;800;900&family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
 
     <style>
       * { margin: 0; padding: 0; box-sizing: border-box; }
       body {
-        background: #f6f1e8;
-        color: #0a0a0a;
+        background: #0a1220;
+        color: #e6edf5;
         font-family: 'Tajawal','Segoe UI',Tahoma,Arial,sans-serif;
         -webkit-font-smoothing: antialiased;
         -moz-osx-font-smoothing: grayscale;
         font-feature-settings: "kern" 1, "liga" 1;
       }
-      #root { min-height: 100vh; }
+      #root { min-height: 100vh; background: #0a1220; }
       .seo-h1 { position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0,0,0,0);white-space:nowrap; }
-      html { scroll-behavior: smooth; }
-      ::selection { background: rgba(184,115,51,.30); color: #0e1a3a; }
-      /* Engineering grid overlay class */
+      html { scroll-behavior: smooth; background: #0a1220; }
+      ::selection { background: rgba(62,193,211,.28); color: #ffffff; }
+      /* Custom scrollbar */
+      ::-webkit-scrollbar { width: 10px; height: 10px; }
+      ::-webkit-scrollbar-track { background: #0a1220; }
+      ::-webkit-scrollbar-thumb { background: #1f2c47; border-radius: 6px; }
+      ::-webkit-scrollbar-thumb:hover { background: #2a3956; }
+      /* Engineering animation keyframes */
       @keyframes spin-slow { from{transform:rotate(0)} to{transform:rotate(360deg)} }
       @keyframes fade-up { from{opacity:0;transform:translateY(14px)} to{opacity:1;transform:none} }
-      @keyframes draw-line { from{stroke-dashoffset:1000} to{stroke-dashoffset:0} }
+      @keyframes fade-in { from{opacity:0} to{opacity:1} }
+      @keyframes pulse-cyan { 0%,100%{box-shadow:0 0 0 0 rgba(62,193,211,.4)} 50%{box-shadow:0 0 0 12px rgba(62,193,211,0)} }
+      @keyframes shimmer { 0%{background-position:-1000px 0} 100%{background-position:1000px 0} }
     </style>
   </head>
   <body>
